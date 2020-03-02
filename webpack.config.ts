@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
@@ -15,7 +15,10 @@ module.exports = {
     port: 4200
   },
   plugins: [
-    new CleanWebpackPlugin(['dist']),
+    new webpack.ProvidePlugin({
+      PIXI: "pixi.js"
+    }),
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'Development'
     }),
@@ -30,6 +33,10 @@ module.exports = {
         use: 'awesome-typescript-loader'
       },
       {
+          test: /\.scss$/,
+          use: ['style-loader', 'css-loader', 'sass-loader']
+      },
+      {
         test: /\.(png|svg|jpg|gif)$/,
         use: 'file-loader'
       }
@@ -38,10 +45,10 @@ module.exports = {
   resolve: {
     plugins: [
       new TsconfigPathsPlugin({
-        /*configFile: "./path/to/tsconfig.json" */
-      })
+        configFile: "./tsconfig.json"
+      }),
     ],
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js', "*"]
   },
   output: {
     filename: '[name].bundle.js',

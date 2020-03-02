@@ -1,44 +1,27 @@
-import { Application, loader } from 'pixi.js';
-import { Character } from '@app/character.class';
-class Game {
-  private app: Application;
-  constructor() {
-    // instantiate app
-    this.app = new Application({
-      width: 800,
-      height: 600,
-      backgroundColor: 0x1099bb // light blue
-    });
+import { Application } from 'pixi.js';
 
-    // create view in DOM
-    document.body.appendChild(this.app.view);
+import "./app.scss";
 
-    // preload needed assets
-    loader.add('samir', '/assets/img/hero.png');
+import { Game } from 'Game';
+import AssetManager from "AssetManager";
+import CONFIG from 'constants/config';
 
-    // then launch app
-    loader.load(this.setup.bind(this));
-  }
+// Instantiate app
+const app = new Application({
+    width: CONFIG.WINDOW_WIDTH,
+    height: CONFIG.WINDOW_HEIGHT,
+    backgroundColor: CONFIG.BACKGROUND_COLOUR,
+});
 
-  setup(): void {
-    // append hero
-    const hero = new Character(loader.resources['samir'].texture);
-    const heroSprite = hero.sprite;
-    this.app.stage.addChild(heroSprite);
-    heroSprite.y = 300;
+// create view in DOM
+document.body.appendChild(app.view);
 
-    //  animate hero
-    let moveLeft = true;
-    this.app.ticker.add(() => {
-      const speed = 2;
-      if (heroSprite.x < this.app.view.width && moveLeft) {
-        heroSprite.x += speed;
-      } else {
-        heroSprite.x -= speed;
-        moveLeft = heroSprite.x <= 0;
-      }
-    });
-  }
-}
+//Create game
+const game = new Game(app);
 
-new Game();
+// Load Assets
+AssetManager.onLoadComplete(() => {
+    // set up ticker
+    app.ticker.add(game.update.bind(game));
+    game.setup();
+});
