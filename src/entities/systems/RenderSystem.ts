@@ -1,5 +1,3 @@
-import { Sprite, Point } from 'pixi.js';
-
 import AssetManager from "AssetManager";
 import { SYSTEM, System } from '.';
 import Entity from 'entities/Entity';
@@ -9,7 +7,7 @@ export default class RenderSystem extends System {
     id = SYSTEM.RENDER_SYSTEM;
 
     spriteUrl: string;
-    sprite: Sprite;
+    sprite: PIXI.Sprite;
 
     constructor(spriteUrl: string) {
         super();
@@ -21,8 +19,8 @@ export default class RenderSystem extends System {
 
         const app = entity.game.getApp();
 
-        const texture = AssetManager.loader.resources[this.spriteUrl].texture;
-        this.sprite = new Sprite(texture);
+        const texture = AssetManager.getTexture(this.spriteUrl);
+        this.sprite = new PIXI.Sprite(texture);
         app.stage.addChild(this.sprite);
         this.sprite.parentGroup = LAYERS.ENTITIES;
 
@@ -34,6 +32,6 @@ export default class RenderSystem extends System {
         super.postUpdate(delta);
 
         // Sync postition
-        this.sprite.position = new Point(this.entity.position.x, this.entity.position.y);
+        this.sprite.position = new PIXI.Point(this.entity.position.x, this.entity.position.y);
     }
 }

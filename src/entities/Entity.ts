@@ -1,4 +1,3 @@
-import { Sprite } from 'pixi.js';
 import { v1 as uuid } from 'uuid';
 
 import { Game } from 'Game';
@@ -8,7 +7,7 @@ import { SYSTEM, System } from 'entities/systems';
 export default class Entity {
     game: Game;
     id: string;
-    sprite: Sprite;
+    sprite: PIXI.Sprite;
     position: Vector;
 
     systems: Map<SYSTEM, System>

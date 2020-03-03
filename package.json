@@ -25,6 +25,7 @@
   ],
   "dependencies": {
     "easystarjs": "^0.4.3",
+    "pixi-inspector": "^1.0.7",
     "pixi-layers": "^0.2.3",
     "pixi-tilemap": "^2.0.3",
     "pixi.js": "^5.1.5",

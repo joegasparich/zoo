@@ -1,5 +1,3 @@
-import { Application } from "pixi.js";
-
 import { SPRITES } from "constants/assets";
 
 import Entity from "entities/Entity";
@@ -8,14 +6,15 @@ import { PhysicsSystem, RenderSystem } from "entities/systems";
 import Actor from "entities/Actor";
 import Vector from "types/vector";
 import PlayerInputSystem from "entities/systems/PlayerInputSystem";
-import Grid from "Grid";
+import MapGrid from "MapGrid";
 import LAYERS from "constants/LAYERS";
+import Debug from "Debug";
 
 export class Game {
-    private app: Application;
+    private app: PIXI.Application;
     public stage: PIXI.display.Stage;
 
-    private grid: Grid;
+    private mapGrid: MapGrid;
 
     private entities: Map<string, Entity>
     private entitiesToAdd: Entity[];
@@ -24,7 +23,7 @@ export class Game {
     // Managers
     public inputManager: InputManager;
 
-    constructor(app: Application) {
+    constructor(app: PIXI.Application) {
         this.app = app;
 
         // Set up variables
@@ -39,6 +38,8 @@ export class Game {
 
         this.setupLayers();
 
+        Debug.init(this);
+
         // Test //
         this.registerEntity(new Actor(
             this,
@@ -50,7 +51,7 @@ export class Game {
         this.pushCachedEntities();
         // End Test //
 
-        this.grid = new Grid(this, new Vector(16, 16), 15, 20, 32, true);
+        this.mapGrid = new MapGrid(this, 15, 20);
 
         this.entities.forEach(entity => {
             entity.start();
@@ -105,7 +106,7 @@ export class Game {
         });
     }
 
-    public getApp(): Application {
+    public getApp(): PIXI.Application {
         return this.app;
     }
 }
