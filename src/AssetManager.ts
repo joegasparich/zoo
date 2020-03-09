@@ -1,6 +1,9 @@
-import { SPRITES, TEXTURES, TILESETS } from "constants/assets";
+import { SPRITES, TEXTURES, TILESETS, MAPS } from "constants/assets";
 import Tileset from "Tileset";
 import { CELL_SIZE } from "MapGrid";
+import parseTiledMap from "helpers/parseTiledMap";
+import MapData from "types/Map";
+import { TiledMap } from "types/TiledMap";
 
 class AssetManager {
     private loader: PIXI.Loader;
@@ -14,6 +17,7 @@ class AssetManager {
         this.loader.add(Object.values(SPRITES));
         this.loader.add(Object.values(TEXTURES));
         this.loader.add(Object.values(TILESETS));
+        this.loader.add(Object.values(MAPS));
         this.tilesets = new Map<string, Tileset>();
 
         this.loader.load((loader, resources) => {
@@ -40,6 +44,10 @@ class AssetManager {
 
     getTileset(key: string): Tileset {
         return this.tilesets.get(key);
+    }
+
+    getMap(key: string): MapData {
+        return parseTiledMap(this.loader.resources[key].data as TiledMap);
     }
 }
 

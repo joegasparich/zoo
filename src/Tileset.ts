@@ -7,15 +7,15 @@ export default class Tileset {
 
     constructor(texture: PIXI.Texture, tileWidth: number, tileHeight: number) {
         this.texture = texture;
-        this.rows = Math.floor(texture.width / tileWidth);
-        this.cols = Math.floor(texture.height / tileHeight);
+        this.rows = Math.floor(texture.height / tileHeight);
+        this.cols = Math.floor(texture.width / tileWidth);
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
     }
 
     private getRectFromIndex(index: number): PIXI.Rectangle {
-        const row = Math.min(index % this.rows, this.rows - 1);
-        const col = Math.min(Math.floor(index / this.cols), this.cols - 1);
+        const row = Math.min(index % this.cols, this.cols - 1);
+        const col = Math.min(Math.floor(index / this.cols), this.rows - 1);
 
         return new PIXI.Rectangle(
             row * this.tileWidth,

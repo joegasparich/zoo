@@ -9,3 +9,7 @@ export const TEXTURES = {
 export const TILESETS = {
     GRASSLAND: "/assets/img/tileset.png"
 };
+
+export const MAPS = {
+    TEST: "/assets/maps/testMap.json"
+}

@@ -32,7 +32,7 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
-    "@types/node": "^12.7.8",
+    "@types/node": "^12.12.29",
     "@types/pixi.js": "^5.0.0",
     "@types/uuid": "^3.4.5",
     "awesome-typescript-loader": "^5.2.1",

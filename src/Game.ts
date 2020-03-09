@@ -1,4 +1,4 @@
-import { SPRITES } from "constants/assets";
+import { SPRITES, MAPS } from "constants/assets";
 
 import Entity from "entities/Entity";
 import InputManager from "InputManager";
@@ -10,6 +10,7 @@ import MapGrid from "MapGrid";
 import LAYERS from "constants/LAYERS";
 import Debug from "Debug";
 import Camera from "Camera";
+import AssetManager from "AssetManager";
 
 export class Game {
     private app: PIXI.Application;
@@ -54,7 +55,8 @@ export class Game {
 
         this.camera = new Camera(this, new Vector(20, 20));
         this.camera.setFocus(player);
-        this.mapGrid = new MapGrid(this, 15, 20);
+        const map = AssetManager.getMap(MAPS.TEST);
+        this.mapGrid = new MapGrid(this, map);
         this.mapGrid.setCamera(this.camera);
         Debug.init(this);
 

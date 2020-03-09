@@ -7,6 +7,7 @@ import { Game } from 'Game';
 import LAYERS from 'constants/LAYERS';
 import Tileset from 'Tileset';
 import Camera from 'Camera';
+import MapData from 'types/Map';
 
 export const CELL_SIZE = 32;
 
@@ -20,12 +21,12 @@ export default class MapGrid {
     groundTiles: PIXI.tilemap.CompositeRectTileLayer;
     pathfindingGrid: PathfindingGrid;
 
-    constructor(game: Game, rows: number, cols: number) {
-        this.rows = rows;
-        this.cols = cols;
+    constructor(game: Game, map: MapData) {
+        this.rows = map.width;
+        this.cols = map.height;
         this.pos = new Vector(CELL_SIZE/2, CELL_SIZE/2)
 
-        this.setupTileGrid(game.stage);
+        this.setupTileGrid(game.stage, map);
         this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols, this.drawDebugPath.bind(this));
         this.drawDebug();
 
@@ -48,16 +49,18 @@ export default class MapGrid {
         this.drawTiles()
     }
 
-    setupTileGrid(stage: PIXI.display.Stage) {
+    setupTileGrid(stage: PIXI.display.Stage, map: MapData) {
+        const tileSet = AssetManager.getTileset(TILESETS[map.tileSet as keyof typeof TILESETS]);
+
         this.grid = [];
         for (let i = 0; i < this.cols; i++) {
             this.grid[i] = [];
             for  (let j = 0; j < this.rows; j++) {
-                this.grid[i][j] = new Tile(i, j);
+                const tileIndex = map.tileData[j * map.width + i] - 1
+                this.grid[i][j] = new Tile(i, j, tileSet, tileIndex);
             }
         }
-        const tileTest = AssetManager.getTileset(TILESETS.GRASSLAND).getTile(0);
-        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [tileTest]);
+        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [tileSet.texture]);
         this.groundTiles.parentGroup = LAYERS.GROUND;
         stage.addChild(this.groundTiles);
         this.updateTiles();
@@ -71,7 +74,6 @@ export default class MapGrid {
                 if (!tile) { continue; }
 
                 const texture = tile.tileset.getTile(tile.tileIndex)
-                // texture
                 this.groundTiles.addFrame(texture, i * CELL_SIZE, j * CELL_SIZE);
             }
         }
@@ -131,11 +133,11 @@ class Tile {
     tileset: Tileset;
     tileIndex: number;
 
-    constructor(x: number, y: number) {
+    constructor(x: number, y: number, tileset: Tileset, index: number = 0) {
         this.x = x;
         this.y = y;
 
-        this.tileset = AssetManager.getTileset(TILESETS.GRASSLAND);
-        this.tileIndex = Math.floor(Math.random() * 4);
+        this.tileset = tileset;
+        this.tileIndex = index;
     }
 }

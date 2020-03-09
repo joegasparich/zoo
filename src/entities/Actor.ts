@@ -29,7 +29,7 @@ class Walking implements IState {
     enter() {}
     exit() {}
     update(actor: Actor, delta: number) {
-        actor.physics.addForce(actor.input.inputVector.multiply(actor.speed));
+        actor.physics.addForce(actor.input.inputVector.multiply(actor.accelleration));
     }
 }
 
@@ -40,7 +40,7 @@ export default class Actor extends Entity {
 
     state: StateMachine;
 
-    speed: number = 5; // Temp
+    accelleration: number = 1; // Temp
 
     constructor(game: Game, pos: Vector, inputSystem: InputSystem, physicsSystem: PhysicsSystem, renderSystem: RenderSystem) {
         super(game, pos);
