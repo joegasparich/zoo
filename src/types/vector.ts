@@ -1,3 +1,5 @@
+import { IPoint, Point } from "pixi.js";
+
 export default class Vector {
     x: number;
     y: number;
@@ -43,5 +45,9 @@ export default class Vector {
 
     toString(): string {
         return `[${this.x}, ${this.y}]`
+    }
+
+    toPoint(): IPoint {
+        return new Point(this.x, this.y);
     }
 }

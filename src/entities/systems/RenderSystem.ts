@@ -29,6 +29,7 @@ export default class RenderSystem extends System {
     }
 
     postUpdate(delta: number) {
+        this.sprite.pivot = this.entity.game.getCamera().position.toPoint();
         super.postUpdate(delta);
 
         // Sync postition

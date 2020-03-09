@@ -7,7 +7,6 @@ import { SYSTEM, System } from 'entities/systems';
 export default class Entity {
     game: Game;
     id: string;
-    sprite: PIXI.Sprite;
     position: Vector;
 
     systems: Map<SYSTEM, System>

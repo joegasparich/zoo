@@ -9,11 +9,13 @@ import PlayerInputSystem from "entities/systems/PlayerInputSystem";
 import MapGrid from "MapGrid";
 import LAYERS from "constants/LAYERS";
 import Debug from "Debug";
+import Camera from "Camera";
 
 export class Game {
     private app: PIXI.Application;
     public stage: PIXI.display.Stage;
 
+    private camera: Camera;
     private mapGrid: MapGrid;
 
     private entities: Map<string, Entity>
@@ -38,20 +40,23 @@ export class Game {
 
         this.setupLayers();
 
-        Debug.init(this);
-
         // Test //
-        this.registerEntity(new Actor(
+        const player = new Actor(
             this,
             new Vector(300, 300),
             new PlayerInputSystem(),
             new PhysicsSystem(4),
             new RenderSystem(SPRITES.HERO)
-        ));
+        )
+        this.registerEntity(player);
         this.pushCachedEntities();
         // End Test //
 
+        this.camera = new Camera(this, new Vector(20, 20));
+        this.camera.setFocus(player);
         this.mapGrid = new MapGrid(this, 15, 20);
+        this.mapGrid.setCamera(this.camera);
+        Debug.init(this);
 
         this.entities.forEach(entity => {
             entity.start();
@@ -84,6 +89,10 @@ export class Game {
         this.inputManager.clearKeys();
         this.pushCachedEntities();
         this.removeDeletedEntities();
+
+        this.camera.update();
+        this.mapGrid.update(this);
+        Debug.update();
     }
 
     public registerEntity(entity: Entity): void {
@@ -108,5 +117,9 @@ export class Game {
 
     public getApp(): PIXI.Application {
         return this.app;
+    }
+
+    public getCamera(): Camera {
+        return this.camera;
     }
 }

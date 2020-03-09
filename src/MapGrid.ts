@@ -6,6 +6,7 @@ import Vector from 'types/vector';
 import { Game } from 'Game';
 import LAYERS from 'constants/LAYERS';
 import Tileset from 'Tileset';
+import Camera from 'Camera';
 
 export const CELL_SIZE = 32;
 
@@ -14,7 +15,9 @@ export default class MapGrid {
     cols: number;
     pos: Vector;
 
+    camera: Camera;
     grid: Tile[][];
+    groundTiles: PIXI.tilemap.CompositeRectTileLayer;
     pathfindingGrid: PathfindingGrid;
 
     constructor(game: Game, rows: number, cols: number) {
@@ -22,9 +25,8 @@ export default class MapGrid {
         this.cols = cols;
         this.pos = new Vector(CELL_SIZE/2, CELL_SIZE/2)
 
-        this.setupTileGrid();
+        this.setupTileGrid(game.stage);
         this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols, this.drawDebugPath.bind(this));
-        this.drawTiles(game.stage);
         this.drawDebug();
 
         // TEST //
@@ -38,7 +40,15 @@ export default class MapGrid {
         });
     }
 
-    setupTileGrid() {
+    setCamera(camera: Camera) {
+        this.camera = camera;
+    }
+
+    update(game: Game) {
+        this.drawTiles()
+    }
+
+    setupTileGrid(stage: PIXI.display.Stage) {
         this.grid = [];
         for (let i = 0; i < this.cols; i++) {
             this.grid[i] = [];
@@ -46,22 +56,29 @@ export default class MapGrid {
                 this.grid[i][j] = new Tile(i, j);
             }
         }
+        const tileTest = AssetManager.getTileset(TILESETS.GRASSLAND).getTile(0);
+        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [tileTest]);
+        this.groundTiles.parentGroup = LAYERS.GROUND;
+        stage.addChild(this.groundTiles);
+        this.updateTiles();
     }
 
-    drawTiles(stage: PIXI.display.Stage) {
-        const tileTest = AssetManager.getTileset(TILESETS.GRASSLAND).getTile(0);
-        const groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [tileTest]);
-        groundTiles.parentGroup = LAYERS.GROUND;
-        stage.addChild(groundTiles);
-
+    updateTiles() {
+        this.groundTiles.clear()
         for (var i = 0; i <= this.cols - 1; i++) {
             for (var j = 0; j <= this.rows - 1; j++) {
                 const tile = this.grid[i][j];
+                if (!tile) { continue; }
+
                 const texture = tile.tileset.getTile(tile.tileIndex)
                 // texture
-                groundTiles.addFrame(texture, i * CELL_SIZE, j * CELL_SIZE);
+                this.groundTiles.addFrame(texture, i * CELL_SIZE, j * CELL_SIZE);
             }
         }
+    }
+
+    drawTiles() {
+        this.groundTiles.pivot.set(this.camera.position.x, this.camera.position.y);
     }
 
     drawDebug() {
