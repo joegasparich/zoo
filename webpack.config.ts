@@ -6,7 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
-  entry: './src/app.ts',
+  entry: './src/index.ts',
   devtool: 'inline-source-map',
   mode: 'development',
   devServer: {

@@ -1,7 +1,7 @@
-import IState, { INPUT } from "./State";
-import Entity from "entities/Entity";
+import { Entity } from "engine/entities";
+import { IState, INPUT } from ".";
 
-export class StateMachine {
+export default class StateMachine {
     currentState: IState;
 
     constructor(initialState: IState) {

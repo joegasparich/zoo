@@ -1,41 +1,43 @@
-import { InputSystem } from ".";
+import { InputManager, Vector } from "engine";
+import { InputSystem } from "engine/entities/systems";
+import { INPUT } from "engine/entities/state";
+
 import Actor from "entities/Actor";
-import { INPUT } from "entities/state/State";
-import { KEY } from "InputManager";
-import Vector from "types/vector";
 
 export default class PlayerInputSystem extends InputSystem {
+    id = "PLAYER_INPUT_SYSTEM";
+
     update(delta: number) {
         super.update(delta);
 
         const actor = this.entity as Actor;
 
         this.inputVector = new Vector(
-            +actor.game.inputManager.isKeyHeld(KEY.RIGHT) - +actor.game.inputManager.isKeyHeld(KEY.LEFT),
-            +actor.game.inputManager.isKeyHeld(KEY.DOWN) - +actor.game.inputManager.isKeyHeld(KEY.UP),
+            +actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT) - +actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT),
+            +actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) - +actor.game.inputManager.isKeyHeld(InputManager.KEY.UP),
         )
 
         // Movement
-        if (actor.game.inputManager.isKeyHeld(KEY.UP) ||
-            actor.game.inputManager.isKeyHeld(KEY.DOWN) ||
-            actor.game.inputManager.isKeyHeld(KEY.LEFT) ||
-            actor.game.inputManager.isKeyHeld(KEY.RIGHT) &&
-            !(actor.game.inputManager.isKeyHeld(KEY.UP) && actor.game.inputManager.isKeyHeld(KEY.DOWN)) &&
-            !(actor.game.inputManager.isKeyHeld(KEY.LEFT) && actor.game.inputManager.isKeyHeld(KEY.RIGHT))
+        if (actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) ||
+            actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) ||
+            actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT) ||
+            actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT) &&
+            !(actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) && actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN)) &&
+            !(actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT) && actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT))
         ) {
             actor.state.handleInput(INPUT.MOVE);
         }
 
-        if (!actor.game.inputManager.isKeyHeld(KEY.UP) &&
-            !actor.game.inputManager.isKeyHeld(KEY.DOWN) &&
-            !actor.game.inputManager.isKeyHeld(KEY.LEFT) &&
-            !actor.game.inputManager.isKeyHeld(KEY.RIGHT)
+        if (!actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) &&
+            !actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) &&
+            !actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT) &&
+            !actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT)
         ) {
             actor.state.handleInput(INPUT.STILL);
         }
 
         // Actions
-        if (actor.game.inputManager.isKeyPressed(KEY.SPACE)) {
+        if (actor.game.inputManager.isKeyPressed(InputManager.KEY.SPACE)) {
             actor.state.handleInput(INPUT.USE);
         }
     }

@@ -1,6 +1,6 @@
 import { js as Pathfinder } from "easystarjs";
 
-import Vector from "types/vector";
+import { Vector } from "engine";
 
 export type Path = { x: number; y: number; }[];
 

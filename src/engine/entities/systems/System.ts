@@ -1,8 +1,7 @@
-import Entity from "entities/Entity";
-import { SYSTEM } from "entities/systems";
+import { Entity } from "engine/entities";
 
 export default abstract class System {
-    id: SYSTEM
+    id: string
     entity: Entity;
 
     start(entity: Entity) {

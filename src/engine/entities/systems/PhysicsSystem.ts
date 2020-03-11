@@ -1,11 +1,11 @@
-import { SYSTEM, System } from '.';
-import Vector from 'types/vector';
+import { System } from '.';
+import { Vector } from "engine";
 
 const LINEAR_DRAG = 0.1;
 
 export default class PhysicsSystem extends System {
 
-    id = SYSTEM.PHYSICS_SYSTEM
+    id = "PHYSICS_SYSTEM"
 
     velocity: Vector;
     maxSpeed: number;

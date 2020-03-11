@@ -1,10 +1,10 @@
-import AssetManager from "AssetManager";
-import { SYSTEM, System } from '.';
-import Entity from 'entities/Entity';
-import LAYERS from 'constants/LAYERS'
+import { AssetManager } from 'engine';
+import { Entity } from "engine/entities";
+import { System } from '.';
+import { LAYERS } from 'engine/constants'
 
 export default class RenderSystem extends System {
-    id = SYSTEM.RENDER_SYSTEM;
+    id = "RENDER_SYSTEM";
 
     spriteUrl: string;
     sprite: PIXI.Sprite;
@@ -17,7 +17,7 @@ export default class RenderSystem extends System {
     start(entity: Entity) {
         super.start(entity);
 
-        const app = entity.game.getApp();
+        const app = entity.game.app;
 
         const texture = AssetManager.getTexture(this.spriteUrl);
         this.sprite = new PIXI.Sprite(texture);
@@ -29,7 +29,7 @@ export default class RenderSystem extends System {
     }
 
     postUpdate(delta: number) {
-        this.sprite.pivot = this.entity.game.getCamera().position.toPoint();
+        this.sprite.pivot = this.entity.game.camera.position.toPoint();
         super.postUpdate(delta);
 
         // Sync postition

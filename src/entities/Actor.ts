@@ -1,9 +1,7 @@
-import { Game } from "Game";
-import Vector from "types/vector";
-import Entity from "entities/Entity";
-import { PhysicsSystem, RenderSystem, InputSystem } from "entities/systems";
-import { StateMachine } from "entities/state/StateMachine";
-import IState, { INPUT } from "entities/state/State";
+import { Game, Vector } from "engine";
+import { Entity } from "engine/entities";
+import { PhysicsSystem, RenderSystem, InputSystem } from "engine/entities/systems";
+import { StateMachine, IState, INPUT } from "engine/entities/state";
 
 class Idle implements IState {
     handleInput(input: INPUT): IState | void {

@@ -1,4 +1,4 @@
-export enum KEY {
+enum KEY {
     UP = "ArrowUp",
     DOWN = "ArrowDown",
     LEFT = "ArrowLeft",
@@ -7,6 +7,8 @@ export enum KEY {
 }
 
 export default class InputManager {
+
+    public static KEY = KEY;
 
     keys: string[];
     keysDown: string[];

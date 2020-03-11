@@ -29,7 +29,7 @@
         {
          "name":"tileset",
          "type":"string",
-         "value":"GRASSLAND"
+         "value":"/assets/img/tileset.png"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.3.3",

@@ -1,4 +1,4 @@
-import Entity from "entities/Entity";
+import { Entity } from "engine/entities";
 
 export enum INPUT {
     MOVE,

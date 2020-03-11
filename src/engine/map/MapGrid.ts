@@ -1,56 +1,62 @@
-import PathfindingGrid, { Path } from 'PathfindingGrid';
-import AssetManager from 'AssetManager';
-import { TILESETS } from 'constants/assets';
-import Debug from 'Debug';
-import Vector from 'types/vector';
-import { Game } from 'Game';
-import LAYERS from 'constants/LAYERS';
-import Tileset from 'Tileset';
-import Camera from 'Camera';
-import MapData from 'types/Map';
-
-export const CELL_SIZE = 32;
+import { Game, Debug, Camera, AssetManager, Vector, Tileset } from 'engine';
+import { MapData, Path, PathfindingGrid } from '.';
+import { LAYERS } from 'engine/constants';
 
 export default class MapGrid {
+    game: Game;
+
     rows: number;
     cols: number;
     pos: Vector;
+    cellSize: number;
 
     camera: Camera;
     grid: Tile[][];
     groundTiles: PIXI.tilemap.CompositeRectTileLayer;
     pathfindingGrid: PathfindingGrid;
 
-    constructor(game: Game, map: MapData) {
-        this.rows = map.width;
-        this.cols = map.height;
-        this.pos = new Vector(CELL_SIZE/2, CELL_SIZE/2)
+    constructor(game: Game) {
+        this.game = game;
+        this.pos = new Vector()
 
-        this.setupTileGrid(game.stage, map);
-        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols, this.drawDebugPath.bind(this));
         this.drawDebug();
-
-        // TEST //
-        this.pathfindingGrid.disablePoint(new Vector(0, 2));
-        this.pathfindingGrid.disablePoint(new Vector(1, 2));
-        this.pathfindingGrid.disablePoint(new Vector(2, 2));
-        this.pathfindingGrid.disablePoint(new Vector(3, 2));
-        this.pathfindingGrid.disablePoint(new Vector(4, 2));
-        this.pathfindingGrid.getPath(new Vector(1, 1), new Vector(4, 6)).then((path) => {
-            this.drawDebugPath(path);
-        });
     }
 
     setCamera(camera: Camera) {
         this.camera = camera;
     }
 
+    loadMap(map: MapData) {
+        this.cellSize = map.tileWidth;
+        this.pos = new Vector(this.cellSize/2, this.cellSize/2)
+        this.rows = map.width;
+        this.cols = map.height;
+
+        this.setupTileGrid(this.game.stage, map);
+        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols, this.drawDebugPath.bind(this));
+    }
+
+    clearMap() {
+        this.rows = 0;
+        this.cols = 0;
+        this.grid = [];
+        this.pathfindingGrid = null;
+        this.groundTiles = null;
+    }
+
     update(game: Game) {
-        this.drawTiles()
+        if (this.grid?.length) {
+            this.drawTiles()
+        }
     }
 
     setupTileGrid(stage: PIXI.display.Stage, map: MapData) {
-        const tileSet = AssetManager.getTileset(TILESETS[map.tileSet as keyof typeof TILESETS]);
+        const tileSet = AssetManager.getTileset(map.tileSet);
+
+        if (!tileSet) {
+            console.error(`No tileset ${map.tileSet} found`);
+            return;
+        }
 
         this.grid = [];
         for (let i = 0; i < this.cols; i++) {
@@ -74,7 +80,7 @@ export default class MapGrid {
                 if (!tile) { continue; }
 
                 const texture = tile.tileset.getTile(tile.tileIndex)
-                this.groundTiles.addFrame(texture, i * CELL_SIZE, j * CELL_SIZE);
+                this.groundTiles.addFrame(texture, i * this.cellSize, j * this.cellSize);
             }
         }
     }
@@ -85,24 +91,24 @@ export default class MapGrid {
 
     drawDebug() {
         Debug.setLineStyle(1, 0x00FF00);
-        const xOffset = this.pos.x - CELL_SIZE / 2;
-        const yOffset = this.pos.y - CELL_SIZE / 2;
+        const xOffset = this.pos.x - this.cellSize / 2;
+        const yOffset = this.pos.y - this.cellSize / 2;
         // Horizontal
         for(let i = 0; i < this.rows + 1; i++) {
             Debug.drawLine(
                 xOffset,
-                i * CELL_SIZE + yOffset,
-                this.cols * CELL_SIZE + xOffset,
-                i * CELL_SIZE + yOffset
+                i * this.cellSize + yOffset,
+                this.cols * this.cellSize + xOffset,
+                i * this.cellSize + yOffset
             )
         }
         // Vertical
         for(let i = 0; i < this.cols + 1; i++) {
             Debug.drawLine(
-                i * CELL_SIZE + xOffset,
+                i * this.cellSize + xOffset,
                 yOffset,
-                i * CELL_SIZE + xOffset,
-                this.rows * CELL_SIZE + yOffset
+                i * this.cellSize + xOffset,
+                this.rows * this.cellSize + yOffset
             )
         }
     }
@@ -110,16 +116,16 @@ export default class MapGrid {
     drawDebugPath(path: Path) {
         Debug.setLineStyle(3, 0x0000FF);
 
-        const xOffset = CELL_SIZE/2;
-        const yOffset = CELL_SIZE/2;
+        const xOffset = this.cellSize/2;
+        const yOffset = this.cellSize/2;
 
         let lastNode = path[0];
         path.forEach(node => {
             Debug.drawLine(
-                lastNode.x * CELL_SIZE + xOffset,
-                lastNode.y * CELL_SIZE + yOffset,
-                node.x * CELL_SIZE + xOffset,
-                node.y * CELL_SIZE + yOffset
+                lastNode.x * this.cellSize + xOffset,
+                lastNode.y * this.cellSize + yOffset,
+                node.x * this.cellSize + xOffset,
+                node.y * this.cellSize + yOffset
             );
             lastNode = node;
         })

@@ -1,10 +1,11 @@
 import { IPoint, Point } from "pixi.js";
+import { lerp } from "engine/helpers/math";
 
 export default class Vector {
     x: number;
     y: number;
 
-    constructor(x: number, y: number) {
+    constructor(x: number = 0, y: number = 0) {
         this.x = x;
         this.y = y;
     }
@@ -49,5 +50,16 @@ export default class Vector {
 
     toPoint(): IPoint {
         return new Point(this.x, this.y);
+    }
+
+    static Distance(vectorA: Vector, vectorB: Vector): number {
+        return vectorA.subtract(vectorB).magnitude();
+    }
+
+    static Lerp(startPos: Vector, endPos: Vector, amount: number) {
+        return new Vector(
+            lerp(startPos.x, endPos.x, amount),
+            lerp(startPos.y, endPos.y, amount)
+        )
     }
 }

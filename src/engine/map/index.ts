@@ -1,3 +1,15 @@
+export { default as MapGrid } from "./MapGrid";
+export { default as PathfindingGrid, Path } from "./PathfindingGrid";
+
+export interface MapData {
+    width: number;
+    height: number;
+    tileWidth: number;
+    tileHeight: number;
+    tileSet: string;
+    tileData: number[];
+}
+
 export interface TiledMap {
     compressionlevel: number;
     editorsettings:   Editorsettings;
@@ -18,16 +30,16 @@ export interface TiledMap {
     width:            number;
 }
 
-export interface Editorsettings {
+interface Editorsettings {
     export: Export;
 }
 
-export interface Export {
+interface Export {
     format: string;
     target: string;
 }
 
-export interface Layer {
+interface Layer {
     data:    number[];
     height:  number;
     id:      number;
@@ -40,13 +52,13 @@ export interface Layer {
     y:       number;
 }
 
-export interface Property {
+interface Property {
     name:  string;
     type:  string;
     value: string;
 }
 
-export interface Tileset {
+interface Tileset {
     firstgid: number;
     source:   string;
 }
