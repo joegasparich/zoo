@@ -1,14 +1,17 @@
-import { World, Vec2, Body, Shape, Circle, Polygon, PolygonShape, CircleShape } from "planck-js";
+import { World, Vec2, Body, Shape, Circle, Polygon, PolygonShape, CircleShape, FrictionJoint, FrictionJointDef } from "planck-js";
 
 import { Vector } from "engine";
 import Debug from "engine/Debug";
-import { WORLD_SCALE } from "engine/constants";
+import { WORLD_SCALE, FRAME_RATE } from "engine/constants";
+import { toVec2, toVector } from "engine/helpers/util";
 
-function toVec2(vector: Vector): Vec2 {
-    return new Vec2(vector.x, vector.y);
-}
-function toVector(vec2: Vec2): Vector {
-    return new Vector(vec2.x, vec2.y);
+type PhysicsObjOpts = {
+    position: Vector,
+    collider: Collider,
+    isDynamic: boolean,
+    maxSpeed?: number,
+    friction?: number,
+    density?: number
 }
 
 enum ColliderType {
@@ -39,14 +42,17 @@ export default class PhysicsManager {
 
     public static ColliderType = ColliderType;
 
-    public world: World
+    public world: World;
+    public ground: Body;
 
     public setup() {
         this.world = World();
+        this.ground = this.world.createBody();
+        this.ground.createFixture(new Circle(0));
     }
 
     public update(delta: number) {
-        this.world.step(delta);
+        this.world.step(delta / FRAME_RATE);
         this.drawDebug();
     }
 
@@ -54,14 +60,25 @@ export default class PhysicsManager {
         this.world.setGravity(toVec2(direction));
     }
 
-    public createPhysicsObject(position: Vector, collider: Collider, isDynamic: boolean): Body {
-        const body = isDynamic ? this.world.createDynamicBody({
-            linearDamping: 0,
-            angularDamping: 0.01
-        }) : this.world.createBody();
+    public createPhysicsObject(opts: PhysicsObjOpts): Body {
+        const body = opts.isDynamic
+             ? this.world.createDynamicBody({linearDamping: 5 / (opts.maxSpeed ?? 1)})
+             : this.world.createBody();
 
-        body.setPosition(toVec2(position));
-        body.createFixture(getShape(collider));
+        body.setPosition(toVec2(opts.position));
+        body.createFixture(getShape(opts.collider), {
+            friction: opts.friction ?? 1,
+            density: opts.density ?? 1,
+        });
+        const def: FrictionJointDef = {
+            bodyA: this.ground,
+            bodyB: body,
+            localAnchorA: new Vec2(0,0),
+            localAnchorB: new Vec2(0,0),
+            collideConnected: false,
+            maxForce: 20 * (opts.friction ?? 1)
+        }
+        this.world.createJoint(FrictionJoint(def));
 
         return body;
     }

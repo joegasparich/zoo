@@ -27,7 +27,7 @@ testGame.load(() => {
         testGame,
         new Vector(4, 4),
         new PlayerInputSystem(),
-        new PhysicsSystem(4),
+        new PhysicsSystem(),
         new RenderSystem(SPRITES.HERO)
     )
     testGame.registerEntity(player);

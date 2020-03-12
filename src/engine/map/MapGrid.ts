@@ -52,7 +52,7 @@ export default class MapGrid {
     }
 
     postUpdate() {
-        this.drawDebug();
+        // this.drawDebug();
     }
 
     setupTileGrid(stage: PIXI.display.Stage, map: MapData) {

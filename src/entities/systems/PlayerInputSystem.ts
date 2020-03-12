@@ -16,7 +16,7 @@ export default class PlayerInputSystem extends InputSystem {
         this.inputVector = new Vector(
             +actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT) - +actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT),
             +actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) - +actor.game.inputManager.isKeyHeld(InputManager.KEY.UP),
-        )
+        ).truncate(1);
 
         // Movement
         if (actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) ||
