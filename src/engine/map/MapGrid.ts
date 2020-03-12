@@ -1,4 +1,5 @@
-import { Game, Debug, Camera, AssetManager, Vector, Tileset } from 'engine';
+import { Game, Debug, Camera, Vector, Tileset } from 'engine';
+import { AssetManager } from "engine/managers";
 import { MapData, Path, PathfindingGrid } from '.';
 import { LAYERS } from 'engine/constants';
 

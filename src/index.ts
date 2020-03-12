@@ -1,4 +1,5 @@
-import { Game, Vector, AssetManager } from "engine";
+import { Game, Vector } from "engine";
+import { AssetManager } from "engine/managers";
 import { PhysicsSystem, RenderSystem, CameraFollowSystem } from "engine/entities/systems";
 
 import Actor from "entities/Actor";

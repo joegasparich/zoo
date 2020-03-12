@@ -1,4 +1,5 @@
-import { InputManager, Vector } from "engine";
+import { Vector } from "engine";
+import { InputManager } from "engine/managers";
 import { InputSystem } from "engine/entities/systems";
 import { INPUT } from "engine/entities/state";
 

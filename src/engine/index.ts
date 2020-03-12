@@ -1,6 +1,4 @@
 export { default as Game } from "./Game";
-export { default as AssetManager } from "./AssetManager";
-export { default as InputManager } from "./InputManager";
 export { default as Debug } from "./Debug";
 export { default as Camera } from "./Camera";
 

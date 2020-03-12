@@ -29,6 +29,7 @@
     "pixi-layers": "^0.2.3",
     "pixi-tilemap": "^2.0.3",
     "pixi.js": "^5.1.5",
+    "planck-js": "^0.3.12",
     "uuid": "^3.3.3"
   },
   "devDependencies": {

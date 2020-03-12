@@ -1,7 +1,7 @@
 import { Tileset } from "engine";
 import { MapData, TiledMap } from "engine/map";
 
-import parseTiledMap from "./helpers/parseTiledMap";
+import parseTiledMap from "../helpers/parseTiledMap";
 
 class AssetManager {
     private loader: PIXI.Loader;

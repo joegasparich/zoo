@@ -4,7 +4,8 @@ import "pixi-layers";
 
 import "./app.scss";
 
-import { AssetManager, InputManager, Debug, Camera, Vector } from ".";
+import { Debug, Camera, Vector } from ".";
+import { AssetManager, InputManager, PhysicsManager } from "./managers";
 import { Entity } from "./entities";
 import { MapGrid } from "./map";
 
@@ -13,7 +14,9 @@ import { registerPixiInspector } from "./helpers/util";
 import { LAYERS } from "./constants";
 
 enum GameEvent {
+    LOAD_START,
     LOAD_COMPLETE,
+    SETUP_COMPLETE,
 }
 
 type GameOpts = {
@@ -41,6 +44,7 @@ export default class Game {
     private entitiesToDelete: string[];
 
     // Managers
+    public physicsManager: PhysicsManager;
     public inputManager: InputManager;
 
     constructor(opts: GameOpts) {
@@ -65,33 +69,43 @@ export default class Game {
     }
 
     public load(callback?: Function): void {
-        // Load Assets
+        // Load Assets, all assets should be added to the manager at this point
+        this.fire(GameEvent.LOAD_START);
         AssetManager.doLoad(() => {
-            // set up ticker
+            this.fire(GameEvent.LOAD_COMPLETE);
+
+            // start up the game loop
             this.app.ticker.add(this.update.bind(this));
+
+            // Now that assets have been loaded we can set up the game
             this.setup();
+
             callback();
         });
     }
 
     private setup(): void {
 
-        //Instantiate Managers
         this.inputManager = new InputManager();
+        this.physicsManager = new PhysicsManager();
 
-        this.setupLayers();
+        this.setupRenderLayers();
 
         this.camera = new Camera(this, new Vector(20, 20));
+
         this.mapGrid = new MapGrid(this);
         this.mapGrid.setCamera(this.camera);
+
+        this.physicsManager.setup();
+
         if (this.opts.enableDebug) {
             Debug.init(this);
         }
 
-        this.fire(GameEvent.LOAD_COMPLETE);
+        this.fire(GameEvent.SETUP_COMPLETE);
     }
 
-    private setupLayers(): void {
+    private setupRenderLayers(): void {
         this.stage = new PIXI.display.Stage();
         this.stage.sortableChildren = true;
 
@@ -104,23 +118,38 @@ export default class Game {
     }
 
     public update(delta: number): void {
+        //////////// Pre Update ////////////
+
+        // Setup actions
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
         });
+
+        //////////// Update ////////////
+
+        // Game actions
         this.entities.forEach(entity => {
             entity.update(delta);
         });
+        // Do Physics
+        this.physicsManager.update(delta);
+
+        this.mapGrid.update(this);
+
+        //////////// Post Update ////////////
+
+        // Rendering actions
         this.entities.forEach(entity => {
             entity.postUpdate(delta);
         });
 
+        this.camera.update();
+        Debug.update();
+
+        // Reset tings
         this.inputManager.clearKeys();
         this.pushCachedEntities();
         this.removeDeletedEntities();
-
-        this.camera.update();
-        this.mapGrid.update(this);
-        Debug.update();
     }
 
     public registerEntity(entity: Entity): void {
@@ -147,11 +176,15 @@ export default class Game {
         this.entitiesToDelete = [];
     }
 
+    //-- Events --//
+
     public on(event: GameEvent, callback: Function): void {
         this.eventListeners.push({ event, callback })
     }
 
     private fire(event: GameEvent): void {
+        console.log(`GAME EVENT: ${event.toString()}`);
+
         this.eventListeners
             .filter(listener => listener.event === event)
             .forEach(listener => listener.callback());

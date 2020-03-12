@@ -1,6 +1,6 @@
-import { AssetManager } from 'engine';
-import { Entity } from "engine/entities";
 import { System } from '.';
+import { AssetManager } from 'engine/managers';
+import { Entity } from "engine/entities";
 import { LAYERS } from 'engine/constants'
 
 export default class RenderSystem extends System {
