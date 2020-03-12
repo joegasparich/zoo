@@ -10,7 +10,7 @@ export default class PathfindingGrid {
 
     grid: number[][];
 
-    constructor(rows: number, cols: number, drawDebug: Function) {
+    constructor(rows: number, cols: number) {
         this.grid = this.generateGrid(rows, cols)
 
         this.pathFinder = new Pathfinder();

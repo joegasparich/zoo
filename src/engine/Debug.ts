@@ -1,4 +1,4 @@
-import { Game, Camera } from ".";
+import { Game, Camera, Vector } from ".";
 import { LAYERS } from "./constants";
 
 class Debug {
@@ -12,9 +12,14 @@ class Debug {
         this.camera = game.camera;
     }
 
-    update() {
+    preUpdate() {
         if (!this.graphics) return;
-        this.graphics.pivot = this.camera.position.toPoint();
+        this.graphics.clear()
+    }
+
+    postUpdate() {
+        if (!this.graphics) return;
+        this.graphics.pivot = this.camera.screenPosition.toPoint();
     }
 
     setLineStyle(thickness: number, colour: number) {
@@ -26,6 +31,29 @@ class Debug {
         if (!this.graphics) return;
         this.graphics.moveTo(startX, startY);
         this.graphics.lineTo(endX, endy);
+    }
+
+    drawVectorList(vertices: Vector[]) {
+        let lastVertex: Vector = null;
+        vertices.forEach(vertex => {
+            if (!lastVertex) {
+                lastVertex = vertex;
+                return;
+            }
+
+            this.drawLine(
+                lastVertex.x,
+                lastVertex.y,
+                vertex.x,
+                vertex.y
+            );
+            lastVertex = vertex;
+        })
+    }
+
+    drawCircle(pos: Vector, radius: number) {
+        if (!this.graphics) return;
+        this.graphics.drawCircle(pos.x, pos.y, radius);
     }
 }
 

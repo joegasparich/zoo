@@ -1,7 +1,7 @@
 import { System } from '.';
 import { AssetManager } from 'engine/managers';
 import { Entity } from "engine/entities";
-import { LAYERS } from 'engine/constants'
+import { LAYERS, WORLD_SCALE } from 'engine/constants'
 
 export default class RenderSystem extends System {
     id = "RENDER_SYSTEM";
@@ -29,10 +29,10 @@ export default class RenderSystem extends System {
     }
 
     postUpdate(delta: number) {
-        this.sprite.pivot = this.entity.game.camera.position.toPoint();
+        this.sprite.pivot = this.entity.game.camera.screenPosition.toPoint();
         super.postUpdate(delta);
 
         // Sync postition
-        this.sprite.position = new PIXI.Point(this.entity.position.x, this.entity.position.y);
+        this.sprite.position = new PIXI.Point(this.entity.position.x * WORLD_SCALE, this.entity.position.y * WORLD_SCALE);
     }
 }

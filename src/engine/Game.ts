@@ -121,6 +121,7 @@ export default class Game {
         //////////// Pre Update ////////////
 
         // Setup actions
+        Debug.preUpdate();
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
         });
@@ -144,7 +145,8 @@ export default class Game {
         });
 
         this.camera.update();
-        Debug.update();
+        this.mapGrid.postUpdate();
+        Debug.postUpdate();
 
         // Reset tings
         this.inputManager.clearKeys();

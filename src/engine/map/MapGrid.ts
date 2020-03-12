@@ -1,7 +1,7 @@
 import { Game, Debug, Camera, Vector, Tileset } from 'engine';
 import { AssetManager } from "engine/managers";
 import { MapData, Path, PathfindingGrid } from '.';
-import { LAYERS } from 'engine/constants';
+import { LAYERS, WORLD_SCALE } from 'engine/constants';
 
 export default class MapGrid {
     game: Game;
@@ -34,7 +34,7 @@ export default class MapGrid {
         this.cols = map.height;
 
         this.setupTileGrid(this.game.stage, map);
-        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols, this.drawDebugPath.bind(this));
+        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
     }
 
     clearMap() {
@@ -49,6 +49,10 @@ export default class MapGrid {
         if (this.grid?.length) {
             this.drawTiles()
         }
+    }
+
+    postUpdate() {
+        this.drawDebug();
     }
 
     setupTileGrid(stage: PIXI.display.Stage, map: MapData) {
@@ -87,7 +91,7 @@ export default class MapGrid {
     }
 
     drawTiles() {
-        this.groundTiles.pivot.set(this.camera.position.x, this.camera.position.y);
+        this.groundTiles.pivot.set(this.camera.screenPosition.x, this.camera.screenPosition.y);
     }
 
     drawDebug() {

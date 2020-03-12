@@ -25,7 +25,7 @@ AssetManager.loadAssets(Object.values(MAPS));
 testGame.load(() => {
     const player = new Actor(
         testGame,
-        new Vector(300, 300),
+        new Vector(4, 4),
         new PlayerInputSystem(),
         new PhysicsSystem(4),
         new RenderSystem(SPRITES.HERO)
