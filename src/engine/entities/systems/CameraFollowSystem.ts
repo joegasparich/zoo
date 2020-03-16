@@ -8,13 +8,13 @@ export default class CameraFollowSystem extends System {
 
     camera: Camera;
 
-    start(entity: Entity) {
+    start(entity: Entity): void {
         super.start(entity);
 
         this.camera = entity.game.camera;
     }
 
-    postUpdate(delta: number) {
+    postUpdate(delta: number): void {
         super.postUpdate(delta);
 
         const centredPos = this.entity.position.subtract(new Vector(

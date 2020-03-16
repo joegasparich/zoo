@@ -7,5 +7,5 @@ export default {
     GROUND,
     ENTITIES,
     UI,
-    DEBUG
-}
+    DEBUG,
+};

@@ -1,7 +1,7 @@
-import * as path from 'path';
+import * as path from "path";
 
 import { Tileset } from "engine";
-import { MapData, TiledMap, TiledSet, TileSetData } from "engine/map";
+import { MapData, TiledMap, TiledSet } from "engine/map";
 
 import { parseTiledMap, parseTiledSet } from "../helpers/parseTiled";
 
@@ -15,18 +15,18 @@ class AssetManager {
         this.tilesets = new Map<string, Tileset>();
     }
 
-    loadAssets(assets: string[]) {
+    loadAssets(assets: string[]): void {
         this.loader.add(assets);
     }
 
-    doLoad(callback: Function) {
+    doLoad(callback: Function): void {
         this.loader.load((loader, resources) => {
             callback();
         });
     }
 
     getTexture(key: string): PIXI.Texture {
-        return this.loader.resources[key].texture
+        return this.loader.resources[key].texture;
     }
 
     getTexturesByType(type: object): PIXI.Texture[] {
@@ -40,12 +40,12 @@ class AssetManager {
                 const tiledMap = parseTiledMap(resources[location].data as TiledMap);
 
                 //Load Tile Sets
-                tiledMap.tileSetPath = path.join(location, '..', tiledMap.tileSetPath);
+                tiledMap.tileSetPath = path.join(location, "..", tiledMap.tileSetPath);
                 this.loader.add(tiledMap.tileSetPath);
                 this.loader.load((loader, resources) => {
                     // Load Images
                     const tiledSet = resources[tiledMap.tileSetPath].data as TiledSet;
-                    const imagePath = path.join(tiledMap.tileSetPath, '..', tiledSet.image);
+                    const imagePath = path.join(tiledMap.tileSetPath, "..", tiledSet.image);
 
                     this.loader.add(imagePath);
                     this.loader.load((loader, resources) => {
@@ -57,7 +57,7 @@ class AssetManager {
                     });
                 });
             });
-        })
+        });
     }
 }
 

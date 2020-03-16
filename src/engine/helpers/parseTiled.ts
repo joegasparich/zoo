@@ -14,7 +14,7 @@ export function parseTiledMap(tiledMap: TiledMap): MapData {
         tileHeight: tiledMap.tileheight,
         tileSetPath: tiledMap.tilesets[0].source,
         tileData: tiledMap.layers[0].data,
-    }
+    };
 }
 
 export function parseTiledSet(tsPath: string, tiledSet: TiledSet, image: PIXI.Texture): TileSetData {
@@ -23,7 +23,7 @@ export function parseTiledSet(tsPath: string, tiledSet: TiledSet, image: PIXI.Te
         return;
     }
     if (!image) {
-        console.error('Attempted to parse tileset before image was loaded')
+        console.error("Attempted to parse tileset before image was loaded");
         return;
     }
 
@@ -32,6 +32,6 @@ export function parseTiledSet(tsPath: string, tiledSet: TiledSet, image: PIXI.Te
         image,
         height: image.height,
         width: image.width,
-        tileSize: tiledSet.tilewidth
-    }
+        tileSize: tiledSet.tilewidth,
+    };
 }

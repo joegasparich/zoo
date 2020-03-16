@@ -1,14 +1,14 @@
-import { v1 as uuid } from 'uuid';
+import { v1 as uuid } from "uuid";
 
-import { Game, Vector } from 'engine';
-import { System } from './systems';
+import { Game, Vector } from "engine";
+import { System } from "./systems";
 
 export default class Entity {
     game: Game;
     id: string;
     position: Vector;
 
-    systems: Map<string, System>
+    systems: Map<string, System>;
 
     constructor(game: Game, pos: Vector) {
         this.game = game;
@@ -17,22 +17,27 @@ export default class Entity {
         this.position = pos;
     }
 
-    start() {}
-    preUpdate(delta: number) {
+    start(): void {}
+
+    preUpdate(delta: number): void {
         this.systems.forEach(system => {
             system.preUpdate(delta);
-        });}
-    update(delta: number) {
+        });
+    }
+
+    update(delta: number): void {
         this.systems.forEach(system => {
             system.update(delta);
         });
     }
-    postUpdate(delta: number) {
+
+    postUpdate(delta: number): void {
         this.systems.forEach(system => {
             system.postUpdate(delta);
         });
     }
-    remove() {
+
+    remove(): void {
         this.systems.forEach(system => {
             system.end();
         });
@@ -50,7 +55,7 @@ export default class Entity {
         return system;
     }
 
-    getSystem(type: string) {
+    getSystem(type: string): System {
         return this.systems.get(type);
     }
 }

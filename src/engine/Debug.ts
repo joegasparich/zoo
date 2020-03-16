@@ -5,35 +5,35 @@ class Debug {
     graphics: PIXI.Graphics;
     camera: Camera;
 
-    init(game: Game) {
+    init(game: Game): void {
         this.graphics = new PIXI.Graphics();
         this.graphics.parentGroup = LAYERS.DEBUG;
         game.stage.addChild(this.graphics);
         this.camera = game.camera;
     }
 
-    preUpdate() {
+    preUpdate(): void {
         if (!this.graphics) return;
-        this.graphics.clear()
+        this.graphics.clear();
     }
 
-    postUpdate() {
+    postUpdate(): void {
         if (!this.graphics) return;
         this.graphics.pivot = this.camera.screenPosition.toPoint();
     }
 
-    setLineStyle(thickness: number, colour: number) {
+    setLineStyle(thickness: number, colour: number): void {
         if (!this.graphics) return;
         this.graphics.lineStyle(thickness, colour);
     }
 
-    drawLine(startX: number, startY: number, endX: number, endy: number) {
+    drawLine(startX: number, startY: number, endX: number, endy: number): void {
         if (!this.graphics) return;
         this.graphics.moveTo(startX, startY);
         this.graphics.lineTo(endX, endy);
     }
 
-    drawVectorList(vertices: Vector[]) {
+    drawVectorList(vertices: Vector[]): void {
         let lastVertex: Vector = null;
         vertices.forEach(vertex => {
             if (!lastVertex) {
@@ -45,13 +45,13 @@ class Debug {
                 lastVertex.x,
                 lastVertex.y,
                 vertex.x,
-                vertex.y
+                vertex.y,
             );
             lastVertex = vertex;
-        })
+        });
     }
 
-    drawCircle(pos: Vector, radius: number) {
+    drawCircle(pos: Vector, radius: number): void {
         if (!this.graphics) return;
         this.graphics.drawCircle(pos.x, pos.y, radius);
     }

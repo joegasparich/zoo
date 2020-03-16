@@ -2,7 +2,7 @@ import { js as Pathfinder } from "easystarjs";
 
 import { Vector } from "engine";
 
-export type Path = { x: number; y: number; }[];
+export type Path = { x: number; y: number }[];
 
 export default class PathfindingGrid {
     pathFinder: Pathfinder;
@@ -11,7 +11,7 @@ export default class PathfindingGrid {
     grid: number[][];
 
     constructor(rows: number, cols: number) {
-        this.grid = this.generateGrid(rows, cols)
+        this.grid = this.generateGrid(rows, cols);
 
         this.pathFinder = new Pathfinder();
         this.pathFinder.enableDiagonals();
@@ -31,12 +31,12 @@ export default class PathfindingGrid {
         return grid;
     }
 
-    disablePoint(pos: Vector) {
+    disablePoint(pos: Vector): void {
         this.grid[pos.y][pos.x] = 1;
         this.pathFinder.setGrid(this.grid);
     }
 
-    enablePoint(pos: Vector) {
+    enablePoint(pos: Vector): void {
         this.grid[pos.y][pos.x] = 0;
         this.pathFinder.setGrid(this.grid);
     }
@@ -45,12 +45,12 @@ export default class PathfindingGrid {
         return new Promise((resolve, reject) => {
             this.pathFinder.findPath(start.x, start.y, end.x, end.y, (path) => {
                 if (path === null) {
-                    reject()
+                    reject();
                 } else {
                     resolve(path);
                 }
             });
             this.pathFinder.calculate();
-        })
+        });
     }
 }

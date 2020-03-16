@@ -1,7 +1,7 @@
-import { System } from '.';
-import { AssetManager } from 'engine/managers';
+import { System } from ".";
+import { AssetManager } from "engine/managers";
 import { Entity } from "engine/entities";
-import { LAYERS, WORLD_SCALE } from 'engine/constants'
+import { LAYERS, WORLD_SCALE } from "engine/constants";
 
 export default class RenderSystem extends System {
     id = "RENDER_SYSTEM";
@@ -14,7 +14,7 @@ export default class RenderSystem extends System {
         this.spriteUrl = spriteUrl;
     }
 
-    start(entity: Entity) {
+    start(entity: Entity): void {
         super.start(entity);
 
         const app = entity.game.app;
@@ -28,7 +28,7 @@ export default class RenderSystem extends System {
         this.sprite.anchor.x = 0.5;
     }
 
-    postUpdate(delta: number) {
+    postUpdate(delta: number): void {
         this.sprite.pivot = this.entity.game.camera.screenPosition.toPoint();
         super.postUpdate(delta);
 

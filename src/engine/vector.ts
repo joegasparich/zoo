@@ -5,7 +5,7 @@ export default class Vector {
     x: number;
     y: number;
 
-    constructor(x: number = 0, y: number = 0) {
+    constructor(x = 0, y = 0) {
         this.x = x;
         this.y = y;
     }
@@ -23,7 +23,7 @@ export default class Vector {
     multiply(amount: number): Vector {
         return new Vector(this.x * amount, this.y * amount);
     }
-    divide(amount: number) : Vector{
+    divide(amount: number): Vector{
         if (amount === 0) {
             try {
                 throw "Can't divide by zero";
@@ -35,7 +35,7 @@ export default class Vector {
         return this.multiply(1 / amount);
     }
     magnitude(): number {
-        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
     }
     truncate(amount: number): Vector {
         return this.normalize().multiply(amount);
@@ -45,7 +45,7 @@ export default class Vector {
     }
 
     toString(): string {
-        return `[${this.x}, ${this.y}]`
+        return `[${this.x}, ${this.y}]`;
     }
 
     toPoint(): IPoint {
@@ -59,7 +59,7 @@ export default class Vector {
     static Lerp(startPos: Vector, endPos: Vector, amount: number) {
         return new Vector(
             lerp(startPos.x, endPos.x, amount),
-            lerp(startPos.y, endPos.y, amount)
-        )
+            lerp(startPos.y, endPos.y, amount),
+        );
     }
 }

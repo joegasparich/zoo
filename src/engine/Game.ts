@@ -1,5 +1,5 @@
 import "pixi.js";
-import 'pixi-tilemap';
+import "pixi-tilemap";
 import "pixi-layers";
 
 import "./app.scss";
@@ -17,13 +17,13 @@ enum GameEvent {
     LOAD_START,
     LOAD_COMPLETE,
     SETUP_COMPLETE,
-}
+};
 
 type GameOpts = {
-    windowWidth: number,
-    windowHeight: number,
-    enableDebug?: boolean
-}
+    windowWidth: number;
+    windowHeight: number;
+    enableDebug?: boolean;
+};
 
 export default class Game {
 
@@ -37,9 +37,9 @@ export default class Game {
     public camera: Camera;
     public mapGrid: MapGrid;
 
-    private eventListeners: { event: GameEvent, callback: Function }[];
+    private eventListeners: { event: GameEvent; callback: Function }[];
 
-    private entities: Map<string, Entity>
+    private entities: Map<string, Entity>;
     private entitiesToAdd: Entity[];
     private entitiesToDelete: string[];
 
@@ -173,7 +173,7 @@ export default class Game {
 
     private removeDeletedEntities(): void {
         this.entitiesToDelete.forEach(entityId => {
-            this.entities.delete(entityId)
+            this.entities.delete(entityId);
         });
         this.entitiesToDelete = [];
     }
@@ -181,7 +181,7 @@ export default class Game {
     //-- Events --//
 
     public on(event: GameEvent, callback: Function): void {
-        this.eventListeners.push({ event, callback })
+        this.eventListeners.push({ event, callback });
     }
 
     private fire(event: GameEvent): void {

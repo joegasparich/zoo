@@ -27,27 +27,28 @@ export default class InputManager {
             if (this.keys.includes(event.key)) return;
             this.keys.push(event.key);
             this.keysDown.push(event.key);
-        })
+        });
+
         document.addEventListener("keyup", (event: KeyboardEvent) => {
-            var index = this.keys.indexOf(event.key);
+            const index = this.keys.indexOf(event.key);
             if (index !== -1) this.keys.splice(index, 1);
             this.keysUp.push(event.key);
-        })
+        });
     }
 
-    clearKeys() {
+    clearKeys(): void {
         // Reset one tick key lists
         this.keysDown = [];
         this.keysUp = [];
     }
 
-    isKeyPressed(key: KEY) {
+    isKeyPressed(key: KEY): boolean {
         return this.keysDown.includes(key);
     }
-    isKeyHeld(key: KEY) {
+    isKeyHeld(key: KEY): boolean {
         return this.keys.includes(key);
     }
-    isKeyReleased(key: KEY) {
+    isKeyReleased(key: KEY): boolean {
         return this.keysUp.includes(key);
     }
 }

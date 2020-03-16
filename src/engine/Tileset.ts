@@ -26,8 +26,8 @@ export default class Tileset {
             row * this.tileSize,
             col * this.tileSize,
             this.tileSize,
-            this.tileSize
-        )
+            this.tileSize,
+        );
     }
 
     getTile(index: number): PIXI.Texture {

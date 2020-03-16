@@ -1,5 +1,5 @@
-import { Game, Vector } from '.';
-import { WORLD_SCALE } from './constants';
+import { Game, Vector } from ".";
+import { WORLD_SCALE } from "./constants";
 
 export default class Camera {
     game: Game;
@@ -13,11 +13,11 @@ export default class Camera {
         this.screenPosition = pos.multiply(WORLD_SCALE);
     }
 
-    goToPosition(position: Vector) {
+    goToPosition(position: Vector): void {
         this.target = position;
     }
 
-    update() {
+    update(): void {
         if (this.target) {
             this.position = Vector.Lerp(this.position, this.target, 0.1);
             this.screenPosition = this.position.multiply(WORLD_SCALE);

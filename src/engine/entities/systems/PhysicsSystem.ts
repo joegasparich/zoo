@@ -1,36 +1,36 @@
-import { System } from '.';
+import { System } from ".";
 import { Vector } from "engine";
-import { Entity } from '..';
-import { PhysicsManager } from 'engine/managers';
-import { Body } from 'planck-js';
-import { toVector, toVec2 } from 'engine/helpers/util';
+import { Entity } from "..";
+import { PhysicsManager } from "engine/managers";
+import { Body } from "planck-js";
+import { toVector, toVec2 } from "engine/helpers/util";
 
 export default class PhysicsSystem extends System {
 
-    id = "PHYSICS_SYSTEM"
+    id = "PHYSICS_SYSTEM";
 
-    body: Body
+    body: Body;
 
-    start(entity: Entity) {
+    start(entity: Entity): void {
         super.start(entity);
 
         this.body = entity.game.physicsManager.createPhysicsObject({
             position: this.entity.position,
             collider: {
                 type: PhysicsManager.ColliderType.Circle,
-                radius: 1
+                radius: 1,
             },
-            isDynamic: true
+            isDynamic: true,
         });
     }
 
-    update(delta: number) {
+    update(delta: number): void {
         super.update(delta);
 
-        this.entity.position = toVector(this.body.getPosition()); // this.entity.position.add(this.velocity.multiply(delta / FRAME_RATE));
+        this.entity.position = toVector(this.body.getPosition());
     }
 
-    addForce(force: Vector) {
+    addForce(force: Vector): void {
         this.body.applyForceToCenter(toVec2(force), true);
     }
 }
