@@ -1,16 +1,21 @@
+import { TileSetData } from "./map";
+
 export default class Tileset {
     texture: PIXI.Texture;
     rows: number;
     cols: number;
-    tileWidth: number;
-    tileHeight: number;
+    tileSize: number;
 
-    constructor(texture: PIXI.Texture, tileWidth: number, tileHeight: number) {
-        this.texture = texture;
-        this.rows = Math.floor(texture.height / tileHeight);
-        this.cols = Math.floor(texture.width / tileWidth);
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
+    constructor(data: TileSetData) {
+        if (!data.image) {
+            console.error("Tried to create tileset with no texture");
+            return null;
+        }
+
+        this.texture = data.image;
+        this.rows = Math.floor(data.height / data.tileSize);
+        this.cols = Math.floor(data.width / data.tileSize);
+        this.tileSize = data.tileSize;
     }
 
     private getRectFromIndex(index: number): PIXI.Rectangle {
@@ -18,10 +23,10 @@ export default class Tileset {
         const col = Math.min(Math.floor(index / this.cols), this.rows - 1);
 
         return new PIXI.Rectangle(
-            row * this.tileWidth,
-            col * this.tileHeight,
-            this.tileWidth,
-            this.tileHeight
+            row * this.tileSize,
+            col * this.tileSize,
+            this.tileSize,
+            this.tileSize
         )
     }
 

@@ -56,22 +56,15 @@ export default class MapGrid {
     }
 
     setupTileGrid(stage: PIXI.display.Stage, map: MapData) {
-        const tileSet = AssetManager.getTileset(map.tileSet);
-
-        if (!tileSet) {
-            console.error(`No tileset ${map.tileSet} found`);
-            return;
-        }
-
         this.grid = [];
         for (let i = 0; i < this.cols; i++) {
             this.grid[i] = [];
             for  (let j = 0; j < this.rows; j++) {
                 const tileIndex = map.tileData[j * map.width + i] - 1
-                this.grid[i][j] = new Tile(i, j, tileSet, tileIndex);
+                this.grid[i][j] = new Tile(i, j, map.tileSet, tileIndex);
             }
         }
-        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [tileSet.texture]);
+        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [map.tileSet.texture]);
         this.groundTiles.parentGroup = LAYERS.GROUND;
         stage.addChild(this.groundTiles);
         this.updateTiles();

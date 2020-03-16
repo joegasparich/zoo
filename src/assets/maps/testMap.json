@@ -29,7 +29,7 @@
         {
          "name":"tileset",
          "type":"string",
-         "value":"/assets/img/tileset.png"
+         "value":"GRASSLAND"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.3.3",
@@ -37,7 +37,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"Tilesets\/Test.json"
+         "source":"..\/tilesets\/testTileSet.json"
         }],
  "tilewidth":32,
  "type":"map",

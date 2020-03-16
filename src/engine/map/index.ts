@@ -1,3 +1,5 @@
+import { Tileset } from "engine";
+
 export { default as MapGrid } from "./MapGrid";
 export { default as PathfindingGrid, Path } from "./PathfindingGrid";
 
@@ -6,9 +8,20 @@ export interface MapData {
     height: number;
     tileWidth: number;
     tileHeight: number;
-    tileSet: string;
+    tileSetPath: string;
+    tileSet?: Tileset;
     tileData: number[];
 }
+
+export interface TileSetData {
+    path: string;
+    width: number;
+    height: number;
+    tileSize: number;
+    image: PIXI.Texture;
+}
+
+//--Generated interfaces from Tiled--//
 
 export interface TiledMap {
     compressionlevel: number;
@@ -23,20 +36,11 @@ export interface TiledMap {
     renderorder:      string;
     tiledversion:     string;
     tileheight:       number;
-    tilesets:         Tileset[];
+    tilesets:         MapTileSet[];
     tilewidth:        number;
     type:             string;
     version:          number;
     width:            number;
-}
-
-interface Editorsettings {
-    export: Export;
-}
-
-interface Export {
-    format: string;
-    target: string;
 }
 
 interface Layer {
@@ -52,13 +56,101 @@ interface Layer {
     y:       number;
 }
 
-interface Property {
+interface MapTileSet {
+    firstgid: number;
+    source:   string;
+}
+
+export interface TiledSet {
+    columns:        number;
+    editorsettings: Editorsettings;
+    image:          string;
+    imageheight:    number;
+    imagewidth:     number;
+    margin:         number;
+    name:           string;
+    spacing:        number;
+    terrains:       Terrain[];
+    tilecount:      number;
+    tiledversion:   string;
+    tileheight:     number;
+    tiles:          Tile[];
+    tilewidth:      number;
+    type:           string;
+    version:        number;
+    wangsets:       Wangset[];
+}
+
+export interface Editorsettings {
+    export: Export;
+}
+
+export interface Export {
+    format: string;
+    target: string;
+}
+
+export interface Terrain {
+    name: string;
+    tile: number;
+}
+
+export interface Tile {
+    id:           number;
+    probability?: number;
+    objectgroup?: Objectgroup;
+    properties?:  Property[];
+    terrain?:     number[];
+}
+
+export interface Objectgroup {
+    draworder: string;
+    name:      string;
+    objects:   Object[];
+    opacity:   number;
+    type:      string;
+    visible:   boolean;
+    x:         number;
+    y:         number;
+}
+
+export interface Object {
+    height:   number;
+    id:       number;
+    name:     string;
+    rotation: number;
+    type:     string;
+    visible:  boolean;
+    width:    number;
+    x:        number;
+    y:        number;
+}
+
+export interface Property {
     name:  string;
     type:  string;
     value: string;
 }
 
-interface Tileset {
-    firstgid: number;
-    source:   string;
+export interface Wangset {
+    cornercolors: any[];
+    edgecolors:   Edgecolor[];
+    name:         string;
+    tile:         number;
+    wangtiles:    Wangtile[];
+}
+
+export interface Edgecolor {
+    color:       string;
+    name:        string;
+    probability: number;
+    tile:        number;
+}
+
+export interface Wangtile {
+    dflip:  boolean;
+    hflip:  boolean;
+    tileid: number;
+    vflip:  boolean;
+    wangid: number[];
 }

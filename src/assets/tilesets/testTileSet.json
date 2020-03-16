@@ -1,5 +1,13 @@
 { "columns":12,
- "image":"..\/..\/img\/tileset.png",
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"",
+         "target":"."
+        }
+    },
+ "image":"..\/img\/tileset.png",
  "imageheight":672,
  "imagewidth":384,
  "margin":0,
@@ -76,14 +84,54 @@
         }, 
         {
          "id":48,
+         "objectgroup":
+            {
+             "draworder":"index",
+             "name":"",
+             "objects":[
+                    {
+                     "height":0,
+                     "id":10,
+                     "name":"",
+                     "rotation":0,
+                     "type":"",
+                     "visible":true,
+                     "width":0,
+                     "x":48.8626790227464,
+                     "y":27.1459327904147
+                    }],
+             "opacity":1,
+             "type":"objectgroup",
+             "visible":true,
+             "x":0,
+             "y":0
+            },
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[-1, -1, -1, 0]
         }, 
         {
          "id":49,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[-1, -1, 0, 0]
         }, 
         {
          "id":50,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[-1, -1, 0, -1]
         }, 
         {
@@ -112,14 +160,32 @@
         }, 
         {
          "id":60,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[-1, 0, -1, 0]
         }, 
         {
          "id":61,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, 0, 0, 0]
         }, 
         {
          "id":62,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, -1, 0, -1]
         }, 
         {
@@ -144,14 +210,32 @@
         }, 
         {
          "id":72,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[-1, 0, -1, -1]
         }, 
         {
          "id":73,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, 0, -1, -1]
         }, 
         {
          "id":74,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, -1, -1, -1]
         }, 
         {
@@ -180,10 +264,22 @@
         }, 
         {
          "id":84,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, 0, 0, -1]
         }, 
         {
          "id":85,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, 0, -1, 0]
         }, 
         {
@@ -208,10 +304,22 @@
         }, 
         {
          "id":96,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[0, -1, 0, 0]
         }, 
         {
          "id":97,
+         "properties":[
+                {
+                 "name":"solid",
+                 "type":"string",
+                 "value":"true"
+                }],
          "terrain":[-1, 0, 0, 0]
         }, 
         {

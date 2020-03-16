@@ -1,7 +1,9 @@
-import { Tileset } from "engine";
-import { MapData, TiledMap } from "engine/map";
+import * as path from 'path';
 
-import parseTiledMap from "../helpers/parseTiledMap";
+import { Tileset } from "engine";
+import { MapData, TiledMap, TiledSet, TileSetData } from "engine/map";
+
+import { parseTiledMap, parseTiledSet } from "../helpers/parseTiled";
 
 class AssetManager {
     private loader: PIXI.Loader;
@@ -31,16 +33,31 @@ class AssetManager {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
 
-    registerTileset(key: string): void {
-        this.tilesets.set(key, new Tileset(this.loader.resources[key].texture, 32, 32));
-    }
+    loadMap(location: string): Promise<MapData> {
+        return new Promise((resolve) => {
+            this.loader.add(location);
+            this.loader.load((loader, resources) => {
+                const tiledMap = parseTiledMap(resources[location].data as TiledMap);
 
-    getTileset(key: string): Tileset {
-        return this.tilesets.get(key);
-    }
+                //Load Tile Sets
+                tiledMap.tileSetPath = path.join(location, '..', tiledMap.tileSetPath);
+                this.loader.add(tiledMap.tileSetPath);
+                this.loader.load((loader, resources) => {
+                    // Load Images
+                    const tiledSet = resources[tiledMap.tileSetPath].data as TiledSet;
+                    const imagePath = path.join(tiledMap.tileSetPath, '..', tiledSet.image);
 
-    getMap(key: string): MapData {
-        return parseTiledMap(this.loader.resources[key].data as TiledMap);
+                    this.loader.add(imagePath);
+                    this.loader.load((loader, resources) => {
+                        const tileSetData = parseTiledSet(tiledMap.tileSetPath, tiledSet, resources[imagePath].texture);
+
+                        tiledMap.tileSet = new Tileset(tileSetData);
+
+                        resolve(tiledMap);
+                    });
+                });
+            });
+        })
     }
 }
 

@@ -6,7 +6,8 @@ import Actor from "entities/Actor";
 import { PlayerInputSystem } from "entities/systems";
 
 import CONFIG from "constants/config";
-import { SPRITES, MAPS, TEXTURES, TILESETS } from "constants/assets";
+import { SPRITES, MAPS, TEXTURES } from "constants/assets";
+import { MapData } from "engine/map";
 
 // Create game
 const testGame = new Game({
@@ -18,11 +19,19 @@ const testGame = new Game({
 // Load Assets
 AssetManager.loadAssets(Object.values(SPRITES));
 AssetManager.loadAssets(Object.values(TEXTURES));
-AssetManager.loadAssets(Object.values(TILESETS));
-AssetManager.loadAssets(Object.values(MAPS));
 
 // Set up game
-testGame.load(() => {
+let time = Date.now();
+testGame.load(async () => {
+    console.info(`Game Load took ${Date.now() - time}ms`)
+
+    // Load Map
+    time = Date.now();
+    const map = await AssetManager.loadMap(MAPS.TEST)
+    testGame.mapGrid.loadMap(map);
+    console.info(`Map Load took ${Date.now() - time}ms`)
+
+    // Create Player
     const player = new Actor(
         testGame,
         new Vector(4, 4),
@@ -32,8 +41,4 @@ testGame.load(() => {
     )
     testGame.registerEntity(player);
     player.addSystem(new CameraFollowSystem());
-
-    Object.values(TILESETS).forEach(tileset => AssetManager.registerTileset(tileset))
-    const map = AssetManager.getMap(MAPS.TEST);
-    testGame.mapGrid.loadMap(map);
 })
