@@ -19,15 +19,15 @@
 		"pixi-layers": "^0.2.3",
 		"pixi-tilemap": "^2.0.3",
 		"pixi.js": "^5.1.5",
-		"planck-js": "^0.3.12",
+		"planck-js": "https://github.com/shakiba/planck.js/tarball/master",
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^2.23.0",
-		"@typescript-eslint/parser": "^2.23.0",
 		"@types/node": "^12.12.29",
 		"@types/pixi.js": "^5.0.0",
 		"@types/uuid": "^3.4.5",
+		"@typescript-eslint/eslint-plugin": "^2.23.0",
+		"@typescript-eslint/parser": "^2.23.0",
 		"awesome-typescript-loader": "^5.2.1",
 		"clean-webpack-plugin": "^3.0.0",
 		"copy-webpack-plugin": "^5.0.4",

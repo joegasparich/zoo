@@ -1,10 +1,11 @@
-import { TileSetData } from "./map";
+import { TileSetData, TileData } from "./map";
 
 export default class Tileset {
     texture: PIXI.Texture;
     rows: number;
     cols: number;
     tileSize: number;
+    tiles: Map<number, TileData>;
 
     constructor(data: TileSetData) {
         if (!data.image) {
@@ -16,6 +17,11 @@ export default class Tileset {
         this.rows = Math.floor(data.height / data.tileSize);
         this.cols = Math.floor(data.width / data.tileSize);
         this.tileSize = data.tileSize;
+
+        this.tiles = new Map();
+        data.tiles.forEach(tile => {
+            this.tiles.set(tile.id, tile);
+        });
     }
 
     private getRectFromIndex(index: number): PIXI.Rectangle {
@@ -30,8 +36,12 @@ export default class Tileset {
         );
     }
 
-    getTile(index: number): PIXI.Texture {
-        this.texture.frame = this.getRectFromIndex(index);
+    getTileData(id: number): TileData {
+        return this.tiles.get(id);
+    }
+
+    getTileTexture(id: number): PIXI.Texture {
+        this.texture.frame = this.getRectFromIndex(id);
         return this.texture.clone();
     }
 }

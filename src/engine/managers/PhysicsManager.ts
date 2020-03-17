@@ -5,7 +5,7 @@ import Debug from "engine/Debug";
 import { WORLD_SCALE, FRAME_RATE } from "engine/constants";
 import { toVec2, toVector } from "engine/helpers/util";
 
-type PhysicsObjOpts = {
+export type PhysicsObjOpts = {
     position: Vector;
     collider: Collider;
     isDynamic: boolean;
@@ -14,12 +14,12 @@ type PhysicsObjOpts = {
     density?: number;
 };
 
-enum ColliderType {
+export enum ColliderType {
     Circle,
     Rect
 };
 
-type Collider = {
+export type Collider = {
     type: ColliderType;
     radius?: number;
     width?: number;

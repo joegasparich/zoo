@@ -19,6 +19,12 @@ export interface TileSetData {
     height: number;
     tileSize: number;
     image: PIXI.Texture;
+    tiles: TileData[];
+}
+
+export interface TileData {
+    id: number;
+    solid: boolean;
 }
 
 //--Generated interfaces from Tiled--//

@@ -41,6 +41,7 @@ export default class Vector {
         return this.normalize().multiply(amount);
     }
     normalize(): Vector {
+        if (this.magnitude() === 0) return this;
         return this.divide(this.magnitude());
     }
 

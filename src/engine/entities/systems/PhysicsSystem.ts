@@ -14,13 +14,15 @@ export default class PhysicsSystem extends System {
     start(entity: Entity): void {
         super.start(entity);
 
+        // TODO move these variables to the constructor
         this.body = entity.game.physicsManager.createPhysicsObject({
             position: this.entity.position,
             collider: {
                 type: PhysicsManager.ColliderType.Circle,
-                radius: 1,
+                radius: 0.2,
             },
             isDynamic: true,
+            density: 10,
         });
     }
 

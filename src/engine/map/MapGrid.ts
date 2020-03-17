@@ -1,20 +1,23 @@
 import { Game, Debug, Camera, Vector, Tileset } from "engine";
 import { MapData, Path, PathfindingGrid } from ".";
 import { LAYERS } from "engine/constants";
+import { ColliderType } from "engine/managers";
 
-class Tile {
+class MapCell {
     x: number;
     y: number;
 
+    isSolid: boolean;
     tileset: Tileset;
     tileIndex: number;
 
-    constructor(x: number, y: number, tileset: Tileset, index = 0) {
+    constructor(x: number, y: number, tileset: Tileset, id: number) {
         this.x = x;
         this.y = y;
 
         this.tileset = tileset;
-        this.tileIndex = index;
+        this.tileIndex = id;
+        this.isSolid = tileset.tiles.get(id).solid;
     }
 }
 
@@ -27,7 +30,7 @@ export default class MapGrid {
     cellSize: number;
 
     camera: Camera;
-    grid: Tile[][];
+    grid: MapCell[][];
     groundTiles: PIXI.tilemap.CompositeRectTileLayer;
     pathfindingGrid: PathfindingGrid;
 
@@ -48,8 +51,8 @@ export default class MapGrid {
         this.rows = map.width;
         this.cols = map.height;
 
-        this.setupTileGrid(this.game.stage, map);
         this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
+        this.setupTileGrid(this.game.stage, map);
     }
 
     clearMap(): void {
@@ -76,7 +79,7 @@ export default class MapGrid {
             this.grid[i] = [];
             for  (let j = 0; j < this.rows; j++) {
                 const tileIndex = map.tileData[j * map.width + i] - 1;
-                this.grid[i][j] = new Tile(i, j, map.tileSet, tileIndex);
+                this.grid[i][j] = new MapCell(i, j, map.tileSet, tileIndex);
             }
         }
         this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [map.tileSet.texture]);
@@ -92,8 +95,23 @@ export default class MapGrid {
                 const tile = this.grid[i][j];
                 if (!tile) { continue; }
 
-                const texture = tile.tileset.getTile(tile.tileIndex);
+                // Texture
+                const texture = tile.tileset.getTileTexture(tile.tileIndex);
                 this.groundTiles.addFrame(texture, i * this.cellSize, j * this.cellSize);
+
+                // Collision
+                if (tile.isSolid) {
+                    this.pathfindingGrid.disablePoint(new Vector(tile.x, tile.y));
+                    this.game.physicsManager.createPhysicsObject({
+                        collider: {
+                            type: ColliderType.Rect,
+                            height: 1,
+                            width: 1,
+                        },
+                        position: new Vector(tile.x + 0.5, tile.y + 0.5),
+                        isDynamic: false,
+                    });
+                }
             }
         }
     }

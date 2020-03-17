@@ -38,7 +38,7 @@ export default class Actor extends Entity {
 
     state: StateMachine;
 
-    accelleration = 200; // Temp
+    accelleration = 100; // Temp
 
     constructor(game: Game, pos: Vector, inputSystem: InputSystem, physicsSystem: PhysicsSystem, renderSystem: RenderSystem) {
         super(game, pos);
