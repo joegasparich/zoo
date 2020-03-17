@@ -49,6 +49,12 @@ class Debug {
             );
             lastVertex = vertex;
         });
+        this.drawLine(
+            lastVertex.x,
+            lastVertex.y,
+            vertices[0].x,
+            vertices[0].y,
+        );
     }
 
     drawCircle(pos: Vector, radius: number): void {

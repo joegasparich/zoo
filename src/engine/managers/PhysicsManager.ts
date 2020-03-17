@@ -97,7 +97,9 @@ export default class PhysicsManager {
                     break;
                 case "polygon":
                     const polygon = shape as PolygonShape;
-                    const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y).multiply(WORLD_SCALE));
+                    const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y)
+                        .add(toVector(body.getPosition()))
+                        .multiply(WORLD_SCALE));
                     Debug.drawVectorList(vectorList);
                     break;
                 default:
