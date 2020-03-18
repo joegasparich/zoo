@@ -1,7 +1,7 @@
-import { Game, Debug, Camera, Vector, Tileset } from "engine";
+import { Game, Debug, Camera, Vector, Tileset, Events, Layers } from "engine";
 import { MapData, Path, PathfindingGrid } from ".";
-import { LAYERS } from "engine/constants";
 import { ColliderType } from "engine/managers";
+import Mediator from "engine/Mediator";
 
 class MapCell {
     x: number;
@@ -39,6 +39,11 @@ export default class MapGrid {
         this.pos = new Vector();
 
         this.drawDebug();
+
+        // Listen for map load requests
+        Mediator.on(Events.MapEvent.REQUEST_MAP_LOAD, ((mapData: MapData) => {
+            this.loadMap(mapData);
+        }));
     }
 
     setCamera(camera: Camera): void {
@@ -83,7 +88,7 @@ export default class MapGrid {
             }
         }
         this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [map.tileSet.texture]);
-        this.groundTiles.parentGroup = LAYERS.GROUND;
+        this.groundTiles.parentGroup = Layers.GROUND;
         stage.addChild(this.groundTiles);
         this.updateTiles();
     }

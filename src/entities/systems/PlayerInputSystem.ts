@@ -8,7 +8,7 @@ import Actor from "entities/Actor";
 export default class PlayerInputSystem extends InputSystem {
     id = "PLAYER_INPUT_SYSTEM";
 
-    update(delta: number) {
+    update(delta: number): void {
         super.update(delta);
 
         const actor = this.entity as Actor;

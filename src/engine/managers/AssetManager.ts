@@ -33,7 +33,7 @@ class AssetManager {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
 
-    loadMap(location: string): Promise<MapData> {
+    loadMapData(location: string): Promise<MapData> {
         return new Promise((resolve) => {
             this.loader.add(location);
             this.loader.load((loader, resources) => {

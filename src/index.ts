@@ -1,12 +1,10 @@
 import { Game, Vector } from "engine";
 import { AssetManager } from "engine/managers";
-import { PhysicsSystem, RenderSystem, CameraFollowSystem } from "engine/entities/systems";
-
-import Actor from "entities/Actor";
-import { PlayerInputSystem } from "entities/systems";
 
 import CONFIG from "constants/config";
-import { SPRITES, MAPS, TEXTURES } from "constants/assets";
+import { SPRITES, TEXTURES } from "constants/assets";
+import TestScene from "scenes/TestScene";
+import Player from "entities/Player";
 
 // Create game
 const testGame = new Game({
@@ -20,24 +18,13 @@ AssetManager.loadAssets(Object.values(SPRITES));
 AssetManager.loadAssets(Object.values(TEXTURES));
 
 // Set up game
-let time = Date.now();
 testGame.load(async () => {
-    console.info(`Game Load took ${Date.now() - time}ms`);
-
     // Load Map
-    time = Date.now();
-    const map = await AssetManager.loadMap(MAPS.TEST);
-    testGame.mapGrid.loadMap(map);
-    console.info(`Map Load took ${Date.now() - time}ms`);
+    await testGame.sceneManager.loadScene(new TestScene());
 
     // Create Player
-    const player = new Actor(
+    const player = new Player(
         testGame,
         new Vector(4, 4),
-        new PlayerInputSystem(),
-        new PhysicsSystem(),
-        new RenderSystem(SPRITES.HERO),
     );
-    testGame.registerEntity(player);
-    player.addSystem(new CameraFollowSystem());
 });

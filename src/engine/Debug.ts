@@ -1,5 +1,4 @@
-import { Game, Camera, Vector } from ".";
-import { LAYERS } from "./constants";
+import { Game, Camera, Vector, Layers } from ".";
 
 class Debug {
     graphics: PIXI.Graphics;
@@ -7,7 +6,7 @@ class Debug {
 
     init(game: Game): void {
         this.graphics = new PIXI.Graphics();
-        this.graphics.parentGroup = LAYERS.DEBUG;
+        this.graphics.parentGroup = Layers.DEBUG;
         game.stage.addChild(this.graphics);
         this.camera = game.camera;
     }

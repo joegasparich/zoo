@@ -4,20 +4,13 @@ import "pixi-layers";
 
 import "./app.scss";
 
-import { Debug, Camera, Vector } from ".";
-import { AssetManager, InputManager, PhysicsManager } from "./managers";
+import { Debug, Camera, Vector, Events, Layers } from ".";
+import { AssetManager, InputManager, PhysicsManager, SceneManager } from "./managers";
+import Mediator from "./Mediator";
 import { Entity } from "./entities";
 import { MapGrid } from "./map";
 
 import { registerPixiInspector } from "./helpers/util";
-
-import { LAYERS } from "./constants";
-
-enum GameEvent {
-    LOAD_START,
-    LOAD_COMPLETE,
-    SETUP_COMPLETE,
-};
 
 type GameOpts = {
     windowWidth: number;
@@ -27,8 +20,6 @@ type GameOpts = {
 
 export default class Game {
 
-    public static GameEvent = GameEvent;
-
     public app: PIXI.Application;
     public stage: PIXI.display.Stage;
 
@@ -37,8 +28,6 @@ export default class Game {
     public camera: Camera;
     public mapGrid: MapGrid;
 
-    private eventListeners: { event: GameEvent; callback: Function }[];
-
     private entities: Map<string, Entity>;
     private entitiesToAdd: Entity[];
     private entitiesToDelete: string[];
@@ -46,6 +35,7 @@ export default class Game {
     // Managers
     public physicsManager: PhysicsManager;
     public inputManager: InputManager;
+    public sceneManager: SceneManager;
 
     constructor(opts: GameOpts) {
         this.opts = opts;
@@ -59,7 +49,6 @@ export default class Game {
         registerPixiInspector();
 
         // Set up variables
-        this.eventListeners = [];
         this.entities = new Map();
         this.entitiesToAdd = [];
         this.entitiesToDelete = [];
@@ -70,9 +59,9 @@ export default class Game {
 
     public load(callback?: Function): void {
         // Load Assets, all assets should be added to the manager at this point
-        this.fire(GameEvent.LOAD_START);
+        Mediator.fire(Events.GameEvent.LOAD_START);
         AssetManager.doLoad(() => {
-            this.fire(GameEvent.LOAD_COMPLETE);
+            Mediator.fire(Events.GameEvent.LOAD_COMPLETE);
 
             // start up the game loop
             this.app.ticker.add(this.update.bind(this));
@@ -88,6 +77,7 @@ export default class Game {
 
         this.inputManager = new InputManager();
         this.physicsManager = new PhysicsManager();
+        this.sceneManager = new SceneManager();
 
         this.setupRenderLayers();
 
@@ -102,17 +92,17 @@ export default class Game {
             Debug.init(this);
         }
 
-        this.fire(GameEvent.SETUP_COMPLETE);
+        Mediator.fire(Events.GameEvent.SETUP_COMPLETE);
     }
 
     private setupRenderLayers(): void {
         this.stage = new PIXI.display.Stage();
         this.stage.sortableChildren = true;
 
-        this.stage.addChild(new PIXI.display.Layer(LAYERS.GROUND));
-        this.stage.addChild(new PIXI.display.Layer(LAYERS.ENTITIES));
-        this.stage.addChild(new PIXI.display.Layer(LAYERS.UI));
-        this.stage.addChild(new PIXI.display.Layer(LAYERS.DEBUG));
+        this.stage.addChild(new PIXI.display.Layer(Layers.GROUND));
+        this.stage.addChild(new PIXI.display.Layer(Layers.ENTITIES));
+        this.stage.addChild(new PIXI.display.Layer(Layers.UI));
+        this.stage.addChild(new PIXI.display.Layer(Layers.DEBUG));
 
         this.app.stage = this.stage;
     }
@@ -121,6 +111,7 @@ export default class Game {
         //////////// Pre Update ////////////
 
         // Setup actions
+        this.sceneManager.getCurrentScene().preUpdate();
         Debug.preUpdate();
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
@@ -129,6 +120,7 @@ export default class Game {
         //////////// Update ////////////
 
         // Game actions
+        this.sceneManager.getCurrentScene().update();
         this.entities.forEach(entity => {
             entity.update(delta);
         });
@@ -140,6 +132,7 @@ export default class Game {
         //////////// Post Update ////////////
 
         // Rendering actions
+        this.sceneManager.getCurrentScene().postUpdate();
         this.entities.forEach(entity => {
             entity.postUpdate(delta);
         });
@@ -176,19 +169,5 @@ export default class Game {
             this.entities.delete(entityId);
         });
         this.entitiesToDelete = [];
-    }
-
-    //-- Events --//
-
-    public on(event: GameEvent, callback: Function): void {
-        this.eventListeners.push({ event, callback });
-    }
-
-    private fire(event: GameEvent): void {
-        console.log(`GAME EVENT: ${event.toString()}`);
-
-        this.eventListeners
-            .filter(listener => listener.event === event)
-            .forEach(listener => listener.callback());
     }
 }

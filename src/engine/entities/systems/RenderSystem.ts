@@ -1,7 +1,8 @@
 import { System } from ".";
 import { AssetManager } from "engine/managers";
 import { Entity } from "engine/entities";
-import { LAYERS, WORLD_SCALE } from "engine/constants";
+import { WORLD_SCALE } from "engine/constants";
+import { Layers } from "engine";
 
 export default class RenderSystem extends System {
     id = "RENDER_SYSTEM";
@@ -22,7 +23,7 @@ export default class RenderSystem extends System {
         const texture = AssetManager.getTexture(this.spriteUrl);
         this.sprite = new PIXI.Sprite(texture);
         app.stage.addChild(this.sprite);
-        this.sprite.parentGroup = LAYERS.ENTITIES;
+        this.sprite.parentGroup = Layers.ENTITIES;
 
         this.sprite.anchor.y = 0.5;
         this.sprite.anchor.x = 0.5;

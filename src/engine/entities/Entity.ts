@@ -15,6 +15,8 @@ export default class Entity {
         this.id = uuid();
         this.systems = new Map();
         this.position = pos;
+
+        this.game.registerEntity(this);
     }
 
     start(): void {}
