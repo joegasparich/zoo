@@ -1,30 +1,42 @@
 import { Game, Vector } from "engine";
-import { AssetManager } from "engine/managers";
 
 import CONFIG from "constants/config";
 import { SPRITES, TEXTURES } from "constants/assets";
 import TestScene from "scenes/TestScene";
 import Player from "entities/Player";
+import { AssetManager } from "engine/managers";
 
-// Create game
-const testGame = new Game({
-    windowWidth: CONFIG.WINDOW_WIDTH,
-    windowHeight: CONFIG.WINDOW_HEIGHT,
-    enableDebug: CONFIG.ENABLE_DEBUG,
-});
 
-// Load Assets
-AssetManager.loadAssets(Object.values(SPRITES));
-AssetManager.loadAssets(Object.values(TEXTURES));
+async function run() {
+    // Create game
+    const testGame = new Game({
+        windowWidth: CONFIG.WINDOW_WIDTH,
+        windowHeight: CONFIG.WINDOW_HEIGHT,
+        enableDebug: CONFIG.ENABLE_DEBUG,
+    });
 
-// Set up game
-testGame.load(async () => {
+    // Load Assets
+    AssetManager.preLoadAssets(Object.values(SPRITES));
+    AssetManager.preLoadAssets(Object.values(TEXTURES));
+
+    // Load game
+    await testGame.load(progress => {
+        console.log(`Game Load Progress: ${progress}%`);
+    });
+
     // Load Map
-    await testGame.sceneManager.loadScene(new TestScene());
+    await testGame.sceneManager.loadScene(
+        new TestScene(),
+        (progress: number) => {
+            console.log(`Map Load Progress: ${progress}%`);
+        },
+    );
 
     // Create Player
     const player = new Player(
         testGame,
         new Vector(4, 4),
     );
-});
+}
+
+run();

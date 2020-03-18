@@ -57,20 +57,17 @@ export default class Game {
         document.body.appendChild(this.app.view);
     }
 
-    public load(callback?: Function): void {
-        // Load Assets, all assets should be added to the manager at this point
+    public async load(onProgress?: (progress: number) => void): Promise<void> {
+        // Load Assets, all preloaded assets should be added to the manager at this point
         Mediator.fire(Events.GameEvent.LOAD_START);
-        AssetManager.doLoad(() => {
-            Mediator.fire(Events.GameEvent.LOAD_COMPLETE);
+        await AssetManager.doPreLoad(onProgress);
+        Mediator.fire(Events.GameEvent.LOAD_COMPLETE);
 
-            // start up the game loop
-            this.app.ticker.add(this.update.bind(this));
+        // start up the game loop
+        this.app.ticker.add(this.update.bind(this));
 
-            // Now that assets have been loaded we can set up the game
-            this.setup();
-
-            callback();
-        });
+        // Now that assets have been loaded we can set up the game
+        this.setup();
     }
 
     private setup(): void {

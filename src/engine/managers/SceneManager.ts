@@ -16,7 +16,7 @@ export abstract class Scene {
 export default class SceneManager {
     private currentScene: Scene;
 
-    public async loadScene(scene: Scene): Promise<void> {
+    public async loadScene(scene: Scene, onProgress?: Function): Promise<void> {
         if (this.currentScene) {
             this.currentScene.stop();
         }
@@ -27,7 +27,7 @@ export default class SceneManager {
 
         if (scene.mapPath) {
             Mediator.fire(Events.MapEvent.MAP_LOAD_START, { mapPath: scene.mapPath });
-            const mapData = await AssetManager.loadMapData(scene.mapPath);
+            const mapData = await AssetManager.loadMapData(scene.mapPath, onProgress);
             Mediator.fire(Events.MapEvent.MAP_LOAD_COMPLETE, mapData);
             Mediator.fire(Events.MapEvent.REQUEST_MAP_LOAD, mapData);
         }
