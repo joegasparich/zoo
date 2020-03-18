@@ -19,7 +19,7 @@ export default class Camera {
 
     update(): void {
         if (this.target) {
-            this.position = Vector.Lerp(this.position, this.target, 0.1);
+            this.position = Vector.Lerp(this.position, this.target, 0.1 * this.game.gameSpeed);
             this.screenPosition = this.position.multiply(WORLD_SCALE);
         }
     }

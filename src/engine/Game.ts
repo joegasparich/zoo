@@ -28,6 +28,8 @@ export default class Game {
     public camera: Camera;
     public mapGrid: MapGrid;
 
+    public gameSpeed = 1;
+
     private entities: Map<string, Entity>;
     private entitiesToAdd: Entity[];
     private entitiesToDelete: string[];
@@ -71,7 +73,6 @@ export default class Game {
     }
 
     private setup(): void {
-
         this.inputManager = new InputManager();
         this.physicsManager = new PhysicsManager();
         this.sceneManager = new SceneManager();
@@ -104,7 +105,9 @@ export default class Game {
         this.app.stage = this.stage;
     }
 
-    public update(delta: number): void {
+    private update(delta: number): void {
+        delta *= this.gameSpeed;
+
         //////////// Pre Update ////////////
 
         // Setup actions

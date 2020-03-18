@@ -34,6 +34,6 @@ export default class RenderSystem extends System {
         super.postUpdate(delta);
 
         // Sync postition
-        this.sprite.position = new PIXI.Point(this.entity.position.x * WORLD_SCALE, this.entity.position.y * WORLD_SCALE);
+        this.sprite.position.set(this.entity.position.x * WORLD_SCALE, this.entity.position.y * WORLD_SCALE);
     }
 }

@@ -1,35 +1,13 @@
 import { Game, Vector } from "engine";
 import { Entity } from "engine/entities";
 import { PhysicsSystem, RenderSystem, InputSystem } from "engine/entities/systems";
-import { StateMachine, IState, INPUT } from "engine/entities/state";
+import { StateMachine, State } from "engine/state";
 
-class Idle implements IState {
-    handleInput(input: INPUT): IState | void {
-        switch(input) {
-        case INPUT.MOVE:
-            return new Walking();
-        default:
-            return;
-        }
-    }
-    enter(): void {}
-    exit(): void {}
-    update(): void {}
+export enum ActorStateInput {
+    MOVE= "MOVE",
+    STILL = "STILL",
+    USE = "USE",
 };
-
-class Walking implements IState {
-    handleInput(input: INPUT): IState | void {
-        switch(input) {
-        case INPUT.STILL:
-            return new Idle();
-        }
-    }
-    enter(): void {}
-    exit(): void {}
-    update(actor: Actor, delta: number): void {
-        actor.physics.addForce(actor.input.inputVector.multiply(actor.accelleration));
-    }
-}
 
 export default class Actor extends Entity {
     input: InputSystem;
@@ -47,11 +25,36 @@ export default class Actor extends Entity {
         this.physics = this.addSystem(physicsSystem);
         this.render = this.addSystem(renderSystem);
 
-        this.state = new StateMachine(new Idle());
+        this.state = new StateMachine(Actor.idle);
     }
 
     update(delta: number): void {
         super.update(delta);
-        this.state.update(this, delta);
+        this.state.update(delta, this);
     }
+
+    static idle: State = {
+        handleInput(input) {
+            switch(input) {
+            case ActorStateInput.MOVE:
+                return Actor.walking;
+            default:
+                return;
+            }
+        },
+    };
+
+    static walking: State = {
+        handleInput(input) {
+            switch(input) {
+            case ActorStateInput.STILL:
+                return Actor.idle;
+            default:
+                return;
+            }
+        },
+        update(delta: number, actor: Actor): void {
+            actor.physics.addForce(actor.input.inputVector.multiply(actor.accelleration));
+        },
+    };
 }
