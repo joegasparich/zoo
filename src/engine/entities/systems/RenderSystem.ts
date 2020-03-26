@@ -1,39 +1,76 @@
-import { System } from ".";
+import { System, SYSTEM } from ".";
 import { AssetManager } from "engine/managers";
 import { Entity } from "engine/entities";
 import { WORLD_SCALE } from "engine/constants";
 import { Layers } from "engine";
 
 export default class RenderSystem extends System {
-    id = "RENDER_SYSTEM";
+    public id = SYSTEM.RENDER_SYSTEM;
 
-    spriteUrl: string;
-    sprite: PIXI.Sprite;
+    protected spriteUrl: string;
+    public sprite: PIXI.Sprite;
+
+    public flipX: boolean;
+    public flipY: boolean;
 
     constructor(spriteUrl: string) {
         super();
-        this.spriteUrl = spriteUrl;
+        this.spriteUrl = spriteUrl ?? "";
     }
 
-    start(entity: Entity): void {
+    public start(entity: Entity): void {
         super.start(entity);
 
-        const app = entity.game.app;
-
-        const texture = AssetManager.getTexture(this.spriteUrl);
-        this.sprite = new PIXI.Sprite(texture);
-        app.stage.addChild(this.sprite);
-        this.sprite.parentGroup = Layers.ENTITIES;
-
-        this.sprite.anchor.y = 0.5;
-        this.sprite.anchor.x = 0.5;
+        if (this.spriteUrl) {
+            this.setSprite(this.spriteUrl);
+        }
     }
 
-    postUpdate(delta: number): void {
-        this.sprite.pivot = this.entity.game.camera.screenPosition.toPoint();
+    public setSprite(newSprite: string | PIXI.Texture | PIXI.Sprite): void {
+        if (typeof newSprite === "string") {
+            newSprite = AssetManager.getTexture(newSprite);
+        }
+        if (newSprite instanceof PIXI.Texture) {
+            newSprite = new PIXI.Sprite(newSprite);
+        }
+
+        if (!newSprite) {
+            console.error("Failed to set sprite");
+            return;
+        }
+
+        // Remove old sprite
+        const app = this.entity.game.app;
+        app.stage.removeChild(this.sprite);
+
+        // Add new sprite
+        app.stage.addChild(newSprite);
+        this.sprite = newSprite;
+        this.sprite.parentGroup = Layers.ENTITIES;
+        this.sprite.anchor.set(0.5);
+        this.syncPosition();
+    }
+
+    public postUpdate(delta: number): void {
         super.postUpdate(delta);
+
+        this.syncPosition();
+    }
+
+    protected syncPosition(): void {
+        if (!this.sprite) return;
+
+        this.sprite.pivot = this.entity.game.camera.screenPosition.toPoint();
+        this.sprite.texture.rotate = this.getRotation();
 
         // Sync postition
         this.sprite.position.set(this.entity.position.x * WORLD_SCALE, this.entity.position.y * WORLD_SCALE);
+    }
+
+    private getRotation(): number {
+        if (!this.flipX && !this.flipY) return 0;
+        if (this.flipX && !this.flipY) return 12;
+        if (!this.flipX && this.flipY) return 8;
+        if (this.flipX && this.flipY) return 4;
     }
 }

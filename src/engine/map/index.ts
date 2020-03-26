@@ -1,31 +1,5 @@
-import { Tileset } from "engine";
-
-export { default as MapGrid } from "./MapGrid";
+export { default as MapGrid, MapData } from "./MapGrid";
 export { default as PathfindingGrid, Path } from "./PathfindingGrid";
-
-export interface MapData {
-    width: number;
-    height: number;
-    tileWidth: number;
-    tileHeight: number;
-    tileSetPath: string;
-    tileSet?: Tileset;
-    tileData: number[];
-}
-
-export interface TileSetData {
-    path: string;
-    width: number;
-    height: number;
-    tileSize: number;
-    image: PIXI.Texture;
-    tiles: TileData[];
-}
-
-export interface TileData {
-    id: number;
-    solid: boolean;
-}
 
 //--Generated interfaces from Tiled--//
 

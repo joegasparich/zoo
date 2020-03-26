@@ -1,4 +1,4 @@
-import { System } from ".";
+import { System, SYSTEM } from ".";
 import { Vector } from "engine";
 import { Entity } from "..";
 import { PhysicsManager } from "engine/managers";
@@ -6,8 +6,7 @@ import { Body } from "planck-js";
 import { toVector, toVec2 } from "engine/helpers/util";
 
 export default class PhysicsSystem extends System {
-
-    id = "PHYSICS_SYSTEM";
+    id = SYSTEM.PHYSICS_SYSTEM;
 
     body: Body;
 

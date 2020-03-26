@@ -1,5 +1,5 @@
 import { Game, Debug, Camera, Vector, Tileset, Events, Layers } from "engine";
-import { MapData, Path, PathfindingGrid } from ".";
+import { Path, PathfindingGrid } from ".";
 import { ColliderType } from "engine/managers";
 import Mediator from "engine/Mediator";
 
@@ -19,6 +19,16 @@ class MapCell {
         this.tileIndex = id;
         this.isSolid = tileset.tiles.get(id).solid;
     }
+}
+
+export interface MapData {
+    width: number;
+    height: number;
+    tileWidth: number;
+    tileHeight: number;
+    tileSetPath: string;
+    tileSet?: Tileset;
+    tileData: number[];
 }
 
 export default class MapGrid {
@@ -101,7 +111,7 @@ export default class MapGrid {
                 if (!tile) { continue; }
 
                 // Texture
-                const texture = tile.tileset.getTileTexture(tile.tileIndex);
+                const texture = tile.tileset.getTexture(tile.tileIndex);
                 this.groundTiles.addFrame(texture, i * this.cellSize, j * this.cellSize);
 
                 // Collision

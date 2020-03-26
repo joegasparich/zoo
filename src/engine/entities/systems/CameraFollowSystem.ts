@@ -1,10 +1,10 @@
 import { Entity } from "engine/entities";
-import { System } from ".";
+import { System, SYSTEM } from ".";
 import { Camera, Vector } from "engine";
 import { WORLD_SCALE } from "engine/constants";
 
 export default class CameraFollowSystem extends System {
-    id = "CAMERA_FOLLOW_SYSTEM";
+    id = SYSTEM.CAMERA_FOLLOW_SYSTEM;
 
     camera: Camera;
 

@@ -56,6 +56,10 @@ class AssetManager {
         return this.loader.resources[key].texture;
     }
 
+    public hasTexture(key: string): boolean {
+        return !!this.loader.resources[key];
+    }
+
     public getTexturesByType(type: object): PIXI.Texture[] {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
@@ -73,7 +77,7 @@ class AssetManager {
         // Load Tileset Image
         const imagePath = path.join(tiledMap.tileSetPath, "..", tiledSet.image);
         const imageResource = await this.loadResource(imagePath, (progress: number) => onProgress && onProgress(progress/3 + 66.66));
-        const tileSetData = parseTiledSet(tiledMap.tileSetPath, tiledSet, imageResource.texture);
+        const tileSetData = parseTiledSet(tiledSet, imageResource.texture);
         tiledMap.tileSet = new Tileset(tileSetData);
 
         return tiledMap;
