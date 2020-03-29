@@ -1,0 +1,7 @@
+{
+    "name": "tree",
+    "solid": true,
+    "width": 1,
+    "height": 1,
+    "sprite": "/assets/img/tree.png"
+}

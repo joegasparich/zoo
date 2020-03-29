@@ -1,27 +1,34 @@
 import { System, SYSTEM } from ".";
 import { Vector } from "engine";
-import { Entity } from "..";
-import { PhysicsManager } from "engine/managers";
+import { Collider } from "engine/managers";
 import { Body } from "planck-js";
 import { toVector, toVec2 } from "engine/helpers/util";
+import { Entity } from "..";
 
 export default class PhysicsSystem extends System {
     id = SYSTEM.PHYSICS_SYSTEM;
 
+    collider: Collider;
+    isDynamic: boolean;
+    density: number;
     body: Body;
 
-    start(entity: Entity): void {
+    constructor(collider: Collider, isDynamic: boolean, density = 10) {
+        super();
+
+        this.collider = collider;
+        this.isDynamic = isDynamic;
+        this.density = density;
+    }
+
+    start(entity: Entity) {
         super.start(entity);
 
-        // TODO move these variables to the constructor
-        this.body = entity.game.physicsManager.createPhysicsObject({
+        this.body = this.entity.game.physicsManager.createPhysicsObject({
             position: this.entity.position,
-            collider: {
-                type: PhysicsManager.ColliderType.Circle,
-                radius: 0.2,
-            },
-            isDynamic: true,
-            density: 10,
+            collider: this.collider,
+            isDynamic: this.isDynamic,
+            density: this.density,
         });
     }
 

@@ -1,5 +1,5 @@
 import { TiledMap, MapFileData, TiledSet } from "engine/map";
-import { TileSetData, TileData } from "engine/Tileset";
+import { TileSetData, TileData } from "engine/TileSet";
 
 // TODO: Handle multiple tilesets
 export function parseTiledMap(tiledMap: TiledMap): MapFileData {

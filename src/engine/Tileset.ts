@@ -10,7 +10,7 @@ export interface TileData {
     solid: boolean;
 }
 
-export default class Tileset extends SpriteSheet {
+export default class TileSet extends SpriteSheet {
     tiles: Map<number, TileData>;
 
     constructor(data: TileSetData) {

@@ -1,6 +1,6 @@
 import * as path from "path";
 
-import { Game, Debug, Camera, Vector, Tileset, Layers } from "engine";
+import { Game, Debug, Camera, Vector, TileSet, Layers } from "engine";
 import { Path, PathfindingGrid, TiledMap } from ".";
 import { ColliderType, AssetManager } from "engine/managers";
 import { parseTiledMap } from "engine/helpers/parseTiled";
@@ -18,7 +18,7 @@ export interface MapFileData {
     tileWidth: number;
     tileHeight: number;
     tileSetPath: string;
-    tileSet?: Tileset;
+    tileSet?: TileSet;
     tileData: number[];
 }
 

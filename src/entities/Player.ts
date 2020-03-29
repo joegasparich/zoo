@@ -3,7 +3,7 @@ import { Game, Vector, SpriteSheet } from "engine";
 import { PlayerInputSystem } from "./systems";
 import { PhysicsSystem, CameraFollowSystem, AnimatedRenderSystem, SYSTEM } from "engine/entities/systems";
 import { Animation } from "engine/entities/systems/AnimatedRenderSystem";
-import { AssetManager } from "engine/managers";
+import { AssetManager, PhysicsManager } from "engine/managers";
 import { SPRITESHEETS } from "constants/assets";
 
 export default class Player extends Actor {
@@ -20,7 +20,10 @@ export default class Player extends Actor {
             game,
             position,
             new PlayerInputSystem(),
-            new PhysicsSystem(),
+            new PhysicsSystem({
+                type: PhysicsManager.ColliderType.Circle,
+                radius: 0.15,
+            }, true, 20),
             new AnimatedRenderSystem([
                 new Animation("idle", spritesheet.getTextures([0]), 0.25, false),
                 new Animation("run", spritesheet.getTextures([1,2,3,4,5,6]), 0.25, true),

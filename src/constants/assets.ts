@@ -10,6 +10,10 @@ export const TILES = {
     GRASS: "/assets/tiles/grass.json",
 };
 
+export const OBJECTS = {
+    TREE: "/assets/objects/tree.json",
+};
+
 export const TILESETS = {
     TEST: "/assets/tilesets/testTileSet.json",
 };

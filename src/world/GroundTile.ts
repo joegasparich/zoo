@@ -1,22 +1,18 @@
 import { randomInt } from "engine/helpers/math";
 import { AssetManager } from "engine/managers";
-
-export interface TileData {
-    name: string;
-    tileset: string;
-    variants: number[];
-}
+import { GroundTileData } from "types/AssetTypes";
 
 export default class GroundTile {
-    tileData: TileData;
+    tileData: GroundTileData;
 
     texture: PIXI.Texture;
 
-    constructor(tileDataPath?: string, tileData?: TileData) {
+    constructor(tileDataPath?: string, tileData?: GroundTileData) {
         if (tileDataPath) {
-            tileData = AssetManager.getJSON(tileDataPath) as TileData;
+            tileData = AssetManager.getJSON(tileDataPath) as GroundTileData;
         }
         if (!tileData) {
+            console.error("Tried to create tile without data");
             return;
         }
 

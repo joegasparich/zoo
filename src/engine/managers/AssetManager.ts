@@ -1,14 +1,14 @@
 import * as path from "path";
 
-import { Tileset } from "engine";
-import { TileSetData } from "engine/Tileset";
+import { TileSet } from "engine";
+import { TileSetData } from "engine/TileSet";
 import { parseTiledSet } from "engine/helpers/parseTiled";
 import { TiledSet } from "engine/map";
 
 class AssetManager {
     private loader: PIXI.Loader;
     private preloadedAssets: string[];
-    private tilesets: Map<string, Tileset>;
+    private tilesets: Map<string, TileSet>;
 
     constructor() {
         this.loader = new PIXI.Loader();
@@ -59,7 +59,7 @@ class AssetManager {
 
     public getJSON(key: string): Object {
         if (!this.hasResource(key)) {
-            console.error(`Tried to get unloaded texture: ${key}`);
+            console.error(`Tried to get unloaded JSON: ${key}`);
             return undefined;
         }
         return this.loader.resources[key].data;
@@ -81,15 +81,15 @@ class AssetManager {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
 
-    public createTileset(data: TileSetData): Tileset {
+    public createTileset(data: TileSetData): TileSet {
         if (this.tilesets.has(data.path)) return this.tilesets.get(data.path);
 
-        const tileset = new Tileset(data);
+        const tileset = new TileSet(data);
         this.tilesets.set(data.path, tileset);
         return tileset;
     }
 
-    public getTileset(key: string): Tileset {
+    public getTileset(key: string): TileSet {
         if (!this.tilesets.has(key)) {
             console.error(`Tried to get unregistered tileset: ${key}`);
             return undefined;
@@ -98,7 +98,7 @@ class AssetManager {
         return this.tilesets.get(key);
     }
 
-    public async loadTileSetFile(location: string, onProgress?: Function): Promise<Tileset> {
+    public async loadTileSetFile(location: string, onProgress?: Function): Promise<TileSet> {
         // Load
         const tilesetResource = await this.loadResource(location, (progress: number) => onProgress && onProgress(progress/2));
         const tiledSet = tilesetResource.data as TiledSet;

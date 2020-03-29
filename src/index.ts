@@ -1,11 +1,11 @@
 import { Game, Vector } from "engine";
 
 import CONFIG from "constants/config";
-import { SPRITES, TILES, SPRITESHEETS, TILESETS } from "constants/assets";
+import { SPRITES, TILES, SPRITESHEETS, TILESETS, OBJECTS } from "constants/assets";
 import Player from "entities/Player";
 import { AssetManager } from "engine/managers";
-import IslandScene from "scenes/IslandScene";
-
+import World from "world/World";
+import TileObject from "entities/TileObject";
 
 async function run() {
     // Create game
@@ -19,6 +19,7 @@ async function run() {
     AssetManager.preLoadAssets(Object.values(SPRITES));
     AssetManager.preLoadAssets(Object.values(SPRITESHEETS));
     AssetManager.preLoadAssets(Object.values(TILES));
+    await TileObject.loadTileObjectData(OBJECTS.TREE);
     await AssetManager.loadTileSetFile(TILESETS.TEST);
 
     // Load game
@@ -27,12 +28,8 @@ async function run() {
     });
 
     // Load Map
-    await testGame.sceneManager.loadScene(
-        new IslandScene(),
-        (progress: number) => {
-            console.log(`Map Load Progress: ${progress}%`);
-        },
-    );
+    const world = new World(testGame);
+    world.loadMap();
 
     // Create Player
     const player = new Player(
