@@ -6,8 +6,12 @@ export const SPRITESHEETS = {
     DUDE_RUN: "/assets/img/dude_run.png",
 };
 
-export const TEXTURES = {
-    GRASS: "/assets/img/grass.png",
+export const TILES = {
+    GRASS: "/assets/tiles/grass.json",
+};
+
+export const TILESETS = {
+    TEST: "/assets/tilesets/testTileSet.json",
 };
 
 export const MAPS = {

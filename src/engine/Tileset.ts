@@ -1,6 +1,7 @@
 import SpriteSheet, { SpriteSheetData } from "./SpriteSheet";
 
 export interface TileSetData extends SpriteSheetData {
+    path: string;
     tiles: TileData[];
 }
 

@@ -1,4 +1,4 @@
-export { default as MapGrid, MapData } from "./MapGrid";
+export { default as MapGrid, MapFileData, MapCell } from "./MapGrid";
 export { default as PathfindingGrid, Path } from "./PathfindingGrid";
 
 //--Generated interfaces from Tiled--//

@@ -1,8 +1,8 @@
-import { TiledMap, MapData, TiledSet } from "engine/map";
+import { TiledMap, MapFileData, TiledSet } from "engine/map";
 import { TileSetData, TileData } from "engine/Tileset";
 
 // TODO: Handle multiple tilesets
-export function parseTiledMap(tiledMap: TiledMap): MapData {
+export function parseTiledMap(tiledMap: TiledMap): MapFileData {
     if (!tiledMap) {
         console.error(`Can't parse map: ${tiledMap}`);
         return;
@@ -18,7 +18,7 @@ export function parseTiledMap(tiledMap: TiledMap): MapData {
     };
 }
 
-export function parseTiledSet(tiledSet: TiledSet, image: PIXI.Texture): TileSetData {
+export function parseTiledSet(tiledSet: TiledSet, image: PIXI.Texture, imagePath: string): TileSetData {
     if (!tiledSet) {
         console.error(`Can't parse tileset: ${tiledSet}`);
         return;
@@ -47,5 +47,6 @@ export function parseTiledSet(tiledSet: TiledSet, image: PIXI.Texture): TileSetD
         cellWidth: tiledSet.tilewidth,
         cellHeight: tiledSet.tileheight,
         tiles,
+        path: imagePath,
     };
 }

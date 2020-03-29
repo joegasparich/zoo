@@ -1,12 +1,12 @@
 import Mediator from "engine/Mediator";
-import AssetManager from "./AssetManager";
 import { Events } from "engine";
+import { MapGrid } from "engine/map";
 
 export abstract class Scene {
     name: string;
-    mapPath: string;
+    mapFile: string;
 
-    start(): void {}
+    start(mapGrid: MapGrid): void {}
     preUpdate(): void {}
     update(): void {}
     postUpdate(): void {}
@@ -15,6 +15,11 @@ export abstract class Scene {
 
 export default class SceneManager {
     private currentScene: Scene;
+    private mapGrid: MapGrid;
+
+    constructor(mapGrid: MapGrid) {
+        this.mapGrid = mapGrid;
+    }
 
     public async loadScene(scene: Scene, onProgress?: Function): Promise<void> {
         if (this.currentScene) {
@@ -23,13 +28,12 @@ export default class SceneManager {
 
         this.currentScene = scene;
 
-        scene.start();
+        scene.start(this.mapGrid);
 
-        if (scene.mapPath) {
-            Mediator.fire(Events.MapEvent.MAP_LOAD_START, { mapPath: scene.mapPath });
-            const mapData = await AssetManager.loadMapData(scene.mapPath, onProgress);
-            Mediator.fire(Events.MapEvent.MAP_LOAD_COMPLETE, mapData);
-            Mediator.fire(Events.MapEvent.REQUEST_MAP_LOAD, mapData);
+        if (scene.mapFile) {
+            Mediator.fire(Events.MapEvent.MAP_LOAD_START, { mapPath: scene.mapFile });
+            await this.mapGrid.loadMapFile(scene.mapFile, onProgress);
+            Mediator.fire(Events.MapEvent.MAP_LOAD_COMPLETE);
         }
     }
 

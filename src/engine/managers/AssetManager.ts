@@ -1,16 +1,18 @@
 import * as path from "path";
 
 import { Tileset } from "engine";
-import { MapData, TiledMap, TiledSet } from "engine/map";
-
-import { parseTiledMap, parseTiledSet } from "../helpers/parseTiled";
+import { TileSetData } from "engine/Tileset";
+import { parseTiledSet } from "engine/helpers/parseTiled";
+import { TiledSet } from "engine/map";
 
 class AssetManager {
     private loader: PIXI.Loader;
     private preloadedAssets: string[];
+    private tilesets: Map<string, Tileset>;
 
     constructor() {
         this.loader = new PIXI.Loader();
+        this.tilesets = new Map();
     }
 
     public preLoadAssets(assets: string[]): void {
@@ -39,6 +41,8 @@ class AssetManager {
         if (!assets || !assets.length) {
             return null;
         }
+        const existingAssets = assets.filter(asset => this.loader.resources[asset]);
+        assets = assets.filter(asset => !this.loader.resources[asset]);
 
         this.loader.add(assets);
         const progressListener: (loader: PIXI.Loader) => void = loader => onProgress && onProgress(loader.progress);
@@ -47,16 +51,29 @@ class AssetManager {
         return new Promise((resolve) => {
             this.loader.load((loader, resources) => {
                 this.loader.off("progress", progressListener);
-                resolve(assets.map(asset => resources[asset]));
+                const res = assets.map(asset => resources[asset]).concat(existingAssets.map(asset => resources[asset]))
+                resolve(res);
             });
         });
     }
 
+    public getJSON(key: string): Object {
+        if (!this.hasResource(key)) {
+            console.error(`Tried to get unloaded texture: ${key}`);
+            return undefined;
+        }
+        return this.loader.resources[key].data;
+    }
+
     public getTexture(key: string): PIXI.Texture {
+        if (!this.hasResource(key)) {
+            console.error(`Tried to get unloaded texture: ${key}`);
+            return undefined;
+        }
         return this.loader.resources[key].texture;
     }
 
-    public hasTexture(key: string): boolean {
+    public hasResource(key: string): boolean {
         return !!this.loader.resources[key];
     }
 
@@ -64,23 +81,33 @@ class AssetManager {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
 
-    public async loadMapData(location: string, onProgress?: Function): Promise<MapData> {
-        // Load Map
-        const mapResource = await this.loadResource(location, (progress: number) => onProgress && onProgress(progress/3));
-        const tiledMap = parseTiledMap(mapResource.data as TiledMap);
-        tiledMap.tileSetPath = path.join(location, "..", tiledMap.tileSetPath);
+    public createTileset(data: TileSetData): Tileset {
+        if (this.tilesets.has(data.path)) return this.tilesets.get(data.path);
 
-        // Load Tileset
-        const tilesetResource = await this.loadResource(tiledMap.tileSetPath, (progress: number) => onProgress && onProgress(progress/3 + 33.33));
+        const tileset = new Tileset(data);
+        this.tilesets.set(data.path, tileset);
+        return tileset;
+    }
+
+    public getTileset(key: string): Tileset {
+        if (!this.tilesets.has(key)) {
+            console.error(`Tried to get unregistered tileset: ${key}`);
+            return undefined;
+        }
+
+        return this.tilesets.get(key);
+    }
+
+    public async loadTileSetFile(location: string, onProgress?: Function): Promise<Tileset> {
+        // Load
+        const tilesetResource = await this.loadResource(location, (progress: number) => onProgress && onProgress(progress/2));
         const tiledSet = tilesetResource.data as TiledSet;
 
         // Load Tileset Image
-        const imagePath = path.join(tiledMap.tileSetPath, "..", tiledSet.image);
-        const imageResource = await this.loadResource(imagePath, (progress: number) => onProgress && onProgress(progress/3 + 66.66));
-        const tileSetData = parseTiledSet(tiledSet, imageResource.texture);
-        tiledMap.tileSet = new Tileset(tileSetData);
-
-        return tiledMap;
+        const imagePath = path.join(location, "..", tiledSet.image);
+        const imageResource = await this.loadResource(imagePath, (progress: number) => onProgress && onProgress(progress/2 + 50));
+        const tileSetData = parseTiledSet(tiledSet, imageResource.texture, imagePath);
+        return this.createTileset(tileSetData);
     }
 }
 

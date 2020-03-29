@@ -75,7 +75,6 @@ export default class Game {
     private setup(): void {
         this.inputManager = new InputManager();
         this.physicsManager = new PhysicsManager();
-        this.sceneManager = new SceneManager();
 
         this.setupRenderLayers();
 
@@ -83,6 +82,8 @@ export default class Game {
 
         this.mapGrid = new MapGrid(this);
         this.mapGrid.setCamera(this.camera);
+
+        this.sceneManager = new SceneManager(this.mapGrid);
 
         this.physicsManager.setup();
 
@@ -127,7 +128,7 @@ export default class Game {
         // Do Physics
         this.physicsManager.update(delta);
 
-        this.mapGrid.update(this);
+        this.mapGrid.update();
 
         //////////// Post Update ////////////
 

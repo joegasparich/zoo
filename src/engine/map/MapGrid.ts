@@ -1,27 +1,18 @@
-import { Game, Debug, Camera, Vector, Tileset, Events, Layers } from "engine";
-import { Path, PathfindingGrid } from ".";
-import { ColliderType } from "engine/managers";
-import Mediator from "engine/Mediator";
+import * as path from "path";
 
-class MapCell {
+import { Game, Debug, Camera, Vector, Tileset, Layers } from "engine";
+import { Path, PathfindingGrid, TiledMap } from ".";
+import { ColliderType, AssetManager } from "engine/managers";
+import { parseTiledMap } from "engine/helpers/parseTiled";
+
+export class MapCell {
     x: number;
     y: number;
 
     isSolid: boolean;
-    tileset: Tileset;
-    tileIndex: number;
-
-    constructor(x: number, y: number, tileset: Tileset, id: number) {
-        this.x = x;
-        this.y = y;
-
-        this.tileset = tileset;
-        this.tileIndex = id;
-        this.isSolid = tileset.tiles.get(id).solid;
-    }
+    texture: PIXI.Texture;
 }
-
-export interface MapData {
+export interface MapFileData {
     width: number;
     height: number;
     tileWidth: number;
@@ -49,25 +40,10 @@ export default class MapGrid {
         this.pos = new Vector();
 
         this.drawDebug();
-
-        // Listen for map load requests
-        Mediator.on(Events.MapEvent.REQUEST_MAP_LOAD, ((mapData: MapData) => {
-            this.loadMap(mapData);
-        }));
     }
 
     setCamera(camera: Camera): void {
         this.camera = camera;
-    }
-
-    loadMap(map: MapData): void {
-        this.cellSize = map.tileWidth;
-        this.pos = new Vector(this.cellSize/2, this.cellSize/2);
-        this.rows = map.width;
-        this.cols = map.height;
-
-        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
-        this.setupTileGrid(this.game.stage, map);
     }
 
     clearMap(): void {
@@ -78,7 +54,7 @@ export default class MapGrid {
         this.groundTiles = null;
     }
 
-    update(game: Game): void {
+    update(): void {
         if (this.grid?.length) {
             this.drawTiles();
         }
@@ -88,18 +64,21 @@ export default class MapGrid {
         // this.drawDebug();
     }
 
-    setupTileGrid(stage: PIXI.display.Stage, map: MapData): void{
-        this.grid = [];
-        for (let i = 0; i < this.cols; i++) {
-            this.grid[i] = [];
-            for  (let j = 0; j < this.rows; j++) {
-                const tileIndex = map.tileData[j * map.width + i] - 1;
-                this.grid[i][j] = new MapCell(i, j, map.tileSet, tileIndex);
+    setupTileGrid(cells: MapCell[][]): void{
+        this.grid = cells;
+        this.cols = cells.length;
+        this.rows = cells[0].length;
+        this.cellSize = cells[0][1].texture.width;
+
+        const textures: PIXI.Texture[] = [];
+        for (let i = 0; i < cells.length; i++) {
+            for (let j = 0; j < cells[i].length; j++) {
+                textures.push(cells[i][j].texture);
             }
         }
-        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, [map.tileSet.texture]);
+        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, textures);
         this.groundTiles.parentGroup = Layers.GROUND;
-        stage.addChild(this.groundTiles);
+        this.game.stage.addChild(this.groundTiles);
         this.updateTiles();
     }
 
@@ -111,7 +90,7 @@ export default class MapGrid {
                 if (!tile) { continue; }
 
                 // Texture
-                const texture = tile.tileset.getTexture(tile.tileIndex);
+                const texture = tile.texture;
                 this.groundTiles.addFrame(texture, i * this.cellSize, j * this.cellSize);
 
                 // Collision
@@ -133,6 +112,40 @@ export default class MapGrid {
 
     drawTiles(): void {
         this.groundTiles.pivot.set(this.camera.screenPosition.x, this.camera.screenPosition.y);
+    }
+
+    public async loadMapFile(location: string, onProgress?: Function): Promise<void> {
+        // Load Map File
+        const mapResource = await AssetManager.loadResource(location, (progress: number) => onProgress && onProgress(progress/3));
+        const tiledMap = parseTiledMap(mapResource.data as TiledMap);
+        tiledMap.tileSetPath = path.join(location, "..", tiledMap.tileSetPath);
+
+        // Load Tileset File
+        tiledMap.tileSet = await AssetManager.loadTileSetFile(tiledMap.tileSetPath, (progress: number) => onProgress && onProgress(progress * 2/3 + 33.33));
+
+        // Load Map
+        this.cellSize = tiledMap.tileWidth;
+        this.pos = new Vector(this.cellSize/2, this.cellSize/2);
+        this.rows = tiledMap.width;
+        this.cols = tiledMap.height;
+
+        // Generate cell grid
+        const cells: MapCell[][] = [];
+        for (let i = 0; i < tiledMap.height; i++) {
+            cells[i] = [];
+            for  (let j = 0; j < tiledMap.width; j++) {
+                const tileIndex = tiledMap.tileData[j * tiledMap.width + i] - 1;
+                cells[i][j] = {
+                    x: i,
+                    y: j,
+                    texture: tiledMap.tileSet.getTexture(tileIndex),
+                    isSolid: tiledMap.tileSet.tiles.get(tileIndex).solid,
+                };
+            }
+        }
+
+        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
+        this.setupTileGrid(cells);
     }
 
     drawDebug(): void {
