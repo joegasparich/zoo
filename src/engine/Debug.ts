@@ -9,6 +9,7 @@ class Debug {
         this.graphics.parentGroup = Layers.DEBUG;
         game.stage.addChild(this.graphics);
         this.camera = game.camera;
+        this.graphics.position = this.camera.offset.toPoint();
     }
 
     preUpdate(): void {
@@ -18,7 +19,8 @@ class Debug {
 
     postUpdate(): void {
         if (!this.graphics) return;
-        this.graphics.pivot = this.camera.screenPosition.toPoint();
+        this.graphics.scale.set(this.camera.scale, this.camera.scale);
+        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
     }
 
     setLineStyle(thickness: number, colour: number): void {
@@ -59,6 +61,12 @@ class Debug {
     drawCircle(pos: Vector, radius: number): void {
         if (!this.graphics) return;
         this.graphics.drawCircle(pos.x, pos.y, radius);
+    }
+
+    drawX(pos: Vector, size: number): void {
+        if (!this.graphics) return;
+        this.drawLine(pos.x - size, pos.y - size, pos.x + size, pos.y + size);
+        this.drawLine(pos.x - size, pos.y + size, pos.x + size, pos.y - size);
     }
 }
 

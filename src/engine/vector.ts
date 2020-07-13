@@ -1,5 +1,6 @@
 import { IPoint, Point } from "pixi.js";
 import { lerp } from "engine/helpers/math";
+import * as Planck from "planck-js";
 
 export default class Vector {
     x: number;
@@ -44,6 +45,15 @@ export default class Vector {
         if (this.magnitude() === 0) return this;
         return this.divide(this.magnitude());
     }
+    round(): Vector {
+        return new Vector(Math.round(this.x), Math.round(this.y));
+    }
+    floor(): Vector {
+        return new Vector(Math.floor(this.x), Math.floor(this.y));
+    }
+    ceil(): Vector {
+        return new Vector(Math.ceil(this.x), Math.ceil(this.y));
+    }
 
     toString(): string {
         return `[${this.x}, ${this.y}]`;
@@ -53,14 +63,28 @@ export default class Vector {
         return new Point(this.x, this.y);
     }
 
+    toVec2(): Planck.Vec2 {
+        return new Planck.Vec2(this.x, this.y);
+    }
+
     static Distance(vectorA: Vector, vectorB: Vector): number {
         return vectorA.subtract(vectorB).magnitude();
     }
 
-    static Lerp(startPos: Vector, endPos: Vector, amount: number) {
+    static Lerp(startPos: Vector, endPos: Vector, amount: number): Vector {
         return new Vector(
             lerp(startPos.x, endPos.x, amount),
             lerp(startPos.y, endPos.y, amount),
         );
     }
+
+    static FromPoint(point: IPoint): Vector {
+        return new Vector(point.x, point.y);
+    }
+
+    static FromVec2(vec2: Planck.Vec2): Vector {
+        return new Vector(vec2.x, vec2.y);
+    }
+
+    static Zero = new Vector(0, 0);
 }

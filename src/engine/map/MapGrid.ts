@@ -1,7 +1,7 @@
 import * as path from "path";
 
 import { Game, Debug, Camera, Vector, TileSet, Layers } from "engine";
-import { Path, PathfindingGrid, TiledMap } from ".";
+import { PathfindingGrid, TiledMap } from ".";
 import { ColliderType, AssetManager } from "engine/managers";
 import { parseTiledMap } from "engine/helpers/parseTiled";
 
@@ -23,30 +23,30 @@ export interface MapFileData {
 }
 
 export default class MapGrid {
-    game: Game;
+    private game: Game;
 
-    rows: number;
-    cols: number;
-    pos: Vector;
-    cellSize: number;
+    public rows: number;
+    public cols: number;
+    private position: Vector;
+    public cellSize: number;
 
-    camera: Camera;
-    grid: MapCell[][];
-    groundTiles: PIXI.tilemap.CompositeRectTileLayer;
-    pathfindingGrid: PathfindingGrid;
+    private camera: Camera;
+    private grid: MapCell[][];
+    private groundTiles: PIXI.tilemap.CompositeRectTileLayer;
+    private pathfindingGrid: PathfindingGrid;
 
     constructor(game: Game) {
         this.game = game;
-        this.pos = new Vector();
+        this.position = new Vector();
 
         this.drawDebug();
     }
 
-    setCamera(camera: Camera): void {
+    public setCamera(camera: Camera): void {
         this.camera = camera;
     }
 
-    clearMap(): void {
+    private clearMap(): void {
         this.rows = 0;
         this.cols = 0;
         this.grid = [];
@@ -54,17 +54,16 @@ export default class MapGrid {
         this.groundTiles = null;
     }
 
-    update(): void {
+    public update(): void {}
+
+    public postUpdate(): void {
         if (this.grid?.length) {
             this.drawTiles();
         }
+        this.drawDebugPathGrid();
     }
 
-    postUpdate(): void {
-        // this.drawDebug();
-    }
-
-    setupTileGrid(cells: MapCell[][]): void{
+    public setupTileGrid(cells: MapCell[][]): void{
         this.grid = cells;
         this.cols = cells.length;
         this.rows = cells[0].length;
@@ -80,9 +79,18 @@ export default class MapGrid {
         this.groundTiles.parentGroup = Layers.GROUND;
         this.game.stage.addChild(this.groundTiles);
         this.updateTiles();
+
+        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
     }
 
-    updateTiles(): void {
+    /**
+     * Clears and recreates all tiles on the map,
+     * this needs to be done because the tile grid is all one big texture
+     * TODO: Chunk the map to avoid big updates
+     */
+    private updateTiles(): void {
+        const scale = (this.game.opts.worldScale/this.cellSize); // Ideally this is 1 (16/16)
+
         this.groundTiles.clear();
         for (let i = 0; i <= this.cols - 1; i++) {
             for (let j = 0; j <= this.rows - 1; j++) {
@@ -91,11 +99,11 @@ export default class MapGrid {
 
                 // Texture
                 const texture = tile.texture;
-                this.groundTiles.addFrame(texture, i * this.cellSize, j * this.cellSize);
+                this.groundTiles.addFrame(texture, i * this.cellSize * scale, j * this.cellSize * scale);
 
                 // Collision
                 if (tile.isSolid) {
-                    this.pathfindingGrid.disablePoint(new Vector(tile.x, tile.y));
+                    this.setTileNotPathable(tile.x, tile.y);
                     this.game.physicsManager.createPhysicsObject({
                         collider: {
                             type: ColliderType.Rect,
@@ -110,10 +118,19 @@ export default class MapGrid {
         }
     }
 
-    drawTiles(): void {
-        this.groundTiles.pivot.set(this.camera.screenPosition.x, this.camera.screenPosition.y);
+    /**
+     * Update the position and scale of the tile grid
+     */
+    private drawTiles(): void {
+        this.groundTiles.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
+        this.groundTiles.scale.set(this.camera.scale, this.camera.scale);
     }
 
+    /**
+     * Loads a tiled map from file
+     * @param location The file location
+     * @param onProgress Callback for progress updates
+     */
     public async loadMapFile(location: string, onProgress?: Function): Promise<void> {
         // Load Map File
         const mapResource = await AssetManager.loadResource(location, (progress: number) => onProgress && onProgress(progress/3));
@@ -125,7 +142,7 @@ export default class MapGrid {
 
         // Load Map
         this.cellSize = tiledMap.tileWidth;
-        this.pos = new Vector(this.cellSize/2, this.cellSize/2);
+        this.position = new Vector(this.cellSize/2, this.cellSize/2);
         this.rows = tiledMap.width;
         this.cols = tiledMap.height;
 
@@ -144,14 +161,33 @@ export default class MapGrid {
             }
         }
 
-        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
         this.setupTileGrid(cells);
     }
 
-    drawDebug(): void {
+    public async getPath(start: Vector, end: Vector, opts?: {optimise: boolean}): Promise<Vector[]> {
+        let path = await this.pathfindingGrid.getPath(start, end);
+        if (!path) return;
+
+        if (opts.optimise) path = this.pathfindingGrid.optimisePath(path);
+        return path.map(node => node.add(new Vector(0.5, 0.5)));
+    }
+
+    public isPathWalkable(a: Vector, b: Vector): boolean {
+        return this.pathfindingGrid.isPathWalkable(a, b);
+    }
+
+    public setTileNotPathable(x: number, y: number): void {
+        this.pathfindingGrid.disablePoint(x, y);
+    }
+
+    public setTilePathable(x: number, y: number): void {
+        this.pathfindingGrid.enablePoint(x, y);
+    }
+
+    private drawDebug(): void {
         Debug.setLineStyle(1, 0x00FF00);
-        const xOffset = this.pos.x - this.cellSize / 2;
-        const yOffset = this.pos.y - this.cellSize / 2;
+        const xOffset = this.position.x - this.cellSize / 2;
+        const yOffset = this.position.y - this.cellSize / 2;
         // Horizontal
         for(let i = 0; i < this.rows + 1; i++) {
             Debug.drawLine(
@@ -172,21 +208,23 @@ export default class MapGrid {
         }
     }
 
-    drawDebugPath(path: Path): void {
-        Debug.setLineStyle(3, 0x0000FF);
+    private drawDebugPathGrid(): void {
+        if (!this.pathfindingGrid) return;
 
-        const xOffset = this.cellSize/2;
-        const yOffset = this.cellSize/2;
+        const grid = this.pathfindingGrid.getGrid();
+        const xOffset = this.cellSize / 2;
+        const yOffset = this.cellSize / 2;
 
-        let lastNode = path[0];
-        path.forEach(node => {
-            Debug.drawLine(
-                lastNode.x * this.cellSize + xOffset,
-                lastNode.y * this.cellSize + yOffset,
-                node.x * this.cellSize + xOffset,
-                node.y * this.cellSize + yOffset,
-            );
-            lastNode = node;
-        });
+        for (let i = 0; i < grid.length; i++) {
+            for (let j = 0; j < grid[i].length; j++) {
+                if (grid[i][j] == 0) {
+                    Debug.setLineStyle(0.5, 0x00FF00);
+                    Debug.drawX(new Vector(i * this.cellSize + xOffset, j * this.cellSize + yOffset), 2);
+                } else {
+                    Debug.setLineStyle(0.5, 0x000000);
+                    Debug.drawX(new Vector(i * this.cellSize + xOffset, j * this.cellSize + yOffset), 2);
+                }
+            }
+        }
     }
 }

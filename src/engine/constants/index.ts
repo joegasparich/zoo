@@ -1,2 +1,2 @@
-export const WORLD_SCALE = 32;
+/**Frames per second */
 export const FRAME_RATE = 60; // TODO: Check this isn't changeable

@@ -1,9 +1,9 @@
-import { World, Vec2, Body, Shape, Circle, Polygon, PolygonShape, CircleShape, FrictionJoint, FrictionJointDef } from "planck-js";
+import * as Planck from "planck-js";
 
-import { Vector } from "engine";
+import { Game, Vector } from "engine";
 import Debug from "engine/Debug";
-import { WORLD_SCALE, FRAME_RATE } from "engine/constants";
-import { toVec2, toVector } from "engine/helpers/util";
+import { FRAME_RATE } from "engine/constants";
+import { Entity } from "engine/entities";
 
 export type PhysicsObjOpts = {
     position: Vector;
@@ -26,16 +26,16 @@ export type Collider = {
     height?: number;
 };
 
-function getShape(collider: Collider): Shape {
+function getShape(collider: Collider): Planck.Shape {
     switch(collider.type) {
     case ColliderType.Circle:
-        return Circle(collider.radius);
+        return Planck.Circle(collider.radius);
     case ColliderType.Rect:
-        return Polygon([
-            Vec2(-collider.width/2, -collider.height/2),
-            Vec2(collider.width/2, -collider.height/2),
-            Vec2(collider.width/2, collider.height/2),
-            Vec2(-collider.width/2, collider.height/2),
+        return Planck.Polygon([
+            Planck.Vec2(-collider.width/2, -collider.height/2),
+            Planck.Vec2(collider.width/2, -collider.height/2),
+            Planck.Vec2(collider.width/2, collider.height/2),
+            Planck.Vec2(-collider.width/2, collider.height/2),
         ]);
     }
 }
@@ -44,13 +44,39 @@ export default class PhysicsManager {
 
     public static ColliderType = ColliderType;
 
-    public world: World;
-    public ground: Body;
+    public game: Game;
+    public world: Planck.World;
+    public ground: Planck.Body;
+
+    private entityBody: Map<Entity, Planck.Body>;
+    private bodyEntity: Map<Planck.Body, Entity>;
+
+    private listeners: Map<Planck.Fixture, {
+        enter: ((contact: Planck.Contact) => void);
+        exit: ((contact: Planck.Contact) => void);
+    }[]>;
+
+    constructor(game: Game) {
+        this.game = game;
+
+        this.listeners = new Map();
+        this.entityBody = new Map();
+        this.bodyEntity = new Map();
+    }
 
     public setup(): void {
-        this.world = World();
+        this.world = Planck.World();
         this.ground = this.world.createBody();
-        this.ground.createFixture(new Circle(0));
+        this.ground.createFixture(new Planck.Circle(0));
+
+        this.world.on("begin-contact", (contact: Planck.Contact) => {
+            this.listeners.get(contact.getFixtureA())?.forEach(callbacks => callbacks.enter(contact));
+            this.listeners.get(contact.getFixtureB())?.forEach(callbacks => callbacks.enter(contact));
+        });
+        this.world.on("end-contact", (contact: Planck.Contact) => {
+            this.listeners.get(contact.getFixtureA())?.forEach(callbacks => callbacks.exit(contact));
+            this.listeners.get(contact.getFixtureB())?.forEach(callbacks => callbacks.exit(contact));
+        });
     }
 
     public update(delta: number): void {
@@ -59,47 +85,69 @@ export default class PhysicsManager {
     }
 
     public setGravity(direction: Vector): void {
-        this.world.setGravity(toVec2(direction));
+        this.world.setGravity(direction.toVec2());
     }
 
-    public createPhysicsObject(opts: PhysicsObjOpts): Body {
+    public registerBody(entity: Entity, body: Planck.Body): void {
+        this.entityBody.set(entity, body);
+        this.bodyEntity.set(body, entity);
+    }
+
+    public getBody(entity: Entity): Planck.Body {
+        return this.entityBody.get(entity);
+    }
+
+    public getEntity(body: Planck.Body): Entity {
+        return this.bodyEntity.get(body);
+    }
+
+    public createPhysicsObject(opts: PhysicsObjOpts): Planck.Body {
         const body = opts.isDynamic
             ? this.world.createDynamicBody({linearDamping: 5 / (opts.maxSpeed ?? 1)})
             : this.world.createBody();
 
-        body.setPosition(toVec2(opts.position));
+        body.setPosition(opts.position.toVec2());
         body.createFixture(getShape(opts.collider), {
             friction: opts.friction ?? 1,
             density: opts.density ?? 1,
         });
-        const def: FrictionJointDef = {
+        const def: Planck.FrictionJointDef = {
             bodyA: this.ground,
             bodyB: body,
-            localAnchorA: new Vec2(0,0),
-            localAnchorB: new Vec2(0,0),
+            localAnchorA: new Planck.Vec2(0,0),
+            localAnchorB: new Planck.Vec2(0,0),
             collideConnected: false,
             maxForce: 20 * (opts.friction ?? 1),
         };
-        this.world.createJoint(FrictionJoint(def));
+        this.world.createJoint(Planck.FrictionJoint(def));
 
         return body;
     }
 
-    drawDebug(): void {
-        Debug.setLineStyle(1, 0xFF0000);
+    public onContact(fixture: Planck.Fixture, enter: (contact: Planck.Contact) => void, exit: (contact: Planck.Contact) => void): void {
+        if (!this.listeners.has(fixture)) {
+            this.listeners.set(fixture, [{enter, exit}]);
+        } else {
+            this.listeners.get(fixture).push({enter, exit});
+        }
+    }
+
+    private drawDebug(): void {
         for (let body = this.world.getBodyList(); body; body = body.getNext()) {
             for (let fixture = body.getFixtureList(); fixture; fixture = fixture.getNext()) {
+                Debug.setLineStyle(1, 0xFF0000);
+                if (fixture.isSensor()) Debug.setLineStyle(1, 0x0000FF);
                 const shape = fixture.getShape();
                 switch(shape.getType()) {
                 case "circle":
-                    const circle = shape as CircleShape;
-                    Debug.drawCircle(toVector(body.getPosition()).multiply(WORLD_SCALE), circle.getRadius() * WORLD_SCALE);
+                    const circle = shape as Planck.CircleShape;
+                    Debug.drawCircle(Vector.FromVec2(body.getPosition()).multiply(this.game.opts.worldScale), circle.getRadius() * this.game.opts.worldScale);
                     break;
                 case "polygon":
-                    const polygon = shape as PolygonShape;
+                    const polygon = shape as Planck.PolygonShape;
                     const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y)
-                        .add(toVector(body.getPosition()))
-                        .multiply(WORLD_SCALE));
+                        .add(Vector.FromVec2(body.getPosition()))
+                        .multiply(this.game.opts.worldScale));
                     Debug.drawVectorList(vectorList);
                     break;
                 default:

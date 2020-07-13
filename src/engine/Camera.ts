@@ -1,16 +1,18 @@
+import CONFIG from "constants/config";
 import { Game, Vector } from ".";
-import { WORLD_SCALE } from "./constants";
 
 export default class Camera {
     game: Game;
-    position: Vector;
-    screenPosition: Vector;
+    worldPosition: Vector;
+    scale: number;
     target: Vector;
+    offset: Vector;
 
-    constructor(game: Game, pos: Vector) {
+    constructor(game: Game, pos: Vector, scale: number) {
         this.game = game;
-        this.position = pos;
-        this.screenPosition = pos.multiply(WORLD_SCALE);
+        this.worldPosition = pos;
+        this.scale = scale;
+        this.offset = new Vector(CONFIG.WINDOW_WIDTH/2, CONFIG.WINDOW_HEIGHT/2);
     }
 
     goToPosition(position: Vector): void {
@@ -19,8 +21,25 @@ export default class Camera {
 
     update(): void {
         if (this.target) {
-            this.position = Vector.Lerp(this.position, this.target, 0.1 * this.game.gameSpeed);
-            this.screenPosition = this.position.multiply(WORLD_SCALE);
+            this.worldPosition = Vector.Lerp(this.worldPosition, this.target, 0.1 * this.game.opts.gameSpeed);
         }
+    }
+
+    worldToScreenPosition(worldPos: Vector): Vector {
+        if (!worldPos) {
+            console.error("No world position was provided");
+            return;
+        }
+
+        return worldPos.subtract(this.worldPosition).multiply(this.game.opts.worldScale * this.scale).add(this.offset);
+    }
+
+    screenToWorldPosition(screenPos: Vector): Vector {
+        if (!screenPos) {
+            console.error("No screen position was provided");
+            return;
+        }
+
+        return screenPos.subtract(this.offset).divide(this.game.opts.worldScale * this.scale).add(this.worldPosition);
     }
 }

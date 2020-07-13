@@ -11,36 +11,47 @@ import { Entity } from "./entities";
 import { MapGrid } from "./map";
 
 import { registerPixiInspector } from "./helpers/util";
+import CONFIG from "constants/config";
 
 type GameOpts = {
-    windowWidth: number;
-    windowHeight: number;
+    windowWidth?: number;
+    windowHeight?: number;
     enableDebug?: boolean;
+    worldScale?: number;
+    gameSpeed?: number;
+};
+
+const defaultOpts: GameOpts = {
+    windowWidth: 800,
+    windowHeight: 600,
+    enableDebug: false,
+    worldScale: 16,
+    gameSpeed: 1,
 };
 
 export default class Game {
-
     public app: PIXI.Application;
     public stage: PIXI.display.Stage;
 
-    private opts: GameOpts;
+    public opts: GameOpts;
 
     public camera: Camera;
-    public mapGrid: MapGrid;
-
-    public gameSpeed = 1;
+    public map: MapGrid;
 
     private entities: Map<string, Entity>;
     private entitiesToAdd: Entity[];
     private entitiesToDelete: string[];
 
     // Managers
+    public input: InputManager;
     public physicsManager: PhysicsManager;
-    public inputManager: InputManager;
     public sceneManager: SceneManager;
 
     constructor(opts: GameOpts) {
-        this.opts = opts;
+        this.opts = Object.assign(defaultOpts, opts);
+
+        // Set PIXI settings
+        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
         // Instantiate app
         this.app = new PIXI.Application({
@@ -57,6 +68,9 @@ export default class Game {
 
         // create view in DOM
         document.body.appendChild(this.app.view);
+
+        // Prevent right clicks
+        document.body.setAttribute("oncontextmenu", "return false;");
     }
 
     public async load(onProgress?: (progress: number) => void): Promise<void> {
@@ -73,17 +87,17 @@ export default class Game {
     }
 
     private setup(): void {
-        this.inputManager = new InputManager();
-        this.physicsManager = new PhysicsManager();
+        this.input = new InputManager(this);
+        this.physicsManager = new PhysicsManager(this);
 
-        this.setupRenderLayers();
+        this.setupStage();
 
-        this.camera = new Camera(this, new Vector(20, 20));
+        this.camera = new Camera(this, new Vector(20, 20), CONFIG.CAMERA_SCALE);
 
-        this.mapGrid = new MapGrid(this);
-        this.mapGrid.setCamera(this.camera);
+        this.map = new MapGrid(this);
+        this.map.setCamera(this.camera);
 
-        this.sceneManager = new SceneManager(this.mapGrid);
+        this.sceneManager = new SceneManager(this.map);
 
         this.physicsManager.setup();
 
@@ -94,7 +108,7 @@ export default class Game {
         Mediator.fire(Events.GameEvent.SETUP_COMPLETE);
     }
 
-    private setupRenderLayers(): void {
+    private setupStage(): void {
         this.stage = new PIXI.display.Stage();
         this.stage.sortableChildren = true;
 
@@ -106,44 +120,55 @@ export default class Game {
         this.app.stage = this.stage;
     }
 
+    /**
+     * The main game loop.
+     * @param delta ms since the last update
+     */
     private update(delta: number): void {
-        delta *= this.gameSpeed;
+        delta *= this.opts.gameSpeed;
 
         //////////// Pre Update ////////////
 
         // Setup actions
-        this.sceneManager.getCurrentScene().preUpdate();
+        const scene = this.sceneManager.getCurrentScene();
+        scene && scene.preUpdate();
         Debug.preUpdate();
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
         });
 
+        Mediator.fire(Events.GameEvent.PRE_UPDATE, {delta, game: this});
+
         //////////// Update ////////////
 
         // Game actions
-        this.sceneManager.getCurrentScene().update();
+        scene && scene.update();
         this.entities.forEach(entity => {
             entity.update(delta);
         });
         // Do Physics
         this.physicsManager.update(delta);
 
-        this.mapGrid.update();
+        this.map.update();
+
+        Mediator.fire(Events.GameEvent.UPDATE, {delta, game: this});
 
         //////////// Post Update ////////////
 
         // Rendering actions
-        this.sceneManager.getCurrentScene().postUpdate();
+        scene && scene.postUpdate();
         this.entities.forEach(entity => {
             entity.postUpdate(delta);
         });
 
-        this.camera.update();
-        this.mapGrid.postUpdate();
+        this.map.postUpdate();
         Debug.postUpdate();
+        this.camera.update();
+
+        Mediator.fire(Events.GameEvent.POST_UPDATE, {delta, game: this});
 
         // Reset tings
-        this.inputManager.clearKeys();
+        this.input.clearKeys();
         this.pushCachedEntities();
         this.removeDeletedEntities();
     }

@@ -1,8 +1,7 @@
 import { System, SYSTEM } from ".";
 import { Vector } from "engine";
 import { Collider } from "engine/managers";
-import { Body } from "planck-js";
-import { toVector, toVec2 } from "engine/helpers/util";
+import * as Planck from "planck-js";
 import { Entity } from "..";
 
 export default class PhysicsSystem extends System {
@@ -11,7 +10,7 @@ export default class PhysicsSystem extends System {
     collider: Collider;
     isDynamic: boolean;
     density: number;
-    body: Body;
+    body: Planck.Body;
 
     constructor(collider: Collider, isDynamic: boolean, density = 10) {
         super();
@@ -21,7 +20,7 @@ export default class PhysicsSystem extends System {
         this.density = density;
     }
 
-    start(entity: Entity) {
+    start(entity: Entity): void {
         super.start(entity);
 
         this.body = this.entity.game.physicsManager.createPhysicsObject({
@@ -30,15 +29,16 @@ export default class PhysicsSystem extends System {
             isDynamic: this.isDynamic,
             density: this.density,
         });
+        this.entity.game.physicsManager.registerBody(entity, this.body);
     }
 
     update(delta: number): void {
         super.update(delta);
 
-        this.entity.position = toVector(this.body.getPosition());
+        this.entity.position = Vector.FromVec2(this.body.getPosition());
     }
 
     addForce(force: Vector): void {
-        this.body.applyForceToCenter(toVec2(force), true);
+        this.body.applyForceToCenter(force.toVec2(), true);
     }
 }

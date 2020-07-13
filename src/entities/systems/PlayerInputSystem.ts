@@ -11,33 +11,34 @@ export default class PlayerInputSystem extends InputSystem {
         super.update(delta);
 
         const actor = this.entity as Actor;
+        const game = this.entity.game;
 
         this.inputVector = new Vector(
-            +actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT) - +actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT),
-            +actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) - +actor.game.inputManager.isKeyHeld(InputManager.KEY.UP),
+            +game.input.isKeyHeld(InputManager.KEY.RIGHT) - +game.input.isKeyHeld(InputManager.KEY.LEFT),
+            +game.input.isKeyHeld(InputManager.KEY.DOWN) - +game.input.isKeyHeld(InputManager.KEY.UP),
         ).truncate(1);
 
         // Movement
-        if (actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) ||
-            actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) ||
-            actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT) ||
-            actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT) &&
-            !(actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) && actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN)) &&
-            !(actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT) && actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT))
+        if (game.input.isKeyHeld(InputManager.KEY.UP) ||
+            game.input.isKeyHeld(InputManager.KEY.DOWN) ||
+            game.input.isKeyHeld(InputManager.KEY.LEFT) ||
+            game.input.isKeyHeld(InputManager.KEY.RIGHT) &&
+            !(game.input.isKeyHeld(InputManager.KEY.UP) && game.input.isKeyHeld(InputManager.KEY.DOWN)) &&
+            !(game.input.isKeyHeld(InputManager.KEY.LEFT) && game.input.isKeyHeld(InputManager.KEY.RIGHT))
         ) {
             actor.state.handleInput(ActorStateInput.MOVE);
         }
 
-        if (!actor.game.inputManager.isKeyHeld(InputManager.KEY.UP) &&
-            !actor.game.inputManager.isKeyHeld(InputManager.KEY.DOWN) &&
-            !actor.game.inputManager.isKeyHeld(InputManager.KEY.LEFT) &&
-            !actor.game.inputManager.isKeyHeld(InputManager.KEY.RIGHT)
+        if (!game.input.isKeyHeld(InputManager.KEY.UP) &&
+            !game.input.isKeyHeld(InputManager.KEY.DOWN) &&
+            !game.input.isKeyHeld(InputManager.KEY.LEFT) &&
+            !game.input.isKeyHeld(InputManager.KEY.RIGHT)
         ) {
             actor.state.handleInput(ActorStateInput.STILL);
         }
 
         // Actions
-        if (actor.game.inputManager.isKeyPressed(InputManager.KEY.SPACE)) {
+        if (game.input.isKeyPressed(InputManager.KEY.SPACE)) {
             actor.state.handleInput(ActorStateInput.USE);
         }
     }

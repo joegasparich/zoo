@@ -7,14 +7,16 @@ import { TileObjectData } from "types/AssetTypes";
 export default class TileObject extends Entity {
     render: RenderSystem;
     physics: PhysicsSystem;
+    blocksPath: boolean;
 
-    constructor(game: Game, pos: Vector, data: TileObjectData, collider: Collider) {
+    constructor(game: Game, pos: Vector, data: TileObjectData, collider: Collider, blocksPath = false) {
         super(game, pos);
 
         const sprite = data.sprite;
 
         this.render = this.addSystem(new RenderSystem(sprite));
         this.physics = this.addSystem(new PhysicsSystem(collider, false, 1));
+        this.blocksPath = blocksPath;
     }
 
     static async loadTileObjectData(path: string): Promise<TileObjectData> {

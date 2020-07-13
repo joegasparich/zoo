@@ -8,6 +8,9 @@ import TileObject from "entities/TileObject";
 import { AssetManager, ColliderType } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
 
+const MAP_SIZE = 20;
+const TREE_RATE = 10;
+
 export default class IslandScene extends Scene {
     world: World;
 
@@ -25,9 +28,9 @@ export default class IslandScene extends Scene {
         const cells: MapCell[][] = [];
 
         // Place Grass
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < MAP_SIZE; i++) {
             cells[i] = [];
-            for (let j = 0; j < 100; j++) {
+            for (let j = 0; j < MAP_SIZE; j++) {
                 const tile = new GroundTile(TILES.GRASS);
                 cells[i][j] = {
                     x: i,
@@ -41,7 +44,7 @@ export default class IslandScene extends Scene {
         world.map.setupTileGrid(cells);
 
         //Place Trees
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < MAP_SIZE * TREE_RATE; i++) {
             world.registerTileObject(new TileObject(
                 world.game,
                 world.getRandomCell().add(new Vector(0.5, 0.5)),
@@ -51,6 +54,7 @@ export default class IslandScene extends Scene {
                     height: 0.6,
                     width: 0.6,
                 },
+                true,
             ));
         }
     }

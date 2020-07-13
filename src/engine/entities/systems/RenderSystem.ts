@@ -1,8 +1,8 @@
 import { System, SYSTEM } from ".";
 import { AssetManager } from "engine/managers";
 import { Entity } from "engine/entities";
-import { WORLD_SCALE } from "engine/constants";
-import { Layers } from "engine";
+import { Camera, Layers } from "engine";
+import { Point } from "pixi.js";
 
 export default class RenderSystem extends System {
     public id = SYSTEM.RENDER_SYSTEM;
@@ -12,6 +12,9 @@ export default class RenderSystem extends System {
 
     public flipX: boolean;
     public flipY: boolean;
+    public scale = 1;
+
+    protected camera: Camera;
 
     constructor(spriteUrl: string) {
         super();
@@ -20,6 +23,8 @@ export default class RenderSystem extends System {
 
     public start(entity: Entity): void {
         super.start(entity);
+
+        this.camera = entity.game.camera;
 
         if (this.spriteUrl) {
             this.setSprite(this.spriteUrl);
@@ -60,11 +65,11 @@ export default class RenderSystem extends System {
     protected syncPosition(): void {
         if (!this.sprite) return;
 
-        this.sprite.pivot = this.entity.game.camera.screenPosition.toPoint();
+        this.sprite.scale = new Point(this.camera.scale * this.scale, this.camera.scale * this.scale);
         this.sprite.texture.rotate = this.getRotation();
 
         // Sync postition
-        this.sprite.position.set(this.entity.position.x * WORLD_SCALE, this.entity.position.y * WORLD_SCALE);
+        this.sprite.position = this.camera.worldToScreenPosition(this.entity.position).toPoint();
     }
 
     private getRotation(): number {

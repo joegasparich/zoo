@@ -1,18 +1,24 @@
-import { Game, Vector } from "engine";
+import { Game } from "engine";
 
 import CONFIG from "constants/config";
 import { SPRITES, TILES, SPRITESHEETS, TILESETS, OBJECTS } from "constants/assets";
-import Player from "entities/Player";
 import { AssetManager } from "engine/managers";
-import World from "world/World";
 import TileObject from "entities/TileObject";
+import GameManager from "GameManager";
+
+import "CameraControl";
+
+let testGame: Game;
+
+let gameManager: GameManager;
 
 async function run() {
     // Create game
-    const testGame = new Game({
+    testGame = new Game({
         windowWidth: CONFIG.WINDOW_WIDTH,
         windowHeight: CONFIG.WINDOW_HEIGHT,
         enableDebug: CONFIG.ENABLE_DEBUG,
+        worldScale: 16,
     });
 
     // Load Assets
@@ -27,15 +33,7 @@ async function run() {
         console.log(`Game Load Progress: ${progress}%`);
     });
 
-    // Load Map
-    const world = new World(testGame);
-    world.loadMap();
-
-    // Create Player
-    const player = new Player(
-        testGame,
-        new Vector(4, 4),
-    );
+    gameManager = new GameManager(testGame);
 }
 
 run();

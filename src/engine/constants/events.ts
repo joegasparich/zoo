@@ -2,6 +2,9 @@ export enum GameEvent {
     LOAD_START = "LOAD_START",
     LOAD_COMPLETE = "LOAD_COMPLETE",
     SETUP_COMPLETE = "SETUP_COMPLETE",
+    PRE_UPDATE = "PRE_UPDATE",
+    UPDATE = "UPDATE",
+    POST_UPDATE = "POST_UPDATE",
 };
 
 export enum MapEvent {

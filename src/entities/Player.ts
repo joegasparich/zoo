@@ -1,13 +1,14 @@
 import Actor from "./Actor";
 import { Game, Vector, SpriteSheet } from "engine";
 import { PlayerInputSystem } from "./systems";
-import { PhysicsSystem, CameraFollowSystem, AnimatedRenderSystem, SYSTEM } from "engine/entities/systems";
+import { PhysicsSystem, CameraFollowSystem, AnimatedRenderSystem, SYSTEM, PathFollowSystem, WallAvoidanceSystem } from "engine/entities/systems";
 import { Animation } from "engine/entities/systems/AnimatedRenderSystem";
 import { AssetManager, PhysicsManager } from "engine/managers";
 import { SPRITESHEETS } from "constants/assets";
 
 export default class Player extends Actor {
     private animator: AnimatedRenderSystem;
+    public pather: PathFollowSystem;
 
     constructor(game: Game, position: Vector) {
         const spritesheet = new SpriteSheet({
@@ -30,11 +31,19 @@ export default class Player extends Actor {
             ]),
         );
         this.addSystem(new CameraFollowSystem());
+        this.pather = this.addSystem(new PathFollowSystem());
+        this.addSystem(new WallAvoidanceSystem());
         this.animator = this.getSystem(SYSTEM.ANIMATED_RENDER_SYSTEM) as AnimatedRenderSystem;
         this.animator.setAnimation("idle");
     }
 
-    postUpdate(delta: number): void {
+    public update(delta: number): void {
+        super.update(delta);
+
+        this.pather.followPath(this.accelleration);
+    }
+
+    public postUpdate(delta: number): void {
         super.postUpdate(delta);
 
         if (this.input.inputVector.x > 0) {

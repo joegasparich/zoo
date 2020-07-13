@@ -1,5 +1,5 @@
 export { default as MapGrid, MapFileData, MapCell } from "./MapGrid";
-export { default as PathfindingGrid, Path } from "./PathfindingGrid";
+export { default as PathfindingGrid } from "./PathfindingGrid";
 
 //--Generated interfaces from Tiled--//
 
