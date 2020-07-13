@@ -10,6 +10,8 @@ export default class Entity {
 
     systems: Map<string, System>;
 
+    private hasStarted: boolean;
+
     constructor(game: Game, pos: Vector) {
         this.game = game;
         this.id = uuid();
@@ -19,7 +21,11 @@ export default class Entity {
         this.game.registerEntity(this);
     }
 
-    start(): void {}
+    start(): void {
+        this.hasStarted = true;
+
+        this.systems.forEach(system => system.start(this));
+    }
 
     preUpdate(delta: number): void {
         this.systems.forEach(system => {
@@ -53,7 +59,9 @@ export default class Entity {
 
         this.systems.set(system.id, system);
 
-        system.start(this);
+        if (this.hasStarted) {
+            system.start(this);
+        }
         return system;
     }
 

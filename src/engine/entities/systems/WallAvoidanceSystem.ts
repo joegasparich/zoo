@@ -4,7 +4,7 @@ import * as Planck from "planck-js";
 import * as util from "engine/helpers/util";
 import { Vector } from "engine";
 
-const TRIGGER_DISTANCE = 0.5;
+const TRIGGER_DISTANCE = 0.3;
 const AVOID_STRENGTH = 30;
 
 export default class WallAvoidanceSystem extends System {

@@ -29,6 +29,10 @@ export default class AnimatedRenderSystem extends RenderSystem {
     }
 
     public setAnimation(key: string): void {
+        if (!this.hasStarted) {
+            console.error("System hasn't been started yet");
+            return;
+        }
         if (!this.animations.has(key)) {
             console.error("Tried to play nonexistent animation " + key);
         }

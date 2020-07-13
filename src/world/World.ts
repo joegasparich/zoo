@@ -31,7 +31,6 @@ export default class World {
     }
 
     registerTileObject(tileObject: TileObject): void {
-        this.game.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {

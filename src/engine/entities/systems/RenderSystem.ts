@@ -32,6 +32,11 @@ export default class RenderSystem extends System {
     }
 
     public setSprite(newSprite: string | PIXI.Texture | PIXI.Sprite): void {
+        if (!this.hasStarted) {
+            console.error("System hasn't been started yet");
+            return;
+        }
+
         if (typeof newSprite === "string") {
             newSprite = AssetManager.getTexture(newSprite);
         }

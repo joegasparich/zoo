@@ -19,7 +19,14 @@ export default class TileObject extends Entity {
         this.blocksPath = blocksPath;
     }
 
-    static async loadTileObjectData(path: string): Promise<TileObjectData> {
+    public start(): void {
+        // Centre in tile
+        this.position = this.position.floor().add(new Vector(0.5, 0.5));
+
+        super.start();
+    }
+
+    public static async loadTileObjectData(path: string): Promise<TileObjectData> {
         const resource = await AssetManager.loadResource(path);
         const data = resource.data as TileObjectData;
         await AssetManager.loadResource(data.sprite);

@@ -8,8 +8,8 @@ import TileObject from "entities/TileObject";
 import { AssetManager, ColliderType } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
 
-const MAP_SIZE = 20;
-const TREE_RATE = 10;
+const MAP_SIZE = 5;
+const TREE_RATE = 1;
 
 export default class IslandScene extends Scene {
     world: World;
@@ -44,18 +44,22 @@ export default class IslandScene extends Scene {
         world.map.setupTileGrid(cells);
 
         //Place Trees
-        for (let i = 0; i < MAP_SIZE * TREE_RATE; i++) {
-            world.registerTileObject(new TileObject(
-                world.game,
-                world.getRandomCell().add(new Vector(0.5, 0.5)),
-                AssetManager.getJSON(OBJECTS.TREE) as TileObjectData,
-                {
-                    type: ColliderType.Rect,
-                    height: 0.6,
-                    width: 0.6,
-                },
-                true,
-            ));
-        }
+        // for (let i = 0; i < MAP_SIZE * TREE_RATE; i++) {
+        // }
+        this.placeTree(this.world.getRandomCell());
+    }
+
+    placeTree(position: Vector): void {
+        this.world.registerTileObject(new TileObject(
+            this.world.game,
+            position,
+            AssetManager.getJSON(OBJECTS.TREE) as TileObjectData,
+            {
+                type: ColliderType.Rect,
+                height: 0.6,
+                width: 0.6,
+            },
+            true,
+        ));
     }
 }

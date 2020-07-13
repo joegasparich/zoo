@@ -12,6 +12,8 @@ export default class PhysicsSystem extends System {
     density: number;
     body: Planck.Body;
 
+    lastPosition: Vector;
+
     constructor(collider: Collider, isDynamic: boolean, density = 10) {
         super();
 
@@ -30,12 +32,18 @@ export default class PhysicsSystem extends System {
             density: this.density,
         });
         this.entity.game.physicsManager.registerBody(entity, this.body);
+        this.lastPosition = this.entity.position;
     }
 
     update(delta: number): void {
         super.update(delta);
+        if (this.entity.position !== this.lastPosition) {
+            // Position has been altered somewhere, compensate
+            this.body.setPosition(this.entity.position.toVec2());
+        }
 
         this.entity.position = Vector.FromVec2(this.body.getPosition());
+        this.lastPosition = this.entity.position;
     }
 
     addForce(force: Vector): void {

@@ -38,8 +38,6 @@ export default class MapGrid {
     constructor(game: Game) {
         this.game = game;
         this.position = new Vector();
-
-        this.drawDebug();
     }
 
     public setCamera(camera: Camera): void {
@@ -60,6 +58,8 @@ export default class MapGrid {
         if (this.grid?.length) {
             this.drawTiles();
         }
+
+        this.drawDebug();
         this.drawDebugPathGrid();
     }
 
@@ -185,9 +185,9 @@ export default class MapGrid {
     }
 
     private drawDebug(): void {
-        Debug.setLineStyle(1, 0x00FF00);
-        const xOffset = this.position.x - this.cellSize / 2;
-        const yOffset = this.position.y - this.cellSize / 2;
+        Debug.setLineStyle(1, 0xFFFFFF);
+        const xOffset =  this.position.x// - this.cellSize / 2;
+        const yOffset = this.position.y// - this.cellSize / 2;
         // Horizontal
         for(let i = 0; i < this.rows + 1; i++) {
             Debug.drawLine(
