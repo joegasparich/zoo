@@ -16,7 +16,7 @@ export default class World {
         this.tileObjects = new Map();
     }
 
-    async loadMap() {
+    public async loadMap() {
         await this.game.sceneManager.loadScene(
             new IslandScene(this),
             // new TestScene(),
@@ -26,15 +26,20 @@ export default class World {
         );
     }
 
-    getRandomCell(): Vector {
+    public getRandomCell(): Vector {
         return new Vector(randomInt(0, this.map.cols), randomInt(0, this.map.rows));
     }
 
-    registerTileObject(tileObject: TileObject): void {
+    public registerTileObject(tileObject: TileObject): void {
         this.tileObjects.set(tileObject.id, tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {
-            this.map.setTileNotPathable(Math.floor(tileObject.position.x), Math.floor(tileObject.position.y));
+            this.map.setTileNotPathable(tileObject.position.floor());
+            this.map.setTileSolid(tileObject.position.floor(), true);
         }
+    }
+
+    public isTileFree(position: Vector): boolean {
+        return this.map.isTileFree(position);
     }
 }

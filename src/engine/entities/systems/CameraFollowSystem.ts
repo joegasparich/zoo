@@ -10,7 +10,7 @@ export default class CameraFollowSystem extends System {
     start(entity: Entity): void {
         super.start(entity);
 
-        this.camera = entity.game.camera;
+        this.camera = this.game.camera;
     }
 
     postUpdate(delta: number): void {

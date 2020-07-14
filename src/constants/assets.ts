@@ -1,5 +1,6 @@
 export const SPRITES = {
     HERO: "/assets/img/hero.png",
+    TREE: "/assets/img/tree.png",
 };
 
 export const SPRITESHEETS = {

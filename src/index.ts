@@ -1,20 +1,19 @@
 import { Game } from "engine";
 
+import { AssetManager } from "engine/managers";
+
 import CONFIG from "constants/config";
 import { SPRITES, TILES, SPRITESHEETS, TILESETS, OBJECTS } from "constants/assets";
-import { AssetManager } from "engine/managers";
 import TileObject from "entities/TileObject";
-import GameManager from "GameManager";
+import ZooGame from "ZooGame";
 
 import "CameraControl";
 
 let testGame: Game;
 
-let gameManager: GameManager;
-
-async function run() {
+async function run(): Promise<void> {
     // Create game
-    testGame = new Game({
+    testGame = new ZooGame({
         windowWidth: CONFIG.WINDOW_WIDTH,
         windowHeight: CONFIG.WINDOW_HEIGHT,
         enableDebug: CONFIG.ENABLE_DEBUG,
@@ -32,8 +31,6 @@ async function run() {
     await testGame.load(progress => {
         console.log(`Game Load Progress: ${progress}%`);
     });
-
-    gameManager = new GameManager(testGame);
 }
 
 run();

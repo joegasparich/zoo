@@ -47,7 +47,7 @@ export default class Game {
     public physicsManager: PhysicsManager;
     public sceneManager: SceneManager;
 
-    constructor(opts: GameOpts) {
+    public constructor(opts: GameOpts) {
         this.opts = Object.assign(defaultOpts, opts);
 
         // Set PIXI settings
@@ -80,13 +80,13 @@ export default class Game {
         Mediator.fire(Events.GameEvent.LOAD_COMPLETE);
 
         // start up the game loop
-        this.app.ticker.add(this.update.bind(this));
+        this.app.ticker.add(this.loop.bind(this));
 
         // Now that assets have been loaded we can set up the game
         this.setup();
     }
 
-    private setup(): void {
+    protected setup(): void {
         this.input = new InputManager(this);
         this.physicsManager = new PhysicsManager(this);
 
@@ -124,11 +124,25 @@ export default class Game {
      * The main game loop.
      * @param delta ms since the last update
      */
-    private update(delta: number): void {
+    private loop(delta: number): void {
         delta *= this.opts.gameSpeed;
 
-        //////////// Pre Update ////////////
+        this.preUpdate(delta);
+        Mediator.fire(Events.GameEvent.PRE_UPDATE, {delta, game: this});
 
+        this.update(delta);
+        Mediator.fire(Events.GameEvent.UPDATE, {delta, game: this});
+
+        this.postUpdate(delta);
+        Mediator.fire(Events.GameEvent.POST_UPDATE, {delta, game: this});
+
+        // Reset tings
+        this.input.clearKeys();
+        this.pushCachedEntities();
+        this.removeDeletedEntities();
+    }
+
+    protected preUpdate(delta: number): void {
         // Setup actions
         const scene = this.sceneManager.getCurrentScene();
         scene && scene.preUpdate();
@@ -136,12 +150,11 @@ export default class Game {
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
         });
+    }
 
-        Mediator.fire(Events.GameEvent.PRE_UPDATE, {delta, game: this});
-
-        //////////// Update ////////////
-
+    protected update(delta: number): void {
         // Game actions
+        const scene = this.sceneManager.getCurrentScene();
         scene && scene.update();
         this.entities.forEach(entity => {
             entity.update(delta);
@@ -150,12 +163,11 @@ export default class Game {
         this.physicsManager.update(delta);
 
         this.map.update();
+    }
 
-        Mediator.fire(Events.GameEvent.UPDATE, {delta, game: this});
-
-        //////////// Post Update ////////////
-
+    protected postUpdate(delta: number): void {
         // Rendering actions
+        const scene = this.sceneManager.getCurrentScene();
         scene && scene.postUpdate();
         this.entities.forEach(entity => {
             entity.postUpdate(delta);
@@ -164,13 +176,6 @@ export default class Game {
         this.map.postUpdate();
         Debug.postUpdate();
         this.camera.update();
-
-        Mediator.fire(Events.GameEvent.POST_UPDATE, {delta, game: this});
-
-        // Reset tings
-        this.input.clearKeys();
-        this.pushCachedEntities();
-        this.removeDeletedEntities();
     }
 
     public registerEntity(entity: Entity): void {

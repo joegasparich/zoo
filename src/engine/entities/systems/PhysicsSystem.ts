@@ -25,13 +25,13 @@ export default class PhysicsSystem extends System {
     start(entity: Entity): void {
         super.start(entity);
 
-        this.body = this.entity.game.physicsManager.createPhysicsObject({
+        this.body = this.game.physicsManager.createPhysicsObject({
             position: this.entity.position,
             collider: this.collider,
             isDynamic: this.isDynamic,
             density: this.density,
         });
-        this.entity.game.physicsManager.registerBody(entity, this.body);
+        this.game.physicsManager.registerBody(entity, this.body);
         this.lastPosition = this.entity.position;
     }
 

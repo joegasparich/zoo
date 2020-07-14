@@ -15,8 +15,8 @@ export type PhysicsObjOpts = {
 };
 
 export enum ColliderType {
-    Circle,
-    Rect
+    Circle = "CIRCLE",
+    Rect = "RECTANGLE",
 };
 
 export type Collider = {
@@ -27,10 +27,11 @@ export type Collider = {
 };
 
 function getShape(collider: Collider): Planck.Shape {
-    switch(collider.type) {
-    case ColliderType.Circle:
+    // We need to convert to string here since JSON collider types are strings not enums
+    switch(collider.type.toString()) {
+    case ColliderType.Circle.toString():
         return Planck.Circle(collider.radius);
-    case ColliderType.Rect:
+    case ColliderType.Rect.toString():
         return Planck.Polygon([
             Planck.Vec2(-collider.width/2, -collider.height/2),
             Planck.Vec2(collider.width/2, -collider.height/2),

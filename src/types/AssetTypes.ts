@@ -1,6 +1,9 @@
+import { Collider } from "engine/managers";
+
 export interface TileObjectData {
     name: string;
     solid: boolean;
+    collider: Collider;
     width: number;
     height: number;
     sprite: string;

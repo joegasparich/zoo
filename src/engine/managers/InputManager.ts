@@ -17,21 +17,22 @@ enum MOUSE_BUTTON {
 
 export default class InputManager {
 
-    public static KEY = KEY;
-    public static MOUSE_BUTTON = MOUSE_BUTTON;
+    // smh no enum class members
+    public static readonly KEY = KEY;
+    public static readonly MOUSE_BUTTON = MOUSE_BUTTON;
 
-    game: Game;
+    private game: Game;
 
-    keys: string[];
-    keysDown: string[];
-    keysUp: string[];
+    private keys: string[];
+    private keysDown: string[];
+    private keysUp: string[];
 
-    mousePos: Vector;
-    mouseButtons: number[];
-    mouseButtonsUp: number[];
-    mouseButtonsDown: number[];
+    private mousePos: Vector;
+    private mouseButtons: number[];
+    private mouseButtonsUp: number[];
+    private mouseButtonsDown: number[];
 
-    constructor(game: Game) {
+    public constructor(game: Game) {
         this.game = game;
 
         //-- Keyboard --//
@@ -82,7 +83,7 @@ export default class InputManager {
         });
     }
 
-    clearKeys(): void {
+    public clearKeys(): void {
         // Reset one tick key lists
         this.keysDown = [];
         this.keysUp = [];
@@ -90,26 +91,26 @@ export default class InputManager {
         this.mouseButtonsUp = [];
     }
 
-    isKeyPressed(key: KEY): boolean {
+    public isKeyPressed(key: KEY): boolean {
         return this.keysDown.includes(key);
     }
-    isKeyHeld(key: KEY): boolean {
+    public isKeyHeld(key: KEY): boolean {
         return this.keys.includes(key);
     }
-    isKeyReleased(key: KEY): boolean {
+    public isKeyReleased(key: KEY): boolean {
         return this.keysUp.includes(key);
     }
 
-    getMousePos(): Vector {
+    public getMousePos(): Vector {
         return this.mousePos;
     }
-    isMouseButtonPressed(button: MOUSE_BUTTON): boolean {
+    public isMouseButtonPressed(button: MOUSE_BUTTON): boolean {
         return this.mouseButtonsDown.includes(button);
     }
-    isMouseButtonHeld(button: MOUSE_BUTTON): boolean {
+    public isMouseButtonHeld(button: MOUSE_BUTTON): boolean {
         return this.mouseButtons.includes(button);
     }
-    isMouseButtonReleased(button: MOUSE_BUTTON): boolean {
+    public isMouseButtonReleased(button: MOUSE_BUTTON): boolean {
         return this.mouseButtonsUp.includes(button);
     }
 }

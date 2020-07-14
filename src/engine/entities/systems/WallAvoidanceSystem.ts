@@ -28,7 +28,7 @@ export default class WallAvoidanceSystem extends System {
         const fixture = this.physics.body.createFixture(avoidanceArea, {isSensor: true});
 
         // Listen for contact
-        entity.game.physicsManager.onContact(
+        this.game.physicsManager.onContact(
             fixture,
             contact => {
                 // TODO: Ensure that the fixtures are walls

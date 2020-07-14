@@ -35,6 +35,8 @@ export default class MapGrid {
     private groundTiles: PIXI.tilemap.CompositeRectTileLayer;
     private pathfindingGrid: PathfindingGrid;
 
+    private isGridSetup = false;
+
     constructor(game: Game) {
         this.game = game;
         this.position = new Vector();
@@ -50,6 +52,7 @@ export default class MapGrid {
         this.grid = [];
         this.pathfindingGrid = null;
         this.groundTiles = null;
+        this.isGridSetup = false;
     }
 
     public update(): void {}
@@ -81,6 +84,8 @@ export default class MapGrid {
         this.updateTiles();
 
         this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
+
+        this.isGridSetup = true;
     }
 
     /**
@@ -103,7 +108,7 @@ export default class MapGrid {
 
                 // Collision
                 if (tile.isSolid) {
-                    this.setTileNotPathable(tile.x, tile.y);
+                    this.setTileNotPathable(new Vector(tile.x, tile.y));
                     this.game.physicsManager.createPhysicsObject({
                         collider: {
                             type: ColliderType.Rect,
@@ -124,6 +129,30 @@ export default class MapGrid {
     private drawTiles(): void {
         this.groundTiles.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
         this.groundTiles.scale.set(this.camera.scale, this.camera.scale);
+    }
+
+    public setTileSolid(position: Vector, solid: boolean): void {
+        this.grid[position.x][position.y].isSolid = solid;
+    }
+
+    /**
+     * Returns whether the cell is solid at a position
+     * @param position The position to check
+     */
+    public isTileFree(position: Vector): boolean {
+        position = position.floor();
+
+        if (!this.isPositionInMap(position)) return false;
+        if (!this.isGridSetup) return false;
+
+        return !this.grid[position.x][position.y].isSolid;
+    }
+
+    public isPositionInMap(position: Vector): boolean {
+        return position.x >= 0 &&
+               position.x < this.cols &&
+               position.y >= 0 &&
+               position.y < this.rows;
     }
 
     /**
@@ -164,6 +193,7 @@ export default class MapGrid {
         this.setupTileGrid(cells);
     }
 
+    //-- Pathfinding --//
     public async getPath(start: Vector, end: Vector, opts?: {optimise: boolean}): Promise<Vector[]> {
         let path = await this.pathfindingGrid.getPath(start, end);
         if (!path) return;
@@ -176,14 +206,15 @@ export default class MapGrid {
         return this.pathfindingGrid.isPathWalkable(a, b);
     }
 
-    public setTileNotPathable(x: number, y: number): void {
-        this.pathfindingGrid.disablePoint(x, y);
+    public setTileNotPathable(position: Vector): void {
+        this.pathfindingGrid.disablePoint(position.x, position.y);
     }
 
-    public setTilePathable(x: number, y: number): void {
-        this.pathfindingGrid.enablePoint(x, y);
+    public setTilePathable(position: Vector): void {
+        this.pathfindingGrid.enablePoint(position.x, position.y);
     }
 
+    //-- Debug --//
     private drawDebug(): void {
         Debug.setLineStyle(1, 0xFFFFFF);
         const xOffset =  this.position.x// - this.cellSize / 2;

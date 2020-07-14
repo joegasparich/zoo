@@ -3,5 +3,10 @@
     "solid": true,
     "width": 1,
     "height": 1,
+    "collider": {
+        "type": "RECTANGLE",
+        "height": 0.6,
+        "width": 0.6
+    },
     "sprite": "/assets/img/tree.png"
 }

@@ -1,7 +1,7 @@
 import { Entity } from "engine/entities";
 import { RenderSystem, PhysicsSystem } from "engine/entities/systems";
 import { Game, Vector } from "engine";
-import { Collider, AssetManager } from "engine/managers";
+import { AssetManager } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
 
 export default class TileObject extends Entity {
@@ -9,13 +9,13 @@ export default class TileObject extends Entity {
     physics: PhysicsSystem;
     blocksPath: boolean;
 
-    constructor(game: Game, pos: Vector, data: TileObjectData, collider: Collider, blocksPath = false) {
+    constructor(game: Game, pos: Vector, data: TileObjectData, blocksPath = false) {
         super(game, pos);
 
         const sprite = data.sprite;
 
         this.render = this.addSystem(new RenderSystem(sprite));
-        this.physics = this.addSystem(new PhysicsSystem(collider, false, 1));
+        this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1));
         this.blocksPath = blocksPath;
     }
 

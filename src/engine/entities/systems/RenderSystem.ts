@@ -4,11 +4,14 @@ import { Entity } from "engine/entities";
 import { Camera, Layers } from "engine";
 import { Point } from "pixi.js";
 
+const DEFAULT_LAYER = Layers.ENTITIES;
+
 export default class RenderSystem extends System {
     public id = SYSTEM.RENDER_SYSTEM;
 
-    protected spriteUrl: string;
-    public sprite: PIXI.Sprite;
+    private spriteUrl: string;
+    protected sprite: PIXI.Sprite;
+    private layer: PIXI.display.Group;
 
     public flipX: boolean;
     public flipY: boolean;
@@ -16,15 +19,20 @@ export default class RenderSystem extends System {
 
     protected camera: Camera;
 
-    constructor(spriteUrl: string) {
+    public colour = 0xFFFFFF;
+    public blendMode = PIXI.BLEND_MODES.NORMAL;
+    public visible = true;
+
+    public constructor(spriteUrl: string, layer?: PIXI.display.Group) {
         super();
         this.spriteUrl = spriteUrl ?? "";
+        this.layer = layer ?? DEFAULT_LAYER;
     }
 
     public start(entity: Entity): void {
         super.start(entity);
 
-        this.camera = entity.game.camera;
+        this.camera = this.game.camera;
 
         if (this.spriteUrl) {
             this.setSprite(this.spriteUrl);
@@ -50,13 +58,13 @@ export default class RenderSystem extends System {
         }
 
         // Remove old sprite
-        const app = this.entity.game.app;
+        const app = this.game.app;
         app.stage.removeChild(this.sprite);
 
         // Add new sprite
         app.stage.addChild(newSprite);
         this.sprite = newSprite;
-        this.sprite.parentGroup = Layers.ENTITIES;
+        this.sprite.parentGroup = this.layer;
         this.sprite.anchor.set(0.5);
         this.syncPosition();
     }
@@ -64,7 +72,16 @@ export default class RenderSystem extends System {
     public postUpdate(delta: number): void {
         super.postUpdate(delta);
 
+        if (!this.sprite) return;
+
         this.syncPosition();
+        this.setColour();
+    }
+
+    protected setColour(): void {
+        this.sprite.tint = this.colour;
+        this.sprite.blendMode = this.blendMode;
+        this.sprite.visible = this.visible;
     }
 
     protected syncPosition(): void {

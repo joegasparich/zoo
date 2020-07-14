@@ -51,7 +51,7 @@ export default class PathFollowSystem extends System {
     }
 
     private drawDebugPath(): void {
-        const cellSize = this.entity.game.map.cellSize;
+        const cellSize = this.game.map.cellSize;
 
         Debug.setLineStyle(3, 0x0000FF);
 
