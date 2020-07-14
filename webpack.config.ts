@@ -22,6 +22,7 @@ module.exports = {
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: "Development",
+            template: "src/index.html",
         }),
         new CopyWebpackPlugin([{ from: "./src/assets", to: "assets" }]),
         new webpack.NamedModulesPlugin(),

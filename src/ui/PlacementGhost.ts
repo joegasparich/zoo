@@ -28,7 +28,7 @@ export default class PlacementGhost {
         this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
-        this.ghostRenderer.blendMode = PIXI.BLEND_MODES.ADD;
+        this.ghostRenderer.alpha = 0.6;
 
         Mediator.on(GameEvent.POST_UPDATE, this.postUpdate.bind(this));
     }

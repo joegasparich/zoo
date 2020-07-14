@@ -10,7 +10,7 @@ export default class Player extends Actor {
     private animator: AnimatedRenderSystem;
     public pather: PathFollowSystem;
 
-    constructor(game: Game, position: Vector) {
+    public constructor(game: Game, position: Vector) {
         const spritesheet = new SpriteSheet({
             image: AssetManager.getTexture(SPRITESHEETS.DUDE_RUN),
             cellHeight: 24,

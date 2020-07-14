@@ -14,17 +14,22 @@
 		"lint": "eslint '**/*.ts' --no-ignore"
 	},
 	"dependencies": {
+		"@emotion/core": "^10.0.28",
 		"easystarjs": "^0.4.3",
 		"pixi-inspector": "^1.0.7",
 		"pixi-layers": "^0.2.3",
 		"pixi-tilemap": "^2.0.3",
 		"pixi.js": "^5.1.5",
 		"planck-js": "https://github.com/shakiba/planck.js/tarball/master",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.29",
 		"@types/pixi.js": "^5.0.0",
+		"@types/react": "^16.9.43",
+		"@types/react-dom": "^16.9.8",
 		"@types/uuid": "^3.4.5",
 		"@typescript-eslint/eslint-plugin": "^2.23.0",
 		"@typescript-eslint/parser": "^2.23.0",

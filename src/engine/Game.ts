@@ -9,6 +9,7 @@ import { AssetManager, InputManager, PhysicsManager, SceneManager } from "./mana
 import Mediator from "./Mediator";
 import { Entity } from "./entities";
 import { MapGrid } from "./map";
+import { Canvas } from "./ui";
 
 import { registerPixiInspector } from "./helpers/util";
 import CONFIG from "constants/config";
@@ -35,6 +36,7 @@ export default class Game {
 
     public opts: GameOpts;
 
+    public canvas: Canvas;
     public camera: Camera;
     public map: MapGrid;
 
@@ -69,8 +71,8 @@ export default class Game {
         // create view in DOM
         document.body.appendChild(this.app.view);
 
-        // Prevent right clicks
-        document.body.setAttribute("oncontextmenu", "return false;");
+        // create ui canvas
+        this.canvas = new Canvas(this);
     }
 
     public async load(onProgress?: (progress: number) => void): Promise<void> {
@@ -91,6 +93,8 @@ export default class Game {
         this.physicsManager = new PhysicsManager(this);
 
         this.setupStage();
+
+        this.canvas.load();
 
         this.camera = new Camera(this, new Vector(20, 20), CONFIG.CAMERA_SCALE);
 

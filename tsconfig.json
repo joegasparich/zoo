@@ -6,6 +6,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "target": "es5",
+    "jsx": "react",
     "typeRoots": [
       "node_modules/@types"
     ],

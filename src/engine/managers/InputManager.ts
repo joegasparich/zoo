@@ -1,4 +1,5 @@
 import { Game, Vector } from "engine";
+import * as util from "engine/helpers/util";
 
 enum KEY {
     UP = "ArrowUp",
@@ -6,14 +7,25 @@ enum KEY {
     LEFT = "ArrowLeft",
     RIGHT = "ArrowRight",
     SPACE = "Space",
-    Z = "z",
+    A = "a",
+    D = "d",
+    S = "s",
+    W = "w",
     X = "x",
+    Z = "z",
 }
 enum MOUSE_BUTTON {
     LEFT = 0,
     MIDDLE = 1,
     RIGHT = 2,
 }
+
+export type Button = KEY | MOUSE_BUTTON;
+
+export type Input = {
+    name: string;
+    buttons: Button[];
+};
 
 export default class InputManager {
 
@@ -32,8 +44,18 @@ export default class InputManager {
     private mouseButtonsUp: number[];
     private mouseButtonsDown: number[];
 
+    private registeredInputs: Map<Button, string>;
+    private inputsHeld: string[];
+    private inputsUp: string[];
+    private inputsDown: string[];
+
     public constructor(game: Game) {
         this.game = game;
+
+        this.registeredInputs = new Map();
+        this.inputsHeld = [];
+        this.inputsDown = [];
+        this.inputsUp = [];
 
         //-- Keyboard --//
         this.keys = [];
@@ -48,12 +70,20 @@ export default class InputManager {
             if (this.keys.includes(event.key)) return;
             this.keys.push(event.key);
             this.keysDown.push(event.key);
+
+            const input = this.registeredInputs.get(event.key as KEY);
+            if (this.inputsHeld.includes(input)) return;
+            this.inputsHeld.push(input);
+            this.inputsDown.push(input);
         });
 
         document.addEventListener("keyup", (event: KeyboardEvent) => {
-            const index = this.keys.indexOf(event.key);
-            if (index !== -1) this.keys.splice(index, 1);
+            this.keys = util.removeItem(this.keys, event.key);
             this.keysUp.push(event.key);
+
+            const input = this.registeredInputs.get(event.key as KEY);
+            this.inputsHeld = util.removeItem(this.inputsHeld, input);
+            this.inputsUp.push(input);
         });
 
         //-- Mouse --//
@@ -67,6 +97,10 @@ export default class InputManager {
         });
 
         document.addEventListener("mousedown", (event: MouseEvent) => {
+            if (!(event.target instanceof HTMLCanvasElement)) {
+                // Target was UI
+                return;
+            }
             if (Object.values(MOUSE_BUTTON).includes(event.button as MOUSE_BUTTON)) {
                 event.preventDefault();
             }
@@ -74,21 +108,43 @@ export default class InputManager {
             if (this.mouseButtons.includes(event.button)) return;
             this.mouseButtons.push(event.button);
             this.mouseButtonsDown.push(event.button);
+
+            const input = this.registeredInputs.get(event.button as MOUSE_BUTTON);
+            if (this.inputsHeld.includes(input)) return;
+            this.inputsHeld.push(input);
+            this.inputsDown.push(input);
         });
 
         document.addEventListener("mouseup", (event: MouseEvent) => {
             const index = this.mouseButtons.indexOf(event.button);
             if (index !== -1) this.mouseButtons.splice(index, 1);
             this.mouseButtonsUp.push(event.button);
+
+            const input = this.registeredInputs.get(event.button as MOUSE_BUTTON);
+            this.inputsHeld = util.removeItem(this.inputsHeld, input);
+            this.inputsUp.push(input);
         });
     }
 
     public clearKeys(): void {
         // Reset one tick key lists
+        this.inputsDown = [];
+        this.inputsUp = [];
         this.keysDown = [];
         this.keysUp = [];
         this.mouseButtonsDown = [];
         this.mouseButtonsUp = [];
+    }
+
+    public registerInput(input: Input): void {
+        input.buttons.forEach(button => {
+            if (this.registeredInputs.get(button)) {
+                console.error("Button: " + button.toString() + " already registered to " + input.name);
+                return;
+            }
+
+            this.registeredInputs.set(button, input.name);
+        });
     }
 
     public isKeyPressed(key: KEY): boolean {
@@ -112,5 +168,15 @@ export default class InputManager {
     }
     public isMouseButtonReleased(button: MOUSE_BUTTON): boolean {
         return this.mouseButtonsUp.includes(button);
+    }
+
+    public isInputPressed(input: Input): boolean {
+        return this.inputsDown.includes(input.name);
+    }
+    public isInputHeld(input: Input): boolean {
+        return this.inputsHeld.includes(input.name);
+    }
+    public isInputReleased(input: Input): boolean {
+        return this.inputsUp.includes(input.name);
     }
 }

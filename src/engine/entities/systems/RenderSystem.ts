@@ -20,7 +20,7 @@ export default class RenderSystem extends System {
     protected camera: Camera;
 
     public colour = 0xFFFFFF;
-    public blendMode = PIXI.BLEND_MODES.NORMAL;
+    public alpha = 1;
     public visible = true;
 
     public constructor(spriteUrl: string, layer?: PIXI.display.Group) {
@@ -80,7 +80,7 @@ export default class RenderSystem extends System {
 
     protected setColour(): void {
         this.sprite.tint = this.colour;
-        this.sprite.blendMode = this.blendMode;
+        this.sprite.alpha = this.alpha;
         this.sprite.visible = this.visible;
     }
 
