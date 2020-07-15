@@ -1,9 +1,17 @@
+import { Vector } from "engine";
+
 export type Rectangle = {
     x: number;
     y: number;
     width: number;
     height: number;
 };
+
+export function inCircle(circleCentre: Vector, radius: number, point: Vector): boolean {
+    const dx = circleCentre.x - point.x;
+    const dy = circleCentre.y - point.y;
+    return (dx*dx + dy*dy) < radius*radius;
+}
 
 export function lerp (start: number, end: number, percent: number): number {
     return start + (end - start) * percent;

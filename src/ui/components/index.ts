@@ -1,2 +1,2 @@
 export { default as Toolbar } from "./Toolbar";
-export { default as TreeButton } from "./TreeButton";
+export { default as Button } from "./Button";
