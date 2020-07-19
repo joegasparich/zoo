@@ -1,10 +1,8 @@
 import { Game, Vector } from "engine";
-import IslandScene from "scenes/IslandScene";
 import { randomInt } from "engine/helpers/math";
 import { MapGrid } from "engine/map";
 import TileObject from "entities/TileObject";
-import TestScene from "scenes/TestScene";
-import BiomeGrid from "./BiomeGrid";
+import EmptyScene from "scenes/EmptyScene";
 
 export default class World {
     game: Game;
@@ -18,13 +16,12 @@ export default class World {
     }
 
     public async loadMap() {
-        // await this.game.sceneManager.loadScene(
-        //     new IslandScene(this),
-        //     // new TestScene(),
-        //     (progress: number) => {
-        //         console.log(`Map Load Progress: ${progress}%`);
-        //     },
-        // );
+        await this.game.sceneManager.loadScene(
+            new EmptyScene(this),
+            (progress: number) => {
+                console.log(`Map Load Progress: ${progress}%`);
+            },
+        );
     }
 
     public getRandomCell(): Vector {

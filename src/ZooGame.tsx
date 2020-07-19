@@ -16,7 +16,7 @@ export default class ZooGame extends Game {
     public world: World;
     public player: Player;
 
-    private biomeGrid: BiomeGrid;
+    public biomeGrid: BiomeGrid;
     private toolbarRef: React.RefObject<Toolbar>;
 
     protected setup(): void {
@@ -38,22 +38,33 @@ export default class ZooGame extends Game {
         );
         this.player.render.scale = 0.5;
 
-        this.biomeGrid = new BiomeGrid(this, 50, 50, 8);
+        this.biomeGrid = new BiomeGrid(this, 20, 20, 8);
 
+        this.createUI();
+    }
+
+    private createUI(): void {
         this.toolbarRef = React.createRef<Toolbar>();
         this.canvas.addChild(<Toolbar key="toolbar" ref={this.toolbarRef} />);
-
         this.toolbarRef.current.start(this);
     }
 
     protected update(delta: number): void {
         super.update(delta);
 
-        if (this.input.isInputPressed(Inputs.LeftMouse)) {
-            const placePos: Vector = this.camera.screenToWorldPosition(this.input.getMousePos()).floor();
+        this.pollInput();
 
-            this.placeTileObject(AssetManager.getJSON(OBJECTS.TREE) as TileObjectData, placePos);
-        }
+        this.toolbarRef.current.update();
+        this.biomeGrid.postUpdate();
+    }
+
+    protected postUpdate(delta: number): void {
+        super.postUpdate(delta);
+        this.toolbarRef.current.postUpdate();
+    }
+
+    private pollInput(): void {
+        if (this.toolbarRef.current.hasFocus()) return;
 
         if (this.input.isInputPressed(Inputs.RightMouse)) {
             const mousePos: Vector = this.camera.screenToWorldPosition(this.input.getMousePos());
@@ -65,13 +76,6 @@ export default class ZooGame extends Game {
                     this.player.pather.setPath(path);
                 });
         }
-
-        this.biomeGrid.postUpdate();
-    }
-
-    protected postUpdate(delta: number): void {
-        super.postUpdate(delta);
-        this.toolbarRef.current.postUpdate();
     }
 
     public placeTileObject(object: TileObjectData, position: Vector): void {

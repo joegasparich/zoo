@@ -1,42 +1,38 @@
 import { Scene } from "engine";
 import { MapGrid, MapCell } from "engine/map";
 
-import GroundTile from "world/GroundTile";
-import { TILES } from "constants/assets";
 import World from "world/World";
 
-const MAP_SIZE = 5;
+const MAP_SIZE = 10;
 
-export default class IslandScene extends Scene {
-    world: World;
+export default class EmptyScene extends Scene {
+    private world: World;
 
-    constructor(world: World) {
+    public constructor(world: World) {
         super();
 
         this.world = world;
     }
 
-    start(map: MapGrid) {
+    public start(map: MapGrid): void {
         this.generateMap(this.world);
     }
 
-    generateMap(world: World): void {
+    private generateMap(world: World): void {
         const cells: MapCell[][] = [];
 
         // Place Grass
         for (let i = 0; i < MAP_SIZE; i++) {
             cells[i] = [];
             for (let j = 0; j < MAP_SIZE; j++) {
-                const tile = new GroundTile(TILES.GRASS);
                 cells[i][j] = {
                     x: i,
                     y: j,
-                    texture: tile.texture,
                     isSolid: false,
                 };
             }
         }
 
-        world.map.setupTileGrid(cells, true);
+        world.map.setupTileGrid(cells, false);
     }
 }

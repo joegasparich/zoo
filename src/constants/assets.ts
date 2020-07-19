@@ -3,6 +3,13 @@ export const SPRITES = {
     TREE: "/assets/img/tree.png",
 };
 
+export const UI = {
+    BIOME: "/assets/img/biome.png",
+    GRASS: "/assets/img/grass.png",
+    SNOW: "/assets/img/snow.png",
+    SAND: "/assets/img/sand.png",
+};
+
 export const SPRITESHEETS = {
     DUDE_RUN: "/assets/img/dude_run.png",
 };

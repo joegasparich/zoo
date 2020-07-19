@@ -82,7 +82,7 @@ export default class PhysicsManager {
 
     public update(delta: number): void {
         this.world.step(delta / FRAME_RATE);
-        this.drawDebug();
+        // this.drawDebug();
     }
 
     public setGravity(direction: Vector): void {

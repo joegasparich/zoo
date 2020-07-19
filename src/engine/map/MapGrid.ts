@@ -6,11 +6,12 @@ import { ColliderType, AssetManager } from "engine/managers";
 import { parseTiledMap } from "engine/helpers/parseTiled";
 
 export class MapCell {
-    x: number;
-    y: number;
+    public x: number;
+    public y: number;
 
-    isSolid: boolean;
-    texture: PIXI.Texture;
+    public isSolid: boolean;
+    public texture?: PIXI.Texture;
+    public cellSize?: number;
 }
 export interface MapFileData {
     width: number;
@@ -37,7 +38,7 @@ export default class MapGrid {
 
     private isGridSetup = false;
 
-    constructor(game: Game) {
+    public constructor(game: Game) {
         this.game = game;
         this.position = new Vector();
     }
@@ -58,7 +59,7 @@ export default class MapGrid {
     public update(): void {}
 
     public postUpdate(): void {
-        if (this.grid?.length) {
+        if (this.grid?.length && this.groundTiles) {
             this.drawTiles();
         }
 
@@ -66,22 +67,24 @@ export default class MapGrid {
         this.drawDebugPathGrid();
     }
 
-    public setupTileGrid(cells: MapCell[][]): void{
+    public setupTileGrid(cells: MapCell[][], useTexture: boolean): void{
         this.grid = cells;
         this.cols = cells.length;
         this.rows = cells[0].length;
-        this.cellSize = cells[0][1].texture.width;
+        this.cellSize = cells[0][1].texture?.width ?? cells[0][1].cellSize;
 
-        const textures: PIXI.Texture[] = [];
-        for (let i = 0; i < cells.length; i++) {
-            for (let j = 0; j < cells[i].length; j++) {
-                textures.push(cells[i][j].texture);
+        if (useTexture) {
+            const textures: PIXI.Texture[] = [];
+            for (let i = 0; i < cells.length; i++) {
+                for (let j = 0; j < cells[i].length; j++) {
+                    textures.push(cells[i][j].texture);
+                }
             }
+            this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, textures);
+            this.groundTiles.parentGroup = Layers.GROUND;
+            this.game.stage.addChild(this.groundTiles);
+            this.updateTiles();
         }
-        this.groundTiles = new PIXI.tilemap.CompositeRectTileLayer(0, textures);
-        this.groundTiles.parentGroup = Layers.GROUND;
-        this.game.stage.addChild(this.groundTiles);
-        this.updateTiles();
 
         this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
 
@@ -190,7 +193,7 @@ export default class MapGrid {
             }
         }
 
-        this.setupTileGrid(cells);
+        this.setupTileGrid(cells, true);
     }
 
     //-- Pathfinding --//
@@ -217,8 +220,8 @@ export default class MapGrid {
     //-- Debug --//
     private drawDebug(): void {
         Debug.setLineStyle(1, 0xFFFFFF);
-        const xOffset =  this.position.x// - this.cellSize / 2;
-        const yOffset = this.position.y// - this.cellSize / 2;
+        const xOffset =  this.position.x;
+        const yOffset = this.position.y;
         // Horizontal
         for(let i = 0; i < this.rows + 1; i++) {
             Debug.drawLine(

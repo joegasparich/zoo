@@ -1,16 +1,22 @@
-import { Layers } from "engine";
+import { Layers, Vector } from "engine";
 import { GameEvent } from "engine/constants/events";
 import { Entity } from "engine/entities";
 import { RenderSystem, SYSTEM } from "engine/entities/systems";
 import Mediator from "engine/Mediator";
-import { FollowMouseSystem, SnapToGridSystem } from "entities/systems";
+import { FollowMouseSystem, SnapToGridSystem, ZOO_SYSTEM } from "entities/systems";
 
 import { SPRITES } from "constants/assets";
 import World from "world/World";
 import ZooGame from "ZooGame";
+import { InputManager } from "engine/managers";
 
 // Should never be seen
 const DEFAULT_SPRITE = SPRITES.TREE;
+
+enum Mode {
+    Sprite,
+    Draw
+}
 
 export default class PlacementGhost {
     private game: ZooGame;
@@ -18,7 +24,10 @@ export default class PlacementGhost {
 
     private ghost: Entity;
     private ghostRenderer: RenderSystem;
+    private drawFunction: Function;
     private visible: boolean;
+    private mode: Mode;
+    private snap: boolean;
 
     public constructor(game: ZooGame) {
         this.game = game;
@@ -34,16 +43,31 @@ export default class PlacementGhost {
     }
 
     public postUpdate(): void {
-        const renderer = this.ghost.getSystem(SYSTEM.RENDER_SYSTEM) as RenderSystem;
-        if (this.world.isTileFree(this.ghost.position)) {
-            renderer.colour = 0x0088DD;
-        } else {
-            renderer.colour = 0xFF0000;
+        if (!this.visible) return;
+
+        if (this.mode === Mode.Sprite) {
+            const renderer = this.ghost.getSystem(SYSTEM.RENDER_SYSTEM) as RenderSystem;
+            if (this.world.isTileFree(this.ghost.position)) {
+                renderer.colour = 0x0088DD;
+            } else {
+                renderer.colour = 0xFF0000;
+            }
+        }
+        if (this.mode === Mode.Draw) {
+            this.drawFunction(this.game.camera.screenToWorldPosition(this.game.input.getMousePos()));
         }
     }
 
     public setSprite(sprite: string | PIXI.Sprite | PIXI.Texture): void {
+        this.mode = Mode.Sprite;
         this.ghostRenderer.setSprite(sprite);
+        this.ghostRenderer.visible = true;
+    }
+
+    public setDrawFunction(fn: (pos: Vector) => void): void {
+        this.mode = Mode.Draw;
+        this.ghostRenderer.visible = false;
+        this.drawFunction = fn;
     }
 
     public setVisible(visible: boolean): void {
@@ -51,5 +75,16 @@ export default class PlacementGhost {
         this.visible = visible;
 
         this.ghostRenderer.visible = this.visible;
+    }
+
+    public setSnap(snap: boolean): void {
+        if (this.snap === snap) return;
+        this.snap = snap;
+
+        if (snap) {
+            this.ghost.addSystem(new SnapToGridSystem());
+        } else {
+            this.ghost.removeSystem(ZOO_SYSTEM.SNAP_TO_GRID_SYSTEM);
+        }
     }
 }

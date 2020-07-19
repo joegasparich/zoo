@@ -1,10 +1,10 @@
 import { Camera, Game, Layers, Vector } from "engine";
 import { inCircle } from "engine/helpers/math";
 
-enum Biome {
-    Grass = 0x339900,
-    Sand = 0x884400,
-    Snow = 0xDDDDFF,
+export enum Biome {
+    Grass = 0xb6d53c,
+    Sand = 0xf4cca1,
+    Snow = 0xdff6f5,
 }
 
 class Square {
@@ -21,6 +21,8 @@ class Square {
 }
 
 export default class BiomeGrid {
+    public static Biome = Biome;
+
     private game: Game;
     private camera: Camera;
 
@@ -56,17 +58,11 @@ export default class BiomeGrid {
         this.game.stage.addChild(this.graphics);
 
         this.draw();
-        //Test//
-        const rad = 4;
-        this.setBiome(new Vector(10.5, 10.5), rad, Biome.Snow);
-        this.draw();
-
-        this.graphics.lineStyle(1, 0xFF0000);
-        this.graphics.drawCircle(10.5*this.cellSize, 10.5*this.cellSize, rad*this.cellSize);
-        this.graphics.lineStyle();
     }
 
     public draw(): void {
+        this.graphics.clear();
+
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 for (let q = 0; q < 4; q++) {
@@ -116,10 +112,10 @@ export default class BiomeGrid {
     public setBiome(pos: Vector, radius: number, biome: Biome): void {
         if (!this.isPositionInGrid(pos)) return;
 
-        for(let i = pos.x - (radius+1); i <= pos.x + (radius+1); i++) {
-            for(let j = pos.y - (radius+1); j <= pos.y + (radius+1); j++) {
+        for(let i = pos.x - (radius); i <= pos.x + (radius); i++) {
+            for(let j = pos.y - (radius); j <= pos.y + (radius); j++) {
                 const cellPos = new Vector(i, j).floor();
-                if (!this.isPositionInGrid(cellPos)) return;
+                if (!this.isPositionInGrid(cellPos)) continue;
                 // Get Triangles in circle
                 for (let q = 0; q < 4; q++) {
                     this.getQuadrantVertices(cellPos.x, cellPos.y, q).forEach((point: Vector) => {
@@ -133,9 +129,11 @@ export default class BiomeGrid {
                 }
             }
         }
+
+        this.draw();
     }
 
     private isPositionInGrid(pos: Vector): boolean {
-        return pos.x > 0 && pos.x < this.width * this.cellSize && pos.y > 0 && pos.y < this.height * this.cellSize;
+        return pos.x >= 0 && pos.x < this.width && pos.y >= 0 && pos.y < this.height;
     }
 }

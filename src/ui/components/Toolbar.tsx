@@ -2,25 +2,38 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { Vector } from "engine";
-import { UIComponent } from "engine/ui";
+import { Debug, Vector } from "engine";
+import { UIComponent, UIComponentProps } from "engine/ui";
+import { AssetManager } from "engine/managers";
 
 import { Button } from "ui/components";
-import { SPRITES } from "constants/assets";
+import { OBJECTS, SPRITES, UI } from "constants/assets";
 import { PlacementGhost } from "ui";
 import ZooGame from "ZooGame";
+import Inputs from "constants/inputs";
+import { TileObjectData } from "types/AssetTypes";
+import { Biome } from "world/BiomeGrid";
+import FloatingPanel from "./FloatingPanel";
 
 enum Tool {
-    Snow,
-    Tree
+    None,
+    Tree,
+    Biome,
 }
 
-export default class Toolbar extends UIComponent {
+interface ToolbarState {
+    activeButton: string;
+}
+
+export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState> {
 
     private game: ZooGame;
 
     private currentTool: Tool;
+    private currentBiome: Biome;
     private ghost: PlacementGhost;
+
+    private radius: number;
 
     protected getStyles(): SerializedStyles {
         return css`
@@ -31,6 +44,11 @@ export default class Toolbar extends UIComponent {
             top: 0;
             width: 100%;
             height: 40px;
+
+            .panel-button {
+                display: flex;
+                justify-content: center;
+            }
         `;
     }
 
@@ -38,13 +56,34 @@ export default class Toolbar extends UIComponent {
         return (
             <React.Fragment>
                 <Button
+                    key="treeButton"
                     image={SPRITES.TREE}
                     onClick={(): void => { this.setTool(Tool.Tree); }}
                 />
-                <Button
-                    image={SPRITES.TREE}
-                    onClick={(): void => { this.setTool(Tool.Snow); }}
-                />
+                <div className="panel-button">
+                    <Button
+                        key="biomeButton"
+                        image={UI.BIOME}
+                        onClick={(): void => { this.setState({activeButton: "biome"}); }}
+                    />
+                    <FloatingPanel key="panel" hidden={this.state?.activeButton !== "biome"}>
+                        <Button
+                            key="grassButton"
+                            image={UI.GRASS}
+                            onClick={(): void => { this.setTool(Tool.Biome); this.currentBiome = Biome.Grass; }}
+                        />
+                        <Button
+                            key="snowButton"
+                            image={UI.SNOW}
+                            onClick={(): void => { this.setTool(Tool.Biome); this.currentBiome = Biome.Snow; }}
+                        />
+                        <Button
+                            key="sandButton"
+                            image={UI.SAND}
+                            onClick={(): void => { this.setTool(Tool.Biome); this.currentBiome = Biome.Sand; }}
+                        />
+                    </FloatingPanel>
+                </div>
             </React.Fragment>
         );
     }
@@ -53,25 +92,55 @@ export default class Toolbar extends UIComponent {
         this.game = game;
 
         this.ghost = new PlacementGhost(this.game);
+        this.radius = 1;
+
+        this.setTool(Tool.None);
     }
 
     public setTool(tool: Tool): void {
-        this.ghost.setVisible(false);
         this.currentTool = tool;
+        this.ghost.setVisible(true);
 
         switch(this.currentTool) {
         case Tool.Tree:
             this.ghost.setSprite(SPRITES.TREE);
-            this.ghost.setVisible(true);
+            this.ghost.setSnap(true);
+            this.setState({activeButton: "tree"});
             break;
+        case Tool.Biome:
+            this.ghost.setDrawFunction(pos => {
+                Debug.setLineStyle(1, 0x88BBFF);
+                Debug.drawCircle(pos.multiply(16), this.radius * 8, 0x88BBFF, 0.5);
+            });
+            this.ghost.setSnap(false);
+            break;
+        case Tool.None:
         default:
+            this.ghost.setVisible(false);
+            this.setState({activeButton: ""});
             break;
         }
     }
 
-    public preUpdate(): void {
+    public update(): void {
+        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+
+        if(this.game.input.isInputPressed(Inputs.RightMouse)) {
+            this.setTool(Tool.None);
+        }
+
         switch(this.currentTool) {
         case Tool.Tree:
+            if (this.game.input.isInputPressed(Inputs.LeftMouse)) {
+                const placePos: Vector = mouseWorldPos.floor();
+
+                this.game.placeTileObject(AssetManager.getJSON(OBJECTS.TREE) as TileObjectData, placePos);
+            }
+            break;
+        case Tool.Biome:
+            if (this.game.input.isInputHeld(Inputs.LeftMouse)) {
+                this.game.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.radius, this.currentBiome);
+            }
             break;
         default:
             break;
@@ -79,13 +148,7 @@ export default class Toolbar extends UIComponent {
     }
 
     public postUpdate(): void {
-        switch(this.currentTool) {
-        case Tool.Tree:
-            this.ghost.postUpdate();
-            break;
-        default:
-            break;
-        }
+        this.ghost.postUpdate();
     }
 
     private getQuadrant(pos: Vector): number {
@@ -96,5 +159,9 @@ export default class Toolbar extends UIComponent {
         if (xrel < 0 && Math.abs(xrel) > Math.abs(yrel)) return 1; // West
         if (yrel > 0 && Math.abs(yrel) > Math.abs(xrel)) return 2; // South
         if (xrel > 0 && Math.abs(xrel) > Math.abs(yrel)) return 3; // East
+    }
+
+    public hasFocus(): boolean {
+        return this.state.activeButton !== "";
     }
 }

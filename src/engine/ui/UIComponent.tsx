@@ -2,27 +2,32 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-interface UIComponentProps {
+export interface UIComponentProps {
     key: string;
+    hidden?: boolean;
 }
 
-export default abstract class UIComponent extends React.Component<UIComponentProps> {
+export default abstract class UIComponent<P extends UIComponentProps, S> extends React.Component<P, S> {
     private baseStyles = css`
         pointer-events: all;
         background: #AAAAAA;
+
+        .hidden {
+            display: none;
+        }
     `;
 
-    protected abstract getStyles(): SerializedStyles;
+    protected getStyles(): SerializedStyles | void {};
     protected abstract getContent(): JSX.Element;
 
     public render(): JSX.Element {
         const style = css`
             ${this.baseStyles};
-            ${this.getStyles()}
+            ${this.getStyles() || ""}
         `;
 
         return (
-            <div css={style}>
+            <div css={style} className={this.props.hidden ? "hidden" : ""}>
                 {this.getContent()}
             </div>
         );
