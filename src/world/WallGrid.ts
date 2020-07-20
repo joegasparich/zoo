@@ -132,7 +132,7 @@ export default class WallGrid {
         const wall = new Wall(orientation, wallData);
         this.wallGrid[x][y] = wall;
 
-        const texture = Wall.wallSprites.get(wall.data.spriteSheet).getTextureById(orientation ? 0 : 1);
+        const texture = wall.spriteSheet.getTextureById(orientation ? 0 : 1);
         wall.sprite = new PIXI.Sprite(texture);
 
         // Add new sprite

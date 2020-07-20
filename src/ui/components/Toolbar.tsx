@@ -9,14 +9,16 @@ import { AssetManager } from "engine/managers";
 import { Button } from "ui/components";
 import { PlacementGhost } from "ui";
 import ZooGame from "ZooGame";
-import { Inputs, Config, Assets } from "consts";
-import { TileObjectData } from "types/AssetTypes";
+import { Inputs, Config, Assets, Side } from "consts";
+import { TileObjectData, WallData } from "types/AssetTypes";
 import { Biome } from "world/BiomeGrid";
 import FloatingPanel from "./FloatingPanel";
+import Wall from "world/Wall";
 
 enum Tool {
     None,
     Tree,
+    Wall,
     Biome,
 }
 
@@ -35,8 +37,10 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
 
     private game: ZooGame;
 
-    private currentBiome: Biome;
     private ghost: PlacementGhost;
+
+    private currentBiome: Biome;
+    private currentWall: WallData;
 
     public constructor(props: UIComponentProps) {
         super(props);
@@ -91,6 +95,11 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
                         key="treeButton"
                         image={Assets.SPRITES.TREE}
                         onClick={(): void => { this.setTool(Tool.Tree); }}
+                    />
+                    <Button
+                        key="wallButton"
+                        image={Assets.UI.IRON_BAR_FENCE}
+                        onClick={(): void => { this.setTool(Tool.Wall); }}
                     />
                     <div className="panel-button">
                         <Button
@@ -149,33 +158,6 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
         this.setTool(Tool.None);
     }
 
-    public setTool(tool: Tool): void {
-        this.setState({activeTool: tool});
-        this.ghost.setVisible(true);
-
-        switch(tool) {
-            case Tool.Tree:
-                const tree =  AssetManager.getJSON(Assets.OBJECTS.TREE) as TileObjectData;
-                this.ghost.setSprite(tree.sprite);
-                this.ghost.setPivot(tree.pivot);
-                this.ghost.setSnap(true);
-                this.setState({activeButton: "tree"});
-                break;
-            case Tool.Biome:
-                this.ghost.setDrawFunction(pos => {
-                    Debug.setLineStyle(1, 0xFFFFFF);
-                    Debug.drawCircle(pos.multiply(Config.WORLD_SCALE), this.state.radius * Config.BIOME_SCALE, this.currentBiome, 0.5);
-                });
-                this.ghost.setSnap(false);
-                break;
-            case Tool.None:
-            default:
-                this.ghost.setVisible(false);
-                this.setState({activeButton: ""});
-                break;
-        }
-    }
-
     public update(): void {
         const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
 
@@ -189,6 +171,14 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
                     const placePos: Vector = mouseWorldPos.floor();
 
                     this.game.placeTileObject(Assets.OBJECTS.TREE, placePos);
+                }
+                break;
+            case Tool.Wall:
+                if (this.game.input.isInputPressed(Inputs.LeftMouse)) {
+                    const tilePos = mouseWorldPos.floor();
+                    const quadrant = this.getQuadrant(mouseWorldPos);
+
+                    this.game.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, quadrant);
                 }
                 break;
             case Tool.Biome:
@@ -208,17 +198,83 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
     }
 
     public postUpdate(): void {
+        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+
+        switch(this.state.activeTool) {
+            case Tool.Wall:
+                const quadrant = this.getQuadrant(mouseWorldPos);
+                const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+                switch (quadrant) {
+                    case Side.North:
+                        this.ghost.setSprite(spriteSheet.getTextureById(0));
+                        this.ghost.setOffset(new Vector(0, -0.5));
+                        break;
+                    case Side.South:
+                        this.ghost.setSprite(spriteSheet.getTextureById(0));
+                        this.ghost.setOffset(new Vector(0, 0.5));
+                        break;
+                    case Side.West:
+                        this.ghost.setSprite(spriteSheet.getTextureById(1));
+                        this.ghost.setOffset(new Vector(-0.5, 0.5));
+                        break;
+                    case Side.East:
+                        this.ghost.setSprite(spriteSheet.getTextureById(1));
+                        this.ghost.setOffset(new Vector(0.5, 0.5));
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+
         this.ghost.postUpdate();
     }
 
-    private getQuadrant(pos: Vector): number {
+    public setTool(tool: Tool): void {
+        this.setState({activeTool: tool});
+        this.ghost.setVisible(true);
+
+        switch(tool) {
+            case Tool.Tree:
+                const tree =  AssetManager.getJSON(Assets.OBJECTS.TREE) as TileObjectData;
+                this.ghost.setSprite(tree.sprite);
+                this.ghost.setPivot(tree.pivot);
+                this.ghost.setSnap(true);
+                this.setState({activeButton: "tree"});
+                break;
+            case Tool.Wall:
+                this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
+                const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+                this.ghost.setSprite(spriteSheet.getTextureById(0));
+                this.ghost.setPivot(new Vector(0.5, 1));
+                this.ghost.setSnap(true);
+                this.setState({activeButton: "wall"});
+                break;
+            case Tool.Biome:
+                this.ghost.setDrawFunction(pos => {
+                    Debug.setLineStyle(1, 0xFFFFFF);
+                    Debug.drawCircle(pos.multiply(Config.WORLD_SCALE), this.state.radius * Config.BIOME_SCALE, this.currentBiome, 0.5);
+                });
+                this.ghost.setSnap(false);
+                break;
+            case Tool.None:
+            default:
+                this.ghost.setVisible(false);
+                this.setState({activeButton: ""});
+                break;
+        }
+    }
+
+    private getQuadrant(pos: Vector): Side {
         const xrel = (pos.x % 1) - 0.5;
         const yrel = (pos.y % 1) - 0.5;
 
-        if (yrel < 0 && Math.abs(yrel) > Math.abs(xrel)) return 0; // North
-        if (xrel < 0 && Math.abs(xrel) > Math.abs(yrel)) return 1; // West
-        if (yrel > 0 && Math.abs(yrel) > Math.abs(xrel)) return 2; // South
-        if (xrel > 0 && Math.abs(xrel) > Math.abs(yrel)) return 3; // East
+        if (yrel < 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.North;
+        if (xrel > 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.East;
+        if (yrel > 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.South;
+        if (xrel < 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.West;
     }
 
     public hasFocus(): boolean {

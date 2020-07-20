@@ -56,8 +56,9 @@ export default class ZooGame extends Game {
     }
 
     protected postUpdate(delta: number): void {
-        super.postUpdate(delta);
         this.toolbarRef.current.postUpdate();
+
+        super.postUpdate(delta);
     }
 
     private pollInput(): void {

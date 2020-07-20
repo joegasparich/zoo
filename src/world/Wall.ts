@@ -8,11 +8,15 @@ export default class Wall {
 
     public orientation: number; //0 = vertical, 1 = horizontal
     public data: WallData | undefined;
+    public spriteSheet: SpriteSheet;
     public sprite: PIXI.Sprite;
 
     public constructor(orientation: number, data?: WallData) {
         this.orientation = orientation;
-        this.data = data;
+        if (data) {
+            this.data = data;
+            this.spriteSheet = Wall.wallSprites.get(this.data.spriteSheet);
+        }
     }
 
     public static async loadWallData(path: string): Promise<WallData> {

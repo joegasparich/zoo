@@ -27,6 +27,7 @@ export default class PlacementGhost {
     private visible: boolean;
     private mode: Mode;
     private snap: boolean;
+    private offset: Vector;
 
     public constructor(game: ZooGame) {
         this.game = game;
@@ -38,7 +39,7 @@ export default class PlacementGhost {
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
         this.ghostRenderer.alpha = 0.6;
 
-        Mediator.on(GameEvent.POST_UPDATE, this.postUpdate.bind(this));
+        this.offset = new Vector(0, 0);
     }
 
     public postUpdate(): void {
@@ -51,6 +52,7 @@ export default class PlacementGhost {
             } else {
                 renderer.colour = 0xFF0000;
             }
+            this.ghost.position = this.ghost.position.add(this.offset);
         }
         if (this.mode === Mode.Draw) {
             this.drawFunction(this.game.camera.screenToWorldPosition(this.game.input.getMousePos()));
@@ -76,12 +78,17 @@ export default class PlacementGhost {
         this.ghostRenderer.visible = this.visible;
     }
 
-    public setSnap(snap: boolean): void {
+    public setSnap(snap: boolean, gridSize?: number): void {
+        const system = this.ghost.getSystem(ZOO_SYSTEM.SNAP_TO_GRID_SYSTEM) as SnapToGridSystem;
+        if (system) {
+            system.gridSize = gridSize ?? 1;
+        }
+
         if (this.snap === snap) return;
         this.snap = snap;
 
         if (snap) {
-            this.ghost.addSystem(new SnapToGridSystem());
+            this.ghost.addSystem(new SnapToGridSystem(gridSize));
         } else {
             this.ghost.removeSystem(ZOO_SYSTEM.SNAP_TO_GRID_SYSTEM);
         }
@@ -89,5 +96,9 @@ export default class PlacementGhost {
 
     public setPivot(pivot: Vector): void {
         this.ghostRenderer.pivot = pivot;
+    }
+
+    public setOffset(offset: Vector): void {
+        this.offset = offset;
     }
 }
