@@ -1,10 +1,11 @@
-import Actor from "./Actor";
 import { Game, Vector, SpriteSheet } from "engine";
-import { PlayerInputSystem } from "./systems";
 import { PhysicsSystem, CameraFollowSystem, AnimatedRenderSystem, SYSTEM, PathFollowSystem, WallAvoidanceSystem } from "engine/entities/systems";
 import { Animation } from "engine/entities/systems/AnimatedRenderSystem";
 import { AssetManager, PhysicsManager } from "engine/managers";
-import { SPRITESHEETS } from "constants/assets";
+
+import Actor from "./Actor";
+import { PlayerInputSystem } from "./systems";
+import { Assets } from "consts";
 
 export default class Player extends Actor {
     private animator: AnimatedRenderSystem;
@@ -12,7 +13,7 @@ export default class Player extends Actor {
 
     public constructor(game: Game, position: Vector) {
         const spritesheet = new SpriteSheet({
-            image: AssetManager.getTexture(SPRITESHEETS.DUDE_RUN),
+            image: AssetManager.getTexture(Assets.SPRITESHEETS.DUDE_RUN),
             cellHeight: 24,
             cellWidth: 24,
         });
@@ -26,9 +27,9 @@ export default class Player extends Actor {
                 radius: 0.15,
             }, true, 20),
             new AnimatedRenderSystem([
-                new Animation("idle", spritesheet.getTextures([0]), 0.25, false),
-                new Animation("run", spritesheet.getTextures([1,2,3,4,5,6]), 0.25, true),
-            ]),
+                new Animation("idle", spritesheet.getTexturesById([0]), 0.25, false),
+                new Animation("run", spritesheet.getTexturesById([1,2,3,4,5,6]), 0.25, true),
+            ], undefined, new Vector(0.5, 1)),
         );
         this.addSystem(new CameraFollowSystem());
         this.pather = this.addSystem(new PathFollowSystem());

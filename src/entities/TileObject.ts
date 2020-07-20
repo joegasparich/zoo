@@ -5,16 +5,16 @@ import { AssetManager } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
 
 export default class TileObject extends Entity {
-    render: RenderSystem;
-    physics: PhysicsSystem;
-    blocksPath: boolean;
+    private render: RenderSystem;
+    private physics: PhysicsSystem;
+    public blocksPath: boolean;
 
-    constructor(game: Game, pos: Vector, data: TileObjectData, blocksPath = false) {
+    public constructor(game: Game, pos: Vector, data: TileObjectData, blocksPath = false) {
         super(game, pos);
 
         const sprite = data.sprite;
 
-        this.render = this.addSystem(new RenderSystem(sprite));
+        this.render = this.addSystem(new RenderSystem(sprite, undefined, data.pivot));
         this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1));
         this.blocksPath = blocksPath;
     }
@@ -29,6 +29,9 @@ export default class TileObject extends Entity {
     public static async loadTileObjectData(path: string): Promise<TileObjectData> {
         const resource = await AssetManager.loadResource(path);
         const data = resource.data as TileObjectData;
+
+        data.pivot = new Vector(data.pivot.x, data.pivot.y); // Ensure data from json is a vector
+
         await AssetManager.loadResource(data.sprite);
         return data;
     }

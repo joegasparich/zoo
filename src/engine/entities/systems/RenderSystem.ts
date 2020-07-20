@@ -1,8 +1,7 @@
 import { System, SYSTEM } from ".";
 import { AssetManager } from "engine/managers";
 import { Entity } from "engine/entities";
-import { Camera, Layers } from "engine";
-import { Point } from "pixi.js";
+import { Camera, Layers, Vector } from "engine";
 
 const DEFAULT_LAYER = Layers.ENTITIES;
 
@@ -16,6 +15,7 @@ export default class RenderSystem extends System {
     public flipX: boolean;
     public flipY: boolean;
     public scale = 1;
+    public pivot: Vector;
 
     protected camera: Camera;
 
@@ -23,10 +23,11 @@ export default class RenderSystem extends System {
     public alpha = 1;
     public visible = true;
 
-    public constructor(spriteUrl: string, layer?: PIXI.display.Group) {
+    public constructor(spriteUrl: string, layer?: PIXI.display.Group, pivot?: Vector) {
         super();
         this.spriteUrl = spriteUrl ?? "";
         this.layer = layer ?? DEFAULT_LAYER;
+        this.pivot = pivot ?? new Vector(0.5, 0.5);
     }
 
     public start(entity: Entity): void {
@@ -87,8 +88,9 @@ export default class RenderSystem extends System {
     protected syncPosition(): void {
         if (!this.sprite) return;
 
-        this.sprite.scale = new Point(this.camera.scale * this.scale, this.camera.scale * this.scale);
+        this.sprite.scale = new PIXI.Point(this.camera.scale * this.scale, this.camera.scale * this.scale);
         this.sprite.texture.rotate = this.getRotation();
+        if (this.pivot) this.sprite.anchor.copyFrom(this.pivot.toPoint());
 
         // Sync postition
         this.sprite.position = this.camera.worldToScreenPosition(this.entity.position).toPoint();

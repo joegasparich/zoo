@@ -4,7 +4,7 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 import { UIComponent, UIComponentProps } from "engine/ui";
 
 interface ButtonProps extends UIComponentProps {
-    image: string;
+    image?: string;
     onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
@@ -12,8 +12,8 @@ export default class Button extends UIComponent<ButtonProps, {}> {
     protected getContent(): JSX.Element {
         return (
             <div className="button" onClick={this.props.onClick}>
-                <img src={this.props.image} />
-                {this.props.children}
+                { this.props.image && <img src={this.props.image} /> }
+                { this.props.children }
             </div>
         );
     }

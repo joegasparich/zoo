@@ -1,3 +1,4 @@
+import { Vector } from "engine";
 import { Collider } from "engine/managers";
 
 export interface TileObjectData {
@@ -6,6 +7,7 @@ export interface TileObjectData {
     collider: Collider;
     width: number;
     height: number;
+    pivot: Vector;
     sprite: string;
 }
 
@@ -14,4 +16,12 @@ export interface GroundTileData {
     tileset: string;
     variants: number[];
     solid: boolean;
+}
+
+export interface WallData {
+    name: string;
+    type: string;
+    spriteSheet: string;
+    cellHeight: number;
+    cellWidth: number;
 }

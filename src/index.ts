@@ -2,30 +2,31 @@ import { Game } from "engine";
 
 import { AssetManager } from "engine/managers";
 
-import CONFIG from "constants/config";
-import { SPRITES, TILES, SPRITESHEETS, TILESETS, OBJECTS } from "constants/assets";
-import TileObject from "entities/TileObject";
+import { Assets, Config } from "./consts";
 import ZooGame from "ZooGame";
+import TileObject from "entities/TileObject";
 
 import "CameraControl";
+import Wall from "world/Wall";
 
 let testGame: Game;
 
 async function run(): Promise<void> {
     // Create game
     testGame = new ZooGame({
-        windowWidth: CONFIG.WINDOW_WIDTH,
-        windowHeight: CONFIG.WINDOW_HEIGHT,
-        enableDebug: CONFIG.ENABLE_DEBUG,
+        windowWidth: Config.WINDOW_WIDTH,
+        windowHeight: Config.WINDOW_HEIGHT,
+        enableDebug: Config.ENABLE_DEBUG,
         worldScale: 16,
     });
 
     // Load Assets
-    AssetManager.preLoadAssets(Object.values(SPRITES));
-    AssetManager.preLoadAssets(Object.values(SPRITESHEETS));
-    AssetManager.preLoadAssets(Object.values(TILES));
-    await TileObject.loadTileObjectData(OBJECTS.TREE);
-    await AssetManager.loadTileSetFile(TILESETS.TEST);
+    AssetManager.preLoadAssets(Object.values(Assets.SPRITES));
+    AssetManager.preLoadAssets(Object.values(Assets.SPRITESHEETS));
+    AssetManager.preLoadAssets(Object.values(Assets.TILES));
+    await TileObject.loadTileObjectData(Assets.OBJECTS.TREE);
+    await Wall.loadWallData(Assets.WALLS.IRON_BAR);
+    await AssetManager.loadTileSetFile(Assets.TILESETS.TEST);
 
     // Load game
     await testGame.load(progress => {

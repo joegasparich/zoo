@@ -13,6 +13,8 @@ enum KEY {
     W = "w",
     X = "x",
     Z = "z",
+    LEFT_SQUARE_BRACKET = "[",
+    RIGHT_SQUARE_BRACKET = "]",
 }
 enum MOUSE_BUTTON {
     LEFT = 0,
@@ -35,6 +37,8 @@ export default class InputManager {
 
     private game: Game;
 
+    private canvasPos: Vector;
+
     private keys: string[];
     private keysDown: string[];
     private keysUp: string[];
@@ -51,6 +55,9 @@ export default class InputManager {
 
     public constructor(game: Game) {
         this.game = game;
+
+        const canvas = document.getElementsByTagName("canvas")[0];
+        this.canvasPos = new Vector(canvas.getBoundingClientRect().x, canvas.getBoundingClientRect().y);
 
         this.registeredInputs = new Map();
         this.inputsHeld = [];
@@ -93,7 +100,7 @@ export default class InputManager {
 
         this.mousePos = Vector.Zero;
         document.addEventListener("mousemove", (event: MouseEvent) => {
-            this.mousePos = new Vector(event.offsetX, event.offsetY);
+            this.mousePos = new Vector(event.clientX, event.clientY).subtract(this.canvasPos);
         });
 
         document.addEventListener("mousedown", (event: MouseEvent) => {

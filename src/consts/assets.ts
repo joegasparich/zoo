@@ -29,3 +29,7 @@ export const TILESETS = {
 export const MAPS = {
     TEST: "/assets/maps/testMap.json",
 };
+
+export const WALLS = {
+    IRON_BAR: "/assets/walls/ironBarFence.json",
+};

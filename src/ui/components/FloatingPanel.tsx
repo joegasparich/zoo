@@ -4,7 +4,11 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 
 import { UIComponent, UIComponentProps } from "engine/ui";
 
-export default class FloatingPanel extends UIComponent<UIComponentProps, {}> {
+interface FloatingPanelProps extends UIComponentProps {
+    showTriangle: boolean;
+}
+
+export default class FloatingPanel extends UIComponent<FloatingPanelProps, {}> {
     protected getContent(): JSX.Element {
         return (
             <div className="container">{this.props.children}</div>
@@ -14,19 +18,7 @@ export default class FloatingPanel extends UIComponent<UIComponentProps, {}> {
     protected getStyles(): SerializedStyles {
         const triangleSize = 4;
 
-        return css`
-            min-width: 40px;
-            min-height: 40px;
-            position: absolute;
-            top: 45px;
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 5px;
-            box-sizing: border-box;
-
-            // Triangle
+        const triangle = css`
             &:after {
                 content: '';
                 border: ${triangleSize}px solid transparent;
@@ -37,6 +29,22 @@ export default class FloatingPanel extends UIComponent<UIComponentProps, {}> {
                 left: 50%;
                 margin-left: -${triangleSize}px;
             }
+        `;
+
+        return css`
+            min-width: 40px;
+            height: 40px;
+            position: absolute;
+            top: 45px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            box-sizing: border-box;
+
+            // Triangle
+            ${this.props.showTriangle && triangle}
 
             .container {
                 display: flex;

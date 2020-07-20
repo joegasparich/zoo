@@ -1,12 +1,13 @@
+import { Vector } from "engine";
 import { RenderSystem, SYSTEM } from ".";
 
 export class Animation {
-    name: string;
-    textures: PIXI.Texture[];
-    speed: number;
-    loop: boolean;
+    public name: string;
+    public textures: PIXI.Texture[];
+    public speed: number;
+    public loop: boolean;
 
-    constructor(name: string, textures: PIXI.Texture[], speed = 0.25, loop = true) {
+    public constructor(name: string, textures: PIXI.Texture[], speed = 0.25, loop = true) {
         this.name = name;
         this.textures = textures;
         this.speed = speed;
@@ -15,13 +16,13 @@ export class Animation {
 }
 
 export default class AnimatedRenderSystem extends RenderSystem {
-    id = SYSTEM.ANIMATED_RENDER_SYSTEM;
+    public id = SYSTEM.ANIMATED_RENDER_SYSTEM;
 
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;
 
-    constructor(animations: Animation[]) {
-        super(null);
+    public constructor(animations: Animation[], layer?: PIXI.display.Group, pivot?: Vector) {
+        super(null, layer, pivot);
 
         this.animations = new Map();
 

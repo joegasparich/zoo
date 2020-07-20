@@ -3,7 +3,7 @@ import { MapGrid, MapCell } from "engine/map";
 
 import World from "world/World";
 
-const MAP_SIZE = 10;
+const MAP_SIZE = 5;
 
 export default class EmptyScene extends Scene {
     private world: World;
@@ -24,7 +24,7 @@ export default class EmptyScene extends Scene {
         // Place Grass
         for (let i = 0; i < MAP_SIZE; i++) {
             cells[i] = [];
-            for (let j = 0; j < MAP_SIZE; j++) {
+            for (let j = 0; j < MAP_SIZE + 3; j++) {
                 cells[i][j] = {
                     x: i,
                     y: j,

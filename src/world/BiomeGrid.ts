@@ -1,5 +1,7 @@
+import { Side } from "consts";
 import { Camera, Game, Layers, Vector } from "engine";
 import { inCircle } from "engine/helpers/math";
+import World from "./World";
 
 export enum Biome {
     Grass = 0xb6d53c,
@@ -13,10 +15,10 @@ class Square {
     public constructor(biome?: Biome, biomes?: {north: number; south: number; east: number; west: number}) {
         this.quadrants = [];
 
-        this.quadrants[0] = biomes?.north ?? biome ?? Biome.Grass;
-        this.quadrants[1] = biomes?.east ?? biome ?? Biome.Grass;
-        this.quadrants[2] = biomes?.south ?? biome ?? Biome.Grass;
-        this.quadrants[3] = biomes?.west ?? biome ?? Biome.Grass;
+        this.quadrants[Side.North] = biomes?.north ?? biome ?? Biome.Grass;
+        this.quadrants[Side.East] = biomes?.east ?? biome ?? Biome.Grass;
+        this.quadrants[Side.South] = biomes?.south ?? biome ?? Biome.Grass;
+        this.quadrants[Side.West] = biomes?.west ?? biome ?? Biome.Grass;
     }
 }
 
@@ -32,22 +34,20 @@ export default class BiomeGrid {
     public height: number;
     private cellSize: number;
 
-    public constructor(game: Game, width: number, height: number, cellSize: number) {
-        this.game = game;
-        this.camera = game.camera;
+    public constructor(world: World, width: number, height: number, cellSize: number) {
+        this.game = world.game;
+        this.camera = this.game.camera;
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
-
-        this.setup();
     }
 
-    private setup(): void  {
+    public setup(): void  {
         // Generate grid
         this.grid = [];
-        for (let i = 0; i < this.height; i++) {
+        for (let i = 0; i < this.width; i++) {
             this.grid[i] = [];
-            for (let j = 0; j < this.width; j++) {
+            for (let j = 0; j < this.height; j++) {
                 this.grid[i][j] = new Square(Biome.Grass);
             }
         }
@@ -63,8 +63,8 @@ export default class BiomeGrid {
     public draw(): void {
         this.graphics.clear();
 
-        for (let i = 0; i < this.height; i++) {
-            for (let j = 0; j < this.width; j++) {
+        for (let i = 0; i < this.width; i++) {
+            for (let j = 0; j < this.height; j++) {
                 for (let q = 0; q < 4; q++) {
                     this.graphics.beginFill(this.grid[i][j].quadrants[q]).drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
                         const vec = vertex.multiply(this.cellSize);
@@ -75,32 +75,32 @@ export default class BiomeGrid {
         }
     }
 
-    private getQuadrantVertices(x: number, y: number, quadrant: number): Vector[] {
+    private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {
         switch (quadrant) {
-        case 0:
-            return [
-                new Vector(x, y),
-                new Vector((x+1), y),
-                new Vector(x + 0.5, y + 0.5),
-            ];
-        case 1:
-            return [
-                new Vector(x, y),
-                new Vector(x, (y+1)),
-                new Vector(x + 0.5, y + 0.5),
-            ];
-        case 2:
-            return [
-                new Vector(x, (y+1)),
-                new Vector((x+1), (y+1)),
-                new Vector(x + 0.5, y + 0.5),
-            ];
-        case 3:
-            return [
-                new Vector((x+1), y),
-                new Vector((x+1), (y+1)),
-                new Vector(x + 0.5, y + 0.5),
-            ];
+            case Side.North:
+                return [
+                    new Vector(x, y),
+                    new Vector((x+1), y),
+                    new Vector(x + 0.5, y + 0.5),
+                ];
+            case Side.East:
+                return [
+                    new Vector(x, y),
+                    new Vector(x, (y+1)),
+                    new Vector(x + 0.5, y + 0.5),
+                ];
+            case Side.South:
+                return [
+                    new Vector(x, (y+1)),
+                    new Vector((x+1), (y+1)),
+                    new Vector(x + 0.5, y + 0.5),
+                ];
+            case Side.West:
+                return [
+                    new Vector((x+1), y),
+                    new Vector((x+1), (y+1)),
+                    new Vector(x + 0.5, y + 0.5),
+                ];
         }
     }
 

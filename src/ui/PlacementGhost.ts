@@ -1,17 +1,16 @@
 import { Layers, Vector } from "engine";
-import { GameEvent } from "engine/constants/events";
+import { GameEvent } from "engine/consts";
 import { Entity } from "engine/entities";
 import { RenderSystem, SYSTEM } from "engine/entities/systems";
 import Mediator from "engine/Mediator";
 import { FollowMouseSystem, SnapToGridSystem, ZOO_SYSTEM } from "entities/systems";
 
-import { SPRITES } from "constants/assets";
+import { Assets } from "consts";
 import World from "world/World";
 import ZooGame from "ZooGame";
-import { InputManager } from "engine/managers";
 
 // Should never be seen
-const DEFAULT_SPRITE = SPRITES.TREE;
+const DEFAULT_SPRITE = Assets.SPRITES.TREE;
 
 enum Mode {
     Sprite,
@@ -86,5 +85,9 @@ export default class PlacementGhost {
         } else {
             this.ghost.removeSystem(ZOO_SYSTEM.SNAP_TO_GRID_SYSTEM);
         }
+    }
+
+    public setPivot(pivot: Vector): void {
+        this.ghostRenderer.pivot = pivot;
     }
 }

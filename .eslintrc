@@ -14,7 +14,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
         "quotes": ["error", "double"],
         "eol-last": "error",
         "comma-dangle": ["error", "always-multiline"],
@@ -27,6 +27,5 @@
         "@typescript-eslint/ban-types": "warn",
         "@typescript-eslint/no-use-before-define": "off",
         "@typescript-eslint/explicit-member-accessibility": "warn",
-        "require-class-field": "warn"
     }
 }

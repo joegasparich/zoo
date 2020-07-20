@@ -2,7 +2,7 @@ import * as Planck from "planck-js";
 
 import { Game, Vector } from "engine";
 import Debug from "engine/Debug";
-import { FRAME_RATE } from "engine/constants";
+import { FRAME_RATE } from "engine/consts";
 import { Entity } from "engine/entities";
 
 export type PhysicsObjOpts = {
@@ -29,15 +29,15 @@ export type Collider = {
 function getShape(collider: Collider): Planck.Shape {
     // We need to convert to string here since JSON collider types are strings not enums
     switch(collider.type.toString()) {
-    case ColliderType.Circle.toString():
-        return Planck.Circle(collider.radius);
-    case ColliderType.Rect.toString():
-        return Planck.Polygon([
-            Planck.Vec2(-collider.width/2, -collider.height/2),
-            Planck.Vec2(collider.width/2, -collider.height/2),
-            Planck.Vec2(collider.width/2, collider.height/2),
-            Planck.Vec2(-collider.width/2, collider.height/2),
-        ]);
+        case ColliderType.Circle.toString():
+            return Planck.Circle(collider.radius);
+        case ColliderType.Rect.toString():
+            return Planck.Polygon([
+                Planck.Vec2(-collider.width/2, -collider.height/2),
+                Planck.Vec2(collider.width/2, -collider.height/2),
+                Planck.Vec2(collider.width/2, collider.height/2),
+                Planck.Vec2(-collider.width/2, collider.height/2),
+            ]);
     }
 }
 
@@ -140,19 +140,19 @@ export default class PhysicsManager {
                 if (fixture.isSensor()) Debug.setLineStyle(1, 0x0000FF);
                 const shape = fixture.getShape();
                 switch(shape.getType()) {
-                case "circle":
-                    const circle = shape as Planck.CircleShape;
-                    Debug.drawCircle(Vector.FromVec2(body.getPosition()).multiply(this.game.opts.worldScale), circle.getRadius() * this.game.opts.worldScale);
-                    break;
-                case "polygon":
-                    const polygon = shape as Planck.PolygonShape;
-                    const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y)
-                        .add(Vector.FromVec2(body.getPosition()))
-                        .multiply(this.game.opts.worldScale));
-                    Debug.drawVectorList(vectorList);
-                    break;
-                default:
-                    break;
+                    case "circle":
+                        const circle = shape as Planck.CircleShape;
+                        Debug.drawCircle(Vector.FromVec2(body.getPosition()).multiply(this.game.opts.worldScale), circle.getRadius() * this.game.opts.worldScale);
+                        break;
+                    case "polygon":
+                        const polygon = shape as Planck.PolygonShape;
+                        const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y)
+                            .add(Vector.FromVec2(body.getPosition()))
+                            .multiply(this.game.opts.worldScale));
+                        Debug.drawVectorList(vectorList);
+                        break;
+                    default:
+                        break;
                 }
             }
         }

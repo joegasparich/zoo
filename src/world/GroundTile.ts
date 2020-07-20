@@ -19,6 +19,6 @@ export default class GroundTile {
         this.tileData = tileData;
 
         const variantIndex = this.tileData.variants[randomInt(0, this.tileData.variants.length)];
-        this.texture = AssetManager.getTileset(tileData.tileset)?.getTexture(variantIndex);
+        this.texture = AssetManager.getTileset(tileData.tileset)?.getTextureById(variantIndex);
     }
 }

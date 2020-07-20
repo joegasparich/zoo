@@ -12,7 +12,6 @@ import { MapGrid } from "./map";
 import { Canvas } from "./ui";
 
 import { registerPixiInspector } from "./helpers/util";
-import CONFIG from "constants/config";
 
 type GameOpts = {
     windowWidth?: number;
@@ -96,7 +95,7 @@ export default class Game {
 
         this.canvas.load();
 
-        this.camera = new Camera(this, new Vector(20, 20), CONFIG.CAMERA_SCALE);
+        this.camera = new Camera(this, new Vector(20, 20), 1);
 
         this.map = new MapGrid(this);
         this.map.setCamera(this.camera);

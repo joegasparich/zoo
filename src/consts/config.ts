@@ -1,4 +1,4 @@
-const CONFIG = {
+const Config = {
     ENABLE_DEBUG: true,
     WINDOW_WIDTH: 800,
     WINDOW_HEIGHT: 600,
@@ -7,6 +7,7 @@ const CONFIG = {
     CAMERA_SCALE: 3,
     /** The amount of pixels per 1 physics unit */
     WORLD_SCALE: 16,
+    BIOME_SCALE: 8,
 };
 
-export default CONFIG;
+export default Config;

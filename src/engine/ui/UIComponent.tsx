@@ -4,6 +4,7 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 
 export interface UIComponentProps {
     key: string;
+    className?: string;
     hidden?: boolean;
 }
 
@@ -27,7 +28,7 @@ export default abstract class UIComponent<P extends UIComponentProps, S> extends
         `;
 
         return (
-            <div css={style} className={this.props.hidden ? "hidden" : ""}>
+            <div css={style} className={(this.props.className ?? "") + (this.props.hidden ? " hidden" : "")}>
                 {this.getContent()}
             </div>
         );

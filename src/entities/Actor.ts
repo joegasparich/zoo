@@ -36,10 +36,10 @@ export default class Actor extends Entity {
     static idle: State = {
         handleInput(input) {
             switch(input) {
-            case ActorStateInput.MOVE:
-                return Actor.walking;
-            default:
-                return;
+                case ActorStateInput.MOVE:
+                    return Actor.walking;
+                default:
+                    return;
             }
         },
     };
@@ -47,10 +47,10 @@ export default class Actor extends Entity {
     static walking: State = {
         handleInput(input) {
             switch(input) {
-            case ActorStateInput.STILL:
-                return Actor.idle;
-            default:
-                return;
+                case ActorStateInput.STILL:
+                    return Actor.idle;
+                default:
+                    return;
             }
         },
         update(delta: number, actor: Actor): void {

@@ -3,8 +3,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { css, jsx } from "@emotion/core";
 
-import CONFIG from "constants/config";
+// import { Config } from "constants";
 import { Game } from "engine";
+import { Config } from "consts";
 
 export default class Canvas {
 
@@ -25,8 +26,8 @@ export default class Canvas {
 
     public load(): void {
         this.baseNode = document.getElementById("uiRoot");
-        this.baseNode.style.width = CONFIG.WINDOW_WIDTH + "px";
-        this.baseNode.style.height = CONFIG.WINDOW_HEIGHT + "px";
+        this.baseNode.style.width = Config.WINDOW_WIDTH + "px";
+        this.baseNode.style.height = Config.WINDOW_HEIGHT + "px";
 
         this.render();
     }

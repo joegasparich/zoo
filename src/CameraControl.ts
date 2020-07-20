@@ -1,7 +1,8 @@
-import Inputs from "constants/inputs";
 import { Events, Game } from "engine";
 import { lerp } from "engine/helpers/math";
 import Mediator from "engine/Mediator";
+
+import { Inputs } from "consts";
 
 const minZoom = 0.5;
 const maxZoom = 10;

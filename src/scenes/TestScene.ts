@@ -1,8 +1,8 @@
 import { Scene } from "engine";
 
-import { MAPS } from "constants/assets";
+import { Assets } from "consts";
 
 export default class TestScene extends Scene {
-    name = "Test";
-    mapFile = MAPS.TEST;
+    public name = "Test";
+    public mapFile = Assets.MAPS.TEST;
 }

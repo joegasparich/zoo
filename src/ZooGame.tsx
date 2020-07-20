@@ -1,22 +1,19 @@
 import * as React from "react";
 
 import { Game, Vector } from "engine";
-import { AssetManager } from "engine/managers";
 import Player from "entities/Player";
 import TileObject from "entities/TileObject";
 
-import { OBJECTS } from "constants/assets";
 import { TileObjectData } from "types/AssetTypes";
 import World from "world/World";
-import Inputs from "constants/inputs";
+import { Config, Inputs } from "consts";
 import { Toolbar } from "ui/components";
-import BiomeGrid from "world/BiomeGrid";
+import { AssetManager } from "engine/managers";
 
 export default class ZooGame extends Game {
     public world: World;
     public player: Player;
 
-    public biomeGrid: BiomeGrid;
     private toolbarRef: React.RefObject<Toolbar>;
 
     protected setup(): void {
@@ -29,7 +26,9 @@ export default class ZooGame extends Game {
 
         // Load Map
         this.world = new World(this);
-        this.world.loadMap();
+        this.world.setup();
+
+        this.camera.scale = Config.CAMERA_SCALE;
 
         // Create Player
         this.player = new Player(
@@ -37,8 +36,6 @@ export default class ZooGame extends Game {
             new Vector(4, 4),
         );
         this.player.render.scale = 0.5;
-
-        this.biomeGrid = new BiomeGrid(this, 20, 20, 8);
 
         this.createUI();
     }
@@ -55,7 +52,7 @@ export default class ZooGame extends Game {
         this.pollInput();
 
         this.toolbarRef.current.update();
-        this.biomeGrid.postUpdate();
+        this.world.postUpdate(delta);
     }
 
     protected postUpdate(delta: number): void {
@@ -78,8 +75,12 @@ export default class ZooGame extends Game {
         }
     }
 
-    public placeTileObject(object: TileObjectData, position: Vector): void {
+    public placeTileObject(object: (TileObjectData | string), position: Vector): void {
         if (!this.world.isTileFree(position)) return;
+
+        if (typeof object === "string") {
+            object = AssetManager.getJSON(object) as TileObjectData;
+        }
 
         this.world.registerTileObject(new TileObject(
             this,

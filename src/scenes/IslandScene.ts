@@ -2,7 +2,7 @@ import { Scene } from "engine";
 import { MapGrid, MapCell } from "engine/map";
 
 import GroundTile from "world/GroundTile";
-import { TILES } from "constants/assets";
+import { Assets } from "consts";
 import World from "world/World";
 
 const MAP_SIZE = 5;
@@ -27,7 +27,7 @@ export default class IslandScene extends Scene {
         for (let i = 0; i < MAP_SIZE; i++) {
             cells[i] = [];
             for (let j = 0; j < MAP_SIZE; j++) {
-                const tile = new GroundTile(TILES.GRASS);
+                const tile = new GroundTile(Assets.TILES.GRASS);
                 cells[i][j] = {
                     x: i,
                     y: j,

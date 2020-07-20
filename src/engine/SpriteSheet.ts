@@ -1,17 +1,19 @@
+import { Vector } from "engine";
+
 export interface SpriteSheetData {
     cellWidth: number;
     cellHeight: number;
+    pivot?: Vector;
     image: PIXI.Texture;
 }
 
 export default class SpriteSheet {
-    texture: PIXI.Texture;
-    rows: number;
-    cols: number;
-    cellWidth: number;
-    cellHeight: number;
+    private texture: PIXI.Texture;
+    private rows: number;
+    private cols: number;
+    private data: SpriteSheetData;
 
-    constructor(data: SpriteSheetData) {
+    public constructor(data: SpriteSheetData) {
         if (!data.image) {
             console.error("Tried to create sprite sheet with no texture");
             return null;
@@ -20,8 +22,7 @@ export default class SpriteSheet {
         this.texture = data.image;
         this.rows = Math.floor(data.image.height / data.cellWidth);
         this.cols = Math.floor(data.image.width / data.cellWidth);
-        this.cellWidth = data.cellWidth;
-        this.cellHeight = data.cellHeight;
+        this.data = data;
     }
 
     protected getRectFromIndex(index: number): PIXI.Rectangle {
@@ -29,18 +30,22 @@ export default class SpriteSheet {
         const col = Math.min(Math.floor(index / this.cols), this.rows - 1);
 
         return new PIXI.Rectangle(
-            row * this.cellWidth,
-            col * this.cellHeight,
-            this.cellWidth,
-            this.cellHeight,
+            row * this.data.cellWidth,
+            col * this.data.cellHeight,
+            this.data.cellWidth,
+            this.data.cellHeight,
         );
     }
 
-    getTexture(id: number): PIXI.Texture {
+    public getTexture(): PIXI.Texture {
+        return this.texture;
+    }
+
+    public getTextureById(id: number): PIXI.Texture {
         return new PIXI.Texture(this.texture.baseTexture, this.getRectFromIndex(id));
     }
 
-    getTextures(ids: number[]): PIXI.Texture[] {
-        return ids.map(id => this.getTexture(id));
+    public getTexturesById(ids: number[]): PIXI.Texture[] {
+        return ids.map(id => this.getTextureById(id));
     }
 }

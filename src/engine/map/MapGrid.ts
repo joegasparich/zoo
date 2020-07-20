@@ -28,7 +28,7 @@ export default class MapGrid {
 
     public rows: number;
     public cols: number;
-    private position: Vector;
+    public position: Vector;
     public cellSize: number;
 
     private camera: Camera;
@@ -187,7 +187,7 @@ export default class MapGrid {
                 cells[i][j] = {
                     x: i,
                     y: j,
-                    texture: tiledMap.tileSet.getTexture(tileIndex),
+                    texture: tiledMap.tileSet.getTextureById(tileIndex),
                     isSolid: tiledMap.tileSet.tiles.get(tileIndex).solid,
                 };
             }

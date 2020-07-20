@@ -7,6 +7,6 @@ export { default as TileSet } from "./TileSet";
 export { default as SpriteSheet } from "./SpriteSheet";
 export { Scene } from "./managers/SceneManager";
 
-export { default as Layers } from "./constants/layers";
-export * as Events from "./constants/events";
-export * as Constants from "./constants";
+export { default as Layers } from "./consts/layers";
+export * as Events from "./consts/events";
+export * as Constants from "./consts";

@@ -2,7 +2,7 @@ import { Vector } from "engine";
 import { InputSystem } from "engine/entities/systems";
 
 import Actor, { ActorStateInput } from "entities/Actor";
-import Inputs from "constants/inputs";
+import { Inputs } from "consts";
 
 export default class PlayerInputSystem extends InputSystem {
     public id = "PLAYER_INPUT_SYSTEM";
