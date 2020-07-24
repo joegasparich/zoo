@@ -3,5 +3,6 @@
     "type": "fence",
     "spriteSheet": "/assets/img/iron_bar_fence.png",
     "cellHeight": 32,
-    "cellWidth": 16
+    "cellWidth": 16,
+    "solid": true
 }

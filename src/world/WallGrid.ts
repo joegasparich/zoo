@@ -1,11 +1,12 @@
 import { Camera, Debug, Game, Layers, Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { MapGrid } from "engine/map";
+import { Side } from "engine/consts";
 
 import World from "./World";
 import Wall from "./Wall";
 import { WallData } from "types/AssetTypes";
-import { Assets, Config, Side } from "consts";
+import { Config } from "consts";
 
 export default class WallGrid {
     private game: Game;
@@ -33,21 +34,6 @@ export default class WallGrid {
                 this.wallGrid[col][row] = new Wall(orientation);
             }
         }
-
-        // Test
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(2, 2), Side.North);
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(3, 3), Side.East);
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(3, 3), Side.North);
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(2, 5), Side.West);
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(4, 4), Side.South);
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(4, 4), Side.West);
-        this.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(4, 4), Side.East);
-
-        // const wallTextures: PIXI.Texture[] = [];
-        // Wall.wallSprites.forEach(spriteSheet => wallTextures.push(spriteSheet.getTexture()));
-        // this.wallTileMap = new PIXI.tilemap.CompositeRectTileLayer(0, wallTextures);
-        // this.wallTileMap.parentGroup = Layers.GROUND;
-        // this.game.stage.addChild(this.wallTileMap);
     }
 
     public postUpdate(): void {
@@ -60,8 +46,6 @@ export default class WallGrid {
      * Update the position and scale of the tile grid
      */
     private drawWalls(): void {
-        // const scale = (this.game.opts.worldScale/this.cellSize); // Ideally this is 1 (16/16)
-
         for (let col = 0; col < (this.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < this.map.rows + orientation; row++) {
@@ -82,6 +66,14 @@ export default class WallGrid {
         }
     }
 
+    public isWallInMap(tilePos: Vector, side: Side): boolean {
+        return this.map.isPositionInMap(tilePos.floor()) ||
+               tilePos.floor().y === -1 && side === Side.South ||
+               tilePos.floor().y === this.map.rows && side === Side.North ||
+               tilePos.floor().x === -1 && side === Side.East ||
+               tilePos.floor().x === this.map.cols && side === Side.West;
+    }
+
     public getWallAtTile(tilePos: Vector, side: Side): Wall {
         switch(side) {
             case Side.North: return this.wallGrid[(tilePos.x * 2) + 1][tilePos.y];
@@ -100,7 +92,19 @@ export default class WallGrid {
         ];
     }
 
+    public getWalledSides(tilePos: Vector): Side[] {
+        const edges: Side[] = [];
+
+        if (this.wallGrid[(tilePos.x * 2) + 1][tilePos.y].data?.solid) edges.push(Side.North);
+        if (this.wallGrid[(tilePos.x * 2) + 2][tilePos.y].data?.solid) edges.push(Side.East);
+        if (this.wallGrid[(tilePos.x * 2) + 1][tilePos.y + 1].data?.solid) edges.push(Side.South);
+        if (this.wallGrid[tilePos.x * 2][tilePos.y].data?.solid) edges.push(Side.West);
+
+        return edges;
+    }
+
     public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
+        if (!this.isWallInMap(tilePos, side)) return;
         if (typeof wallData === "string") {
             wallData = AssetManager.getJSON(wallData) as WallData;
         }
@@ -134,6 +138,23 @@ export default class WallGrid {
 
         const texture = wall.spriteSheet.getTextureById(orientation ? 0 : 1);
         wall.sprite = new PIXI.Sprite(texture);
+
+        if (side === Side.North && tilePos.y > 0) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+        }
+        if (side === Side.South && tilePos.y < this.map.rows - 1) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+        }
+        if (side === Side.West && tilePos.x > 0) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+        }
+        if (side === Side.East && tilePos.x < this.map.cols - 1) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+        }
 
         // Add new sprite
         this.game.app.stage.addChild(wall.sprite);

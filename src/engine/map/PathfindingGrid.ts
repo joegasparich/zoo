@@ -1,14 +1,16 @@
-import { js as Pathfinder } from "easystarjs";
+import { js as Pathfinder, Direction } from "easystarjs";
 
 import { Vector } from "engine";
-import { start } from "repl";
+import { Side } from "engine/consts";
+
+const allDirections: Direction[] = ["BOTTOM", "BOTTOM_LEFT", "BOTTOM_RIGHT", "LEFT", "RIGHT", "TOP", "TOP_LEFT", "TOP_RIGHT"];
 
 export default class PathfindingGrid {
     private pathFinder: Pathfinder;
 
     private grid: number[][];
 
-    constructor(rows: number, cols: number) {
+    public constructor(rows: number, cols: number) {
         this.grid = this.generateGrid(rows, cols);
 
         this.pathFinder = new Pathfinder();
@@ -27,6 +29,17 @@ export default class PathfindingGrid {
             }
         }
         return grid;
+    }
+
+    public disableEdges(point: Vector, sides: Side[]): void {
+        let allowedDirections: Direction[] = [...allDirections];
+
+        if (sides.includes(Side.North)) allowedDirections = allowedDirections.filter(dir => !dir.includes("LEFT"));
+        if (sides.includes(Side.South)) allowedDirections = allowedDirections.filter(dir => !dir.includes("RIGHT"));
+        if (sides.includes(Side.West)) allowedDirections = allowedDirections.filter(dir => !dir.includes("TOP"));
+        if (sides.includes(Side.East)) allowedDirections = allowedDirections.filter(dir => !dir.includes("BOTTOM"));
+
+        this.pathFinder.setDirectionalCondition(point.y, point.x, allowedDirections);
     }
 
     public disablePoint(x: number, y: number): void {

@@ -1,5 +1,5 @@
-import { Side } from "consts";
 import { Camera, Game, Layers, Vector } from "engine";
+import { Side } from "engine/consts";
 import { inCircle } from "engine/helpers/math";
 import World from "./World";
 

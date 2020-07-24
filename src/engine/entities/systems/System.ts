@@ -6,6 +6,7 @@ export default abstract class System {
     public entity: Entity;
     public game: Game;
 
+    public disabled: boolean;
     protected hasStarted: boolean;
 
     public start(entity: Entity): void {

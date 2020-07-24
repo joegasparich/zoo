@@ -4,6 +4,7 @@ import { Game, Debug, Camera, Vector, TileSet, Layers } from "engine";
 import { PathfindingGrid, TiledMap } from ".";
 import { ColliderType, AssetManager } from "engine/managers";
 import { parseTiledMap } from "engine/helpers/parseTiled";
+import { Side } from "engine/consts";
 
 export class MapCell {
     public x: number;
@@ -136,6 +137,7 @@ export default class MapGrid {
 
     public setTileSolid(position: Vector, solid: boolean): void {
         this.grid[position.x][position.y].isSolid = solid;
+        if (solid) this.setTileNotPathable(position);
     }
 
     /**
@@ -201,7 +203,7 @@ export default class MapGrid {
         let path = await this.pathfindingGrid.getPath(start, end);
         if (!path) return;
 
-        if (opts.optimise) path = this.pathfindingGrid.optimisePath(path);
+        // if (opts.optimise) path = this.pathfindingGrid.optimisePath(path);
         return path.map(node => node.add(new Vector(0.5, 0.5)));
     }
 
@@ -215,6 +217,10 @@ export default class MapGrid {
 
     public setTilePathable(position: Vector): void {
         this.pathfindingGrid.enablePoint(position.x, position.y);
+    }
+
+    public setTileAccess(position: Vector, allowedSides: Side[]): void {
+        this.pathfindingGrid.disableEdges(position, allowedSides);
     }
 
     //-- Debug --//

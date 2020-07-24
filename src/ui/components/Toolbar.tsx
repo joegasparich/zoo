@@ -5,11 +5,12 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 import { Debug, Vector } from "engine";
 import { UIComponent, UIComponentProps } from "engine/ui";
 import { AssetManager } from "engine/managers";
+import { Side } from "engine/consts";
 
 import { Button } from "ui/components";
 import { PlacementGhost } from "ui";
 import ZooGame from "ZooGame";
-import { Inputs, Config, Assets, Side } from "consts";
+import { Inputs, Config, Assets } from "consts";
 import { TileObjectData, WallData } from "types/AssetTypes";
 import { Biome } from "world/BiomeGrid";
 import FloatingPanel from "./FloatingPanel";
@@ -41,6 +42,10 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
 
     private currentBiome: Biome;
     private currentWall: WallData;
+
+    private startWallPos: {pos: Vector; quadrant: Side};
+    private wallGhosts: PlacementGhost[];
+    private isDragging: boolean;
 
     public constructor(props: UIComponentProps) {
         super(props);
@@ -174,11 +179,77 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
                 }
                 break;
             case Tool.Wall:
+                const xDif = mouseWorldPos.floor().x - this.startWallPos?.pos.floor().x;
+                const yDif = mouseWorldPos.floor().y - this.startWallPos?.pos.floor().y;
+                const horizontal = this.startWallPos?.quadrant === Side.North ||
+                                   this.startWallPos?.quadrant === Side.South;
+                const length = (horizontal ? Math.abs(xDif) : Math.abs(yDif)) + 1;
+
                 if (this.game.input.isInputPressed(Inputs.LeftMouse)) {
-                    const tilePos = mouseWorldPos.floor();
+                    const tilePos = mouseWorldPos;
                     const quadrant = this.getQuadrant(mouseWorldPos);
 
-                    this.game.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, quadrant);
+                    this.wallGhosts = [];
+
+                    this.startWallPos = { pos: tilePos, quadrant };
+                }
+                if (this.game.input.isInputHeld(Inputs.LeftMouse)) {
+
+                    this.ghost.setVisible(false);
+
+                    const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+
+                    let i = Math.floor(this.startWallPos?.pos.x);
+                    let j = Math.floor(this.startWallPos?.pos.y);
+                    for (let w = 0; w < this.wallGhosts.length; w++) {
+                        const ghost = this.wallGhosts[w];
+                        ghost.setPosition(new Vector(i, j));
+
+                        if (horizontal) {
+                            ghost.setSprite(spriteSheet.getTextureById(0));
+                            i += Math.sign(mouseWorldPos.floor().x - i);
+                            if (this.startWallPos?.quadrant === Side.North) ghost.setOffset(new Vector(0.5, -1));
+                            else ghost.setOffset(new Vector(0.5, 0));
+                        } else {
+                            ghost.setSprite(spriteSheet.getTextureById(1));
+                            j += Math.sign(mouseWorldPos.floor().y - j);
+                            if (this.startWallPos?.quadrant === Side.West) ghost.setOffset(new Vector(0, 0));
+                            else ghost.setOffset(new Vector(1, 0));
+                        }
+                    };
+
+                    // Generate the ghost entities after so that they have a chance to initialise
+                    while (this.wallGhosts.length < length) {
+                        const ghost = new PlacementGhost(this.game, false);
+                        ghost.canPlaceFunction = (pos: Vector): boolean => this.game.world.wallGrid.isWallInMap(pos, this.startWallPos?.quadrant);
+                        this.wallGhosts.push(ghost);
+                    }
+                    while (this.wallGhosts.length > length) {
+                        this.wallGhosts.pop().destroy();
+                    }
+                }
+                if (this.game.input.isInputReleased(Inputs.LeftMouse)) {
+                    this.ghost.setVisible(true);
+
+                    if (!this.wallGhosts) return;
+
+                    this.wallGhosts.forEach(ghost => {
+                        const tilePos = ghost.getPosition().floor();
+                        let quadrant = Side.North;
+
+                        if (horizontal) {
+                            if (Math.abs(this.startWallPos?.pos.y % 1) < 0.5) quadrant = Side.North;
+                            else quadrant = Side.South;
+                        } else {
+                            if (Math.abs(this.startWallPos?.pos.x % 1) < 0.5) quadrant = Side.West;
+                            else quadrant = Side.East;
+                        }
+
+                        this.game.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, quadrant);
+                        ghost.destroy();
+                    });
+
+                    this.wallGhosts = [];
                 }
                 break;
             case Tool.Biome:
@@ -199,6 +270,8 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
 
     public postUpdate(): void {
         const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+
+        this.wallGhosts?.forEach(ghost => ghost.postUpdate());
 
         switch(this.state.activeTool) {
             case Tool.Wall:
@@ -235,6 +308,8 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
     public setTool(tool: Tool): void {
         this.setState({activeTool: tool});
         this.ghost.setVisible(true);
+        this.ghost.setPivot(new Vector(0.5, 0.5));
+        this.ghost.setOffset(new Vector(0, 0));
 
         switch(tool) {
             case Tool.Tree:
@@ -250,6 +325,7 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
                 this.ghost.setSprite(spriteSheet.getTextureById(0));
                 this.ghost.setPivot(new Vector(0.5, 1));
                 this.ghost.setSnap(true);
+                this.ghost.canPlaceFunction = (pos: Vector): boolean => this.game.world.wallGrid.isWallInMap(pos, this.getQuadrant(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
                 this.setState({activeButton: "wall"});
                 break;
             case Tool.Biome:
@@ -268,8 +344,8 @@ export default class Toolbar extends UIComponent<UIComponentProps, ToolbarState>
     }
 
     private getQuadrant(pos: Vector): Side {
-        const xrel = (pos.x % 1) - 0.5;
-        const yrel = (pos.y % 1) - 0.5;
+        const xrel = ((pos.x + 10000) % 1) - 0.5;
+        const yrel = ((pos.y + 10000) % 1) - 0.5;
 
         if (yrel < 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.North;
         if (xrel > 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.East;

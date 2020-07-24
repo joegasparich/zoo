@@ -24,4 +24,5 @@ export interface WallData {
     spriteSheet: string;
     cellHeight: number;
     cellWidth: number;
+    solid: boolean;
 }

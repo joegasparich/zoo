@@ -15,7 +15,8 @@ export default class RenderSystem extends System {
     public flipX: boolean;
     public flipY: boolean;
     public scale = 1;
-    public pivot: Vector;
+    public pivot: Vector; // Relative to sprite size
+    public offset: Vector; // Relative to world
 
     protected camera: Camera;
 
@@ -28,6 +29,7 @@ export default class RenderSystem extends System {
         this.spriteUrl = spriteUrl ?? "";
         this.layer = layer ?? DEFAULT_LAYER;
         this.pivot = pivot ?? new Vector(0.5, 0.5);
+        this.offset = new Vector(0, 0);
     }
 
     public start(entity: Entity): void {
@@ -38,6 +40,19 @@ export default class RenderSystem extends System {
         if (this.spriteUrl) {
             this.setSprite(this.spriteUrl);
         }
+    }
+
+    public postUpdate(delta: number): void {
+        super.postUpdate(delta);
+
+        if (!this.sprite) return;
+
+        this.syncPosition();
+        this.setColour();
+    }
+
+    public end(): void {
+        this.game.app.stage.removeChild(this.sprite);
     }
 
     public setSprite(newSprite: string | PIXI.Texture | PIXI.Sprite): void {
@@ -70,15 +85,6 @@ export default class RenderSystem extends System {
         this.syncPosition();
     }
 
-    public postUpdate(delta: number): void {
-        super.postUpdate(delta);
-
-        if (!this.sprite) return;
-
-        this.syncPosition();
-        this.setColour();
-    }
-
     protected setColour(): void {
         this.sprite.tint = this.colour;
         this.sprite.alpha = this.alpha;
@@ -93,7 +99,7 @@ export default class RenderSystem extends System {
         if (this.pivot) this.sprite.anchor.copyFrom(this.pivot.toPoint());
 
         // Sync postition
-        this.sprite.position = this.camera.worldToScreenPosition(this.entity.position).toPoint();
+        this.sprite.position = this.camera.worldToScreenPosition(this.entity.position.add(this.offset)).toPoint();
     }
 
     private getRotation(): number {

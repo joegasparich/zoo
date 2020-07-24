@@ -29,19 +29,19 @@ export default class Entity {
 
     public preUpdate(delta: number): void {
         this.systems.forEach(system => {
-            system.preUpdate(delta);
+            if(!system.disabled) system.preUpdate(delta);
         });
     }
 
     public update(delta: number): void {
         this.systems.forEach(system => {
-            system.update(delta);
+            if(!system.disabled) system.update(delta);
         });
     }
 
     public postUpdate(delta: number): void {
         this.systems.forEach(system => {
-            system.postUpdate(delta);
+            if(!system.disabled) system.postUpdate(delta);
         });
     }
 
