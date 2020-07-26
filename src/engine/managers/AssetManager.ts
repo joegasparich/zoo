@@ -2,15 +2,15 @@ import * as path from "path";
 
 import { TileSet } from "engine";
 import { TileSetData } from "engine/TileSet";
-import { parseTiledSet } from "engine/helpers/parseTiled";
 import { TiledSet } from "engine/map";
+import { parseTiledSet } from "engine/helpers/tiled";
 
 class AssetManager {
     private loader: PIXI.Loader;
     private preloadedAssets: string[];
     private tilesets: Map<string, TileSet>;
 
-    constructor() {
+    public constructor() {
         this.loader = new PIXI.Loader();
         this.tilesets = new Map();
     }
@@ -51,7 +51,7 @@ class AssetManager {
         return new Promise((resolve) => {
             this.loader.load((loader, resources) => {
                 this.loader.off("progress", progressListener);
-                const res = assets.map(asset => resources[asset]).concat(existingAssets.map(asset => resources[asset]))
+                const res = assets.map(asset => resources[asset]).concat(existingAssets.map(asset => resources[asset]));
                 resolve(res);
             });
         });

@@ -80,11 +80,11 @@ export default class Game {
         await AssetManager.doPreLoad(onProgress);
         Mediator.fire(Events.GameEvent.LOAD_COMPLETE);
 
+        // Now that assets have been loaded we can set up the game
+        await this.setup();
+
         // start up the game loop
         this.app.ticker.add(this.loop.bind(this));
-
-        // Now that assets have been loaded we can set up the game
-        this.setup();
     }
 
     protected setup(): void {
@@ -194,7 +194,6 @@ export default class Game {
     private pushCachedEntities(): void {
         this.entitiesToAdd.forEach(entity => {
             this.entities.set(entity.id, entity);
-            console.log("Creating entity");
         });
         this.entitiesToAdd = [];
     }

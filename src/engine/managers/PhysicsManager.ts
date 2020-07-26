@@ -175,10 +175,8 @@ export default class PhysicsManager {
             if (tags && !tags?.includes(tag)) return;
             rayCastData = {fixture, point: Vector.FromVec2(point), normal: Vector.FromVec2(normal), fraction};
 
-            console.log("Raycast from " + from + " to " + to + " returned object");
             return fraction;
         });
-        console.log("Raycast from " + from + " to " + to + " returned nothing");
         return rayCastData;
     }
 

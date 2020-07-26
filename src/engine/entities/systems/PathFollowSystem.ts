@@ -46,6 +46,10 @@ export default class PathFollowSystem extends System {
         this.currentNode = this.path.shift();
     }
 
+    public hasPath(): boolean {
+        return !!this.path;
+    }
+
     private moveTowardTarget(target: Vector, speed: number): void {
         this.physics.addForce(target.subtract(this.entity.position).normalize().multiply(speed));
     }

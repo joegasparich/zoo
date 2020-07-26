@@ -1,23 +1,24 @@
 import Mediator from "engine/Mediator";
 import { Events } from "engine";
 import { MapGrid } from "engine/map";
+import { loadMapFile } from "engine/helpers/tiled";
 
 export abstract class Scene {
-    name: string;
-    mapFile: string;
+    public name: string;
+    public mapFile: string;
 
-    start(mapGrid: MapGrid): void {}
-    preUpdate(): void {}
-    update(): void {}
-    postUpdate(): void {}
-    stop(): void {}
+    public start(mapGrid: MapGrid): void {}
+    public preUpdate(): void {}
+    public update(): void {}
+    public postUpdate(): void {}
+    public stop(): void {}
 }
 
 export default class SceneManager {
     private currentScene: Scene;
     private mapGrid: MapGrid;
 
-    constructor(mapGrid: MapGrid) {
+    public constructor(mapGrid: MapGrid) {
         this.mapGrid = mapGrid;
     }
 
@@ -32,7 +33,8 @@ export default class SceneManager {
 
         if (scene.mapFile) {
             Mediator.fire(Events.MapEvent.MAP_LOAD_START, { mapPath: scene.mapFile });
-            await this.mapGrid.loadMapFile(scene.mapFile, onProgress);
+            const cells = await loadMapFile(scene.mapFile, onProgress);
+            await this.mapGrid.setupGrid(cells, true);
             Mediator.fire(Events.MapEvent.MAP_LOAD_COMPLETE);
         }
     }

@@ -13,7 +13,7 @@ export default class PhysicsSystem extends System {
 
     private lastPosition: Vector;
 
-    public constructor(private collider: Collider, private isDynamic: boolean, private density = 10, public tag = TAG.Entity) {
+    public constructor(private collider: Collider, private isDynamic: boolean, private density = 10, public tag = TAG.Entity, private pivot = new Vector(0.5, 0.5)) {
         super();
     }
 
@@ -24,6 +24,7 @@ export default class PhysicsSystem extends System {
             position: this.entity.position,
             collider: this.collider,
             tag: this.tag,
+            pivot: this.pivot,
             isDynamic: this.isDynamic,
             density: this.density,
         });

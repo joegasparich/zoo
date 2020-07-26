@@ -105,6 +105,7 @@ export default class WallGrid {
 
     public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
         if (!this.isWallInMap(tilePos, side)) return;
+        if (this.getWallAtTile(tilePos, side).data) return;
         if (typeof wallData === "string") {
             wallData = AssetManager.getJSON(wallData) as WallData;
         }

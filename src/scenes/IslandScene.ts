@@ -37,6 +37,6 @@ export default class IslandScene extends Scene {
             }
         }
 
-        world.map.setupTileGrid(cells, true);
+        world.map.setupGrid(cells, true);
     }
 }

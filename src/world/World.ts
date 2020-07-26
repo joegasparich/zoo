@@ -5,6 +5,7 @@ import { MapGrid } from "engine/map";
 
 import TileObject from "entities/TileObject";
 import EmptyScene from "scenes/EmptyScene";
+import TestScene from "scenes/TestScene";
 import BiomeGrid from "./BiomeGrid";
 import WallGrid from "./WallGrid";
 
@@ -24,9 +25,9 @@ export default class World {
         this.biomeGrid = new BiomeGrid(this, 10, 16, Config.BIOME_SCALE);
     }
 
-    public setup(): void {
+    public async setup(): Promise<void> {
         // TODO: Figure out how to load map info like biomes after biomeGrid.setup
-        this.loadMap();
+        await this.loadMap();
 
         this.biomeGrid.setup();
         this.wallGrid.setup();
@@ -40,6 +41,7 @@ export default class World {
     private async loadMap(): Promise<void> {
         await this.game.sceneManager.loadScene(
             new EmptyScene(this),
+            // new TestScene(),
             (progress: number) => {
                 console.log(`Map Load Progress: ${progress}%`);
             },

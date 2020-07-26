@@ -16,17 +16,17 @@ export default class ZooGame extends Game {
 
     private toolbarRef: React.RefObject<Toolbar>;
 
-    protected setup(): void {
+    protected async setup(): Promise<void> {
         super.setup();
+
+        // Load Map
+        this.world = new World(this);
+        await this.world.setup();
 
         // Register inputs
         Object.values(Inputs).forEach(input => {
             this.input.registerInput(input);
         });
-
-        // Load Map
-        this.world = new World(this);
-        this.world.setup();
 
         this.camera.scale = Config.CAMERA_SCALE;
 

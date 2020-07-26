@@ -10,6 +10,7 @@ import { Assets } from "consts";
 export default class Player extends Actor {
     private animator: AnimatedRenderSystem;
     public pather: PathFollowSystem;
+    public wallAvoid: WallAvoidanceSystem;
 
     public constructor(game: Game, position: Vector) {
         const spritesheet = new SpriteSheet({
@@ -33,7 +34,7 @@ export default class Player extends Actor {
         );
         this.addSystem(new CameraFollowSystem());
         this.pather = this.addSystem(new PathFollowSystem());
-        this.addSystem(new WallAvoidanceSystem());
+        this.wallAvoid = this.addSystem(new WallAvoidanceSystem());
         this.animator = this.getSystem(SYSTEM.ANIMATED_RENDER_SYSTEM) as AnimatedRenderSystem;
     }
 
@@ -46,7 +47,12 @@ export default class Player extends Actor {
     public update(delta: number): void {
         super.update(delta);
 
-        this.pather.followPath(this.accelleration);
+        if (this.pather.hasPath()) {
+            this.pather.followPath(this.accelleration);
+            this.wallAvoid.shouldAvoid = true;
+        } else {
+            this.wallAvoid.shouldAvoid = false;
+        }
     }
 
     public postUpdate(delta: number): void {

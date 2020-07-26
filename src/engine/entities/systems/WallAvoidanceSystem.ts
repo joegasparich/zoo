@@ -4,11 +4,13 @@ import * as Planck from "planck-js";
 import * as util from "engine/helpers/util";
 import { Vector } from "engine";
 
-const TRIGGER_DISTANCE = 0.3;
-const AVOID_STRENGTH = 30;
+const TRIGGER_DISTANCE = 1;
+const AVOID_STRENGTH = 10;
 
 export default class WallAvoidanceSystem extends System {
     public id = SYSTEM.WALL_AVOIDANCE_SYSTEM;
+
+    public shouldAvoid = true;
 
     private physics: PhysicsSystem;
 
@@ -46,6 +48,8 @@ export default class WallAvoidanceSystem extends System {
 
     public update(delta: number): void {
         super.update(delta);
+
+        if (!this.shouldAvoid) return;
 
         let closestWall: Planck.Fixture;
         let closestDist = Infinity;

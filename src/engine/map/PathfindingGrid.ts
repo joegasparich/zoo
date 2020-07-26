@@ -94,7 +94,7 @@ export default class PathfindingGrid {
         let nextNode: Vector;
         while (path.length) {
             nextNode = path.shift();
-            if (!this.isLineWalkable(currentNode, nextNode)) {
+            if (!this.isLineWalkable(currentNode.add(new Vector(0.5,0.5)), nextNode.add(new Vector(0.5,0.5)))) {
                 // We can't skip this node
                 newPath.push(checkNode);
                 currentNode = checkNode;
@@ -130,5 +130,10 @@ export default class PathfindingGrid {
 
     public getGrid(): number[][] {
         return this.grid;
+    }
+
+    public reset(): void {
+        this.grid = [];
+        this.pathFinder.setGrid([]);
     }
 }

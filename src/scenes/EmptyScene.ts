@@ -33,6 +33,6 @@ export default class EmptyScene extends Scene {
             }
         }
 
-        world.map.setupTileGrid(cells, false);
+        world.map.setupGrid(cells, false);
     }
 }

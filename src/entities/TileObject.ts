@@ -16,7 +16,7 @@ export default class TileObject extends Entity {
         const sprite = data.sprite;
 
         this.render = this.addSystem(new RenderSystem(sprite, undefined, data.pivot));
-        this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1, TAG.Solid));
+        this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1, TAG.Solid, data.pivot));
         this.blocksPath = blocksPath;
     }
 
