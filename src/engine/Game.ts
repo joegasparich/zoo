@@ -98,7 +98,6 @@ export default class Game {
         this.camera = new Camera(this, new Vector(20, 20), 1);
 
         this.map = new MapGrid(this);
-        this.map.setCamera(this.camera);
 
         this.sceneManager = new SceneManager(this.map);
 
@@ -164,8 +163,6 @@ export default class Game {
         });
         // Do Physics
         this.physicsManager.update(delta);
-
-        this.map.update();
     }
 
     protected postUpdate(delta: number): void {

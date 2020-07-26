@@ -5,7 +5,6 @@ import { MapGrid } from "engine/map";
 
 import TileObject from "entities/TileObject";
 import EmptyScene from "scenes/EmptyScene";
-import TestScene from "scenes/TestScene";
 import BiomeGrid from "./BiomeGrid";
 import WallGrid from "./WallGrid";
 
@@ -57,7 +56,6 @@ export default class World {
         this.tileObjects.set(tileObject.id, tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {
-            this.map.setTileNotPathable(tileObject.position.floor());
             this.map.setTileSolid(tileObject.position.floor(), true);
         }
     }

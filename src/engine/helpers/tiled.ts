@@ -1,9 +1,19 @@
 import * as path from "path";
 
-import { Vector } from "engine";
+import { TileSet, Vector } from "engine";
 import { AssetManager } from "engine/managers";
-import { TiledMap, MapFileData, TiledSet, MapCell } from "engine/map";
+import { TiledMap, TiledSet, MapCell } from "engine/map";
 import { TileSetData, TileData } from "engine/TileSet";
+
+export interface MapFileData {
+    width: number;
+    height: number;
+    tileWidth: number;
+    tileHeight: number;
+    tileSetPath: string;
+    tileSet?: TileSet;
+    tileData: number[];
+}
 
 // TODO: Handle multiple tilesets
 export function parseTiledMap(tiledMap: TiledMap): MapFileData {

@@ -1,6 +1,6 @@
-import { Game, Debug, Camera, Vector, TileSet } from "engine";
+import { Game, Debug, Vector } from "engine";
 import { PathfindingGrid } from ".";
-import { MapEvent, Side } from "engine/consts";
+import { MapEvent, Side, TAG } from "engine/consts";
 import { Config } from "consts";
 import Mediator from "engine/Mediator";
 import TileGrid from "./TileGrid";
@@ -13,15 +13,6 @@ export class MapCell {
     public texture?: PIXI.Texture;
     public cellSize?: number;
 }
-export interface MapFileData {
-    width: number;
-    height: number;
-    tileWidth: number;
-    tileHeight: number;
-    tileSetPath: string;
-    tileSet?: TileSet;
-    tileData: number[];
-}
 
 export default class MapGrid {
     private game: Game;
@@ -31,7 +22,6 @@ export default class MapGrid {
     public position: Vector;
     public cellSize: number;
 
-    private camera: Camera;
     private grid: MapCell[][];
     private pathfindingGrid: PathfindingGrid;
     private tileGrid: TileGrid;
@@ -43,10 +33,11 @@ export default class MapGrid {
         this.position = new Vector();
     }
 
-    public setCamera(camera: Camera): void {
-        this.camera = camera;
-    }
-
+    /**
+     * Sets up the map grid
+     * @param cells The map cells to populate the grid with
+     * @param useTexture Whether a textured tile grid will be used
+     */
     public setupGrid(cells: MapCell[][], useTexture: boolean): void{
         this.grid = cells;
         this.cols = cells.length;
@@ -64,24 +55,30 @@ export default class MapGrid {
         this.isGridSetup = true;
     }
 
-    public update(): void {}
-
     public postUpdate(): void {
         this.drawDebug();
-        this.drawDebugPathGrid();
 
         this.tileGrid?.postUpdate();
+        this.pathfindingGrid?.postUpdate();
     }
 
+    /**
+     * Resets the map grid back to an empty state
+     */
     private clearMap(): void {
         this.rows = 0;
         this.cols = 0;
         this.grid = [];
-        this.pathfindingGrid.reset();
-        this.tileGrid.reset();
+        this.pathfindingGrid?.reset();
+        this.tileGrid?.reset();
         this.isGridSetup = false;
     }
 
+    /**
+     * Sets the solidity of the tile at a position
+     * @param position The position of the tile
+     * @param solid Whether or not the tile is solid
+     */
     public setTileSolid(position: Vector, solid: boolean): void {
         this.grid[position.x][position.y].isSolid = solid;
         if (solid) this.setTileNotPathable(position);
@@ -102,6 +99,10 @@ export default class MapGrid {
         return !this.grid[position.x][position.y].isSolid;
     }
 
+    /**
+     * Returns whether the position is within the bounds of the map
+     * @param position The position to check
+     */
     public isPositionInMap(position: Vector): boolean {
         return position.x >= 0 &&
                position.x < this.cols &&
@@ -109,33 +110,55 @@ export default class MapGrid {
                position.y < this.rows;
     }
 
+    /**
+     * Returns the map cell at the position (or undefined if out of bounds)
+     * @param position The position to look for the map cell
+     */
     public getCell(position: Vector): MapCell {
+        if (!this.isPositionInMap) return undefined;
+
         return this.grid[position.x][position.y];
     }
 
     //-- Pathfinding --//
+
+    /**
+     * Calculates and returns a path to a specified location
+     * @param start The start position
+     * @param end The target position
+     * @param opts Optional arguments
+     */
     public async getPath(start: Vector, end: Vector, opts?: {optimise: boolean}): Promise<Vector[]> {
         let path = await this.pathfindingGrid?.getPath(start, end);
         if (!path) return;
 
-        if (opts.optimise) path = this.pathfindingGrid?.optimisePath(path);
+        if (opts.optimise) path = this.pathfindingGrid?.optimisePath(path, this.isLineWalkable);
         return path.map(node => node.add(new Vector(0.5, 0.5)));
     }
 
-    public isPathWalkable(a: Vector, b: Vector): boolean {
-        return this.pathfindingGrid?.isLineWalkable(a, b);
+    /**
+     * Disables the pathfinding node at a position
+     * @param position The position to set not pathable
+     */
+    private setTileNotPathable(position: Vector): void {
+        this.pathfindingGrid?.disableNode(position.x, position.y);
     }
 
-    public setTileNotPathable(position: Vector): void {
-        this.pathfindingGrid?.disablePoint(position.x, position.y);
+    /**
+     * Enables the pathfinding node at a position
+     * @param position The position to set pathable
+     */
+    private setTilePathable(position: Vector): void {
+        this.pathfindingGrid?.enableNode(position.x, position.y);
     }
 
-    public setTilePathable(position: Vector): void {
-        this.pathfindingGrid?.enablePoint(position.x, position.y);
-    }
-
+    /**
+     * Sets the sides of the tile which it is allowed to be pathed to
+     * @param position The position of the tile
+     * @param allowedSides The sides that the tile can be entered from
+     */
     public setTileAccess(position: Vector, allowedSides: Side[]): void {
-        this.pathfindingGrid?.disableEdges(position, allowedSides);
+        this.pathfindingGrid?.disableEdges(Math.floor(position.x), Math.floor(position.y), allowedSides);
     }
 
     /**
@@ -145,7 +168,7 @@ export default class MapGrid {
     public checkPath(path: Vector[]): boolean {
         let lastNode: Vector = undefined;
         for(const node of path) {
-            if (lastNode && !this.pathfindingGrid?.isLineWalkable(node, lastNode)) {
+            if (lastNode && !this.isLineWalkable(node, lastNode)) {
                 return false;
             }
             lastNode = node;
@@ -154,7 +177,24 @@ export default class MapGrid {
         return true;
     }
 
+    /**
+     * Returns whether the line between position A & B is blocked by a solid object
+     * @param a Position A
+     * @param b Position B
+     */
+    public isLineWalkable(a: Vector, b: Vector): boolean {
+        const hit = this.game.physicsManager.rayCast(b, a, [TAG.Solid]);
+        if (hit) {
+            return false;
+        }
+        return true;
+    }
+
     //-- Debug --//
+
+    /**
+     * Draws a grid showing the map cells
+     */
     private drawDebug(): void {
         Debug.setLineStyle(1, 0xFFFFFF);
         const xOffset =  this.position.x;
@@ -176,26 +216,6 @@ export default class MapGrid {
                 i * this.cellSize + xOffset,
                 this.rows * this.cellSize + yOffset,
             );
-        }
-    }
-
-    private drawDebugPathGrid(): void {
-        if (!this.pathfindingGrid) return;
-
-        const grid = this.pathfindingGrid.getGrid();
-        const xOffset = this.cellSize / 2;
-        const yOffset = this.cellSize / 2;
-
-        for (let i = 0; i < grid.length; i++) {
-            for (let j = 0; j < grid[i].length; j++) {
-                if (grid[i][j] == 0) {
-                    Debug.setLineStyle(0.5, 0x00FF00);
-                    Debug.drawX(new Vector(i * this.cellSize + xOffset, j * this.cellSize + yOffset), 2);
-                } else {
-                    Debug.setLineStyle(0.5, 0x000000);
-                    Debug.drawX(new Vector(i * this.cellSize + xOffset, j * this.cellSize + yOffset), 2);
-                }
-            }
         }
     }
 }

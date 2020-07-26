@@ -1,7 +1,9 @@
+import { Config } from "consts";
 import { js as Pathfinder, Direction } from "easystarjs";
 
 import { Game, Vector } from "engine";
-import { Side, TAG } from "engine/consts";
+import { Side } from "engine/consts";
+import Debug from "engine/Debug";
 
 const allDirections: Direction[] = ["BOTTOM", "BOTTOM_LEFT", "BOTTOM_RIGHT", "LEFT", "RIGHT", "TOP", "TOP_LEFT", "TOP_RIGHT"];
 
@@ -20,6 +22,11 @@ export default class PathfindingGrid {
         this.pathFinder.setAcceptableTiles([0]);
     }
 
+    /**
+     * Generates an empty pathfinding grid
+     * @param rows The number of rows in the grid
+     * @param cols The number of columns in the grid
+     */
     private generateGrid(rows: number, cols: number): number[][] {
         const grid: number[][] = [];
         for(let i = 0; i < cols; i++) {
@@ -31,18 +38,34 @@ export default class PathfindingGrid {
         return grid;
     }
 
-    public disableEdges(point: Vector, sides: Side[]): void {
+    public postUpdate(): void {
+        this.drawDebugPathGrid();
+    }
+
+    /**
+     * Disables entry to a node from the specified sides
+     * @param x The x co ordinate of the node
+     * @param y The y co ordinate of the node
+     * @param sides The sides of the node to disable
+     */
+    public disableEdges(x: number, y: number, sides: Side[]): void {
         let allowedDirections: Direction[] = [...allDirections];
 
+        // Note that since the easystar grid is stored as [y][x] that the top for us is LEFT for easystar
         if (sides.includes(Side.North)) allowedDirections = allowedDirections.filter(dir => !dir.includes("LEFT"));
         if (sides.includes(Side.South)) allowedDirections = allowedDirections.filter(dir => !dir.includes("RIGHT"));
         if (sides.includes(Side.West)) allowedDirections = allowedDirections.filter(dir => !dir.includes("TOP"));
         if (sides.includes(Side.East)) allowedDirections = allowedDirections.filter(dir => !dir.includes("BOTTOM"));
 
-        this.pathFinder.setDirectionalCondition(point.y, point.x, allowedDirections);
+        this.pathFinder.setDirectionalCondition(y, x, allowedDirections);
     }
 
-    public disablePoint(x: number, y: number): void {
+    /**
+     * Disables a node in the pathfinding grid
+     * @param x The x co ordinate of the node
+     * @param y The y co ordinate of the node
+     */
+    public disableNode(x: number, y: number): void {
         if (!Number.isInteger(x) || !Number.isInteger(y)) {
             console.error("Tile position must be integers");
             return;
@@ -52,7 +75,12 @@ export default class PathfindingGrid {
         this.pathFinder.setGrid(this.grid);
     }
 
-    public enablePoint(x: number, y: number): void {
+    /**
+     * Enables a node in the pathfinding grid
+     * @param x The x co ordinate of the node
+     * @param y The y co ordinate of the node
+     */
+    public enableNode(x: number, y: number): void {
         if (!Number.isInteger(x) || !Number.isInteger(y)) {
             console.error("Tile position must be integers");
             return;
@@ -62,6 +90,11 @@ export default class PathfindingGrid {
         this.pathFinder.setGrid(this.grid);
     }
 
+    /**
+     * Calculates and returns a path from the start node to the end node
+     * @param start The start co ordinate
+     * @param end The end co ordinate
+     */
     public getPath(start: Vector, end: Vector): Promise<Vector[] | void> {
         if (!this.isPositionInGrid(start.x, start.y) ||
             !this.isPositionInGrid(end.x, end.y)) return Promise.resolve();
@@ -85,7 +118,12 @@ export default class PathfindingGrid {
         });
     }
 
-    public optimisePath(path: Vector[]): Vector[] {
+    /**
+     * Steps through the path and removes redundant edges by checking if the edge is blocked by an object using a ray cast
+     * @param path The path to optimise
+     * @param isLineWalkable a function to determine whether the line between two nodes is walkable
+     */
+    public optimisePath(path: Vector[], isLineWalkable: (nodeA: Vector, nodeB: Vector) => boolean): Vector[] {
         if (path.length < 3) return path;
 
         let currentNode = path.shift();
@@ -94,7 +132,7 @@ export default class PathfindingGrid {
         let nextNode: Vector;
         while (path.length) {
             nextNode = path.shift();
-            if (!this.isLineWalkable(currentNode.add(new Vector(0.5,0.5)), nextNode.add(new Vector(0.5,0.5)))) {
+            if (!isLineWalkable(currentNode.add(new Vector(0.5,0.5)), nextNode.add(new Vector(0.5,0.5)))) {
                 // We can't skip this node
                 newPath.push(checkNode);
                 currentNode = checkNode;
@@ -107,20 +145,21 @@ export default class PathfindingGrid {
         return newPath;
     }
 
-    public isLineWalkable(a: Vector, b: Vector): boolean {
-        const hit = this.game.physicsManager.rayCast(b, a, [TAG.Solid]);
-        if (hit) {
-            return false;
-        }
-        return true;
-    }
-
-    public isWalkable(x: number, y: number): boolean {
-        if (x < 0 || x >= this.grid.length) return false;
-        if (y < 0 || y >= this.grid[0].length) return false;
+    /**
+     * Returns whether the node at the co ordinates is disabled
+     * @param x The x co ordinates of the node
+     * @param y The y co ordinates of the node
+     */
+    public isNodeDisabled(x: number, y: number): boolean {
+        if (!this.isPositionInGrid(x, y)) return false;
         return !this.grid[x][y];
     }
 
+    /**
+     * Returns whether the specified co ordinates are within the bounds of the grid
+     * @param x The x co ordinates to check
+     * @param y The y co ordinates to check
+     */
     public isPositionInGrid(x: number, y: number): boolean {
         return x >= 0 &&
                x < this.grid.length &&
@@ -128,12 +167,29 @@ export default class PathfindingGrid {
                y < this.grid[0].length;
     }
 
-    public getGrid(): number[][] {
-        return this.grid;
-    }
-
     public reset(): void {
         this.grid = [];
         this.pathFinder.setGrid([]);
+    }
+
+    /**
+     * Draws green & red Xs to show which nodes are pathable
+     * TODO: Move to PathfindingGrid.js?
+     */
+    private drawDebugPathGrid(): void {
+        const xOffset = Config.WORLD_SCALE / 2;
+        const yOffset = Config.WORLD_SCALE / 2;
+
+        for (let i = 0; i < this.grid.length; i++) {
+            for (let j = 0; j < this.grid[i].length; j++) {
+                if (this.grid[i][j] == 0) {
+                    Debug.setLineStyle(0.5, 0x00FF00);
+                    Debug.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
+                } else {
+                    Debug.setLineStyle(0.5, 0x000000);
+                    Debug.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
+                }
+            }
+        }
     }
 }

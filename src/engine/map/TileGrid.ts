@@ -18,6 +18,10 @@ export default class TileGrid {
         }
     }
 
+    /**
+     * Sets up the tile grid
+     * @param cells The map cells to generate the tile grid from
+     */
     public setup(cells: MapCell[][]): void {
         const textures: PIXI.Texture[] = [];
         for (let i = 0; i < cells.length; i++) {
@@ -31,7 +35,11 @@ export default class TileGrid {
         this.updateTiles();
     }
 
+    /**
+     * Reset the tile grid back to an empty state
+     */
     public reset(): void {
+        this.game.stage.removeChild(this.tiles);
         this.tiles = null;
     }
 
@@ -55,7 +63,7 @@ export default class TileGrid {
 
                 // Collision
                 if (tile.isSolid) {
-                    this.map.setTileNotPathable(new Vector(tile.x, tile.y));
+                    this.map.setTileSolid(new Vector(tile.x, tile.y), true);
                     this.game.physicsManager.createPhysicsObject({
                         collider: {
                             type: ColliderType.Rect,
