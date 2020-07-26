@@ -3,6 +3,7 @@ import { RenderSystem, PhysicsSystem } from "engine/entities/systems";
 import { Game, Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
+import { TAG } from "engine/consts";
 
 export default class TileObject extends Entity {
     private render: RenderSystem;
@@ -15,7 +16,7 @@ export default class TileObject extends Entity {
         const sprite = data.sprite;
 
         this.render = this.addSystem(new RenderSystem(sprite, undefined, data.pivot));
-        this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1));
+        this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1, TAG.Solid));
         this.blocksPath = blocksPath;
     }
 

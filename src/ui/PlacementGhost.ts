@@ -34,7 +34,7 @@ export default class PlacementGhost {
         this.game = game;
         this.world = game.world;
 
-        this.ghost = new Entity(this.game, this.game.input.getMousePos());
+        this.ghost = this.game.registerEntity(new Entity(this.game, this.game.input.getMousePos()));
         if (shouldFollowMouse) this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));

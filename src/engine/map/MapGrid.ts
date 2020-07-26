@@ -4,7 +4,9 @@ import { Game, Debug, Camera, Vector, TileSet, Layers } from "engine";
 import { PathfindingGrid, TiledMap } from ".";
 import { ColliderType, AssetManager } from "engine/managers";
 import { parseTiledMap } from "engine/helpers/parseTiled";
-import { Side } from "engine/consts";
+import { MapEvent, Side, TAG } from "engine/consts";
+import { Config } from "consts";
+import Mediator from "engine/Mediator";
 
 export class MapCell {
     public x: number;
@@ -72,9 +74,9 @@ export default class MapGrid {
         this.grid = cells;
         this.cols = cells.length;
         this.rows = cells[0].length;
-        this.cellSize = cells[0][1].texture?.width ?? cells[0][1].cellSize;
 
         if (useTexture) {
+            this.cellSize = cells[0][1].texture?.width ?? cells[0][1].cellSize;
             const textures: PIXI.Texture[] = [];
             for (let i = 0; i < cells.length; i++) {
                 for (let j = 0; j < cells[i].length; j++) {
@@ -85,9 +87,11 @@ export default class MapGrid {
             this.groundTiles.parentGroup = Layers.GROUND;
             this.game.stage.addChild(this.groundTiles);
             this.updateTiles();
+        } else {
+            this.cellSize = Config.WORLD_SCALE;
         }
 
-        this.pathfindingGrid = new PathfindingGrid(this.rows, this.cols);
+        this.pathfindingGrid = new PathfindingGrid(this.game, this.rows, this.cols);
 
         this.isGridSetup = true;
     }
@@ -120,6 +124,7 @@ export default class MapGrid {
                             width: 1,
                         },
                         position: new Vector(tile.x + 0.5, tile.y + 0.5),
+                        tag: TAG.Solid,
                         isDynamic: false,
                     });
                 }
@@ -138,6 +143,8 @@ export default class MapGrid {
     public setTileSolid(position: Vector, solid: boolean): void {
         this.grid[position.x][position.y].isSolid = solid;
         if (solid) this.setTileNotPathable(position);
+
+        Mediator.fire(MapEvent.PLACE_SOLID, { position });
     }
 
     /**
@@ -200,7 +207,7 @@ export default class MapGrid {
 
     //-- Pathfinding --//
     public async getPath(start: Vector, end: Vector, opts?: {optimise: boolean}): Promise<Vector[]> {
-        let path = await this.pathfindingGrid.getPath(start, end);
+        const path = await this.pathfindingGrid.getPath(start, end);
         if (!path) return;
 
         // if (opts.optimise) path = this.pathfindingGrid.optimisePath(path);
@@ -208,7 +215,7 @@ export default class MapGrid {
     }
 
     public isPathWalkable(a: Vector, b: Vector): boolean {
-        return this.pathfindingGrid.isPathWalkable(a, b);
+        return this.pathfindingGrid.isLineWalkable(a, b);
     }
 
     public setTileNotPathable(position: Vector): void {
@@ -221,6 +228,22 @@ export default class MapGrid {
 
     public setTileAccess(position: Vector, allowedSides: Side[]): void {
         this.pathfindingGrid.disableEdges(position, allowedSides);
+    }
+
+    /**
+     * Returns whether the path is now blocked
+     * @param path the path to check
+     */
+    public checkPath(path: Vector[]): boolean {
+        let lastNode: Vector = undefined;
+        for(const node of path) {
+            if (lastNode && !this.pathfindingGrid.isLineWalkable(node, lastNode)) {
+                return false;
+            }
+            lastNode = node;
+        }
+
+        return true;
     }
 
     //-- Debug --//

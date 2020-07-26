@@ -2,12 +2,14 @@ import * as Planck from "planck-js";
 
 import { Game, Vector } from "engine";
 import Debug from "engine/Debug";
-import { FRAME_RATE } from "engine/consts";
+import { FRAME_RATE, TAG } from "engine/consts";
 import { Entity } from "engine/entities";
 
 export type PhysicsObjOpts = {
     position: Vector;
     collider: Collider;
+    tag: TAG;
+    pivot?: Vector;
     isDynamic: boolean;
     maxSpeed?: number;
     friction?: number;
@@ -19,11 +21,36 @@ export enum ColliderType {
     Rect = "RECTANGLE",
 };
 
+const defaultPhysicsObjOpts: PhysicsObjOpts = {
+    position: Vector.Zero,
+    collider: {
+        type: ColliderType.Circle,
+    },
+    isDynamic: false,
+    tag: TAG.Solid,
+    density: 10,
+    friction: 1,
+    maxSpeed: 1,
+    pivot: new Vector(0.5, 0.5),
+};
+
 export type Collider = {
     type: ColliderType;
     radius?: number;
     width?: number;
     height?: number;
+};
+
+export type BodyUserData = {
+    tag: TAG;
+    offset: Vector;
+};
+
+export type RaycastData = {
+    fixture: Planck.Fixture;
+    point: Vector;
+    normal: Vector;
+    fraction: number;
 };
 
 function getShape(collider: Collider): Planck.Shape {
@@ -57,7 +84,7 @@ export default class PhysicsManager {
         exit: ((contact: Planck.Contact) => void);
     }[]>;
 
-    constructor(game: Game) {
+    public constructor(game: Game) {
         this.game = game;
 
         this.listeners = new Map();
@@ -69,6 +96,7 @@ export default class PhysicsManager {
         this.world = Planck.World();
         this.ground = this.world.createBody();
         this.ground.createFixture(new Planck.Circle(0));
+        this.ground.setUserData({tag: TAG.Ground});
 
         this.world.on("begin-contact", (contact: Planck.Contact) => {
             this.listeners.get(contact.getFixtureA())?.forEach(callbacks => callbacks.enter(contact));
@@ -82,7 +110,7 @@ export default class PhysicsManager {
 
     public update(delta: number): void {
         this.world.step(delta / FRAME_RATE);
-        // this.drawDebug();
+        this.drawDebug();
     }
 
     public setGravity(direction: Vector): void {
@@ -103,22 +131,28 @@ export default class PhysicsManager {
     }
 
     public createPhysicsObject(opts: PhysicsObjOpts): Planck.Body {
+        opts = Object.assign(defaultPhysicsObjOpts, opts);
+
         const body = opts.isDynamic
-            ? this.world.createDynamicBody({linearDamping: 5 / (opts.maxSpeed ?? 1)})
+            ? this.world.createDynamicBody({linearDamping: 5 / (opts.maxSpeed)})
             : this.world.createBody();
 
-        body.setPosition(opts.position.toVec2());
+        const offset = new Vector(
+            (opts.pivot.x - 0.5) * (opts.collider.radius ?? opts.collider.width ?? 0),
+            (opts.pivot.y - 0.5) * (opts.collider.radius ?? opts.collider.height ?? 0));
+        body.setPosition(opts.position.add(offset).toVec2());
         body.createFixture(getShape(opts.collider), {
-            friction: opts.friction ?? 1,
-            density: opts.density ?? 1,
+            friction: opts.friction,
+            density: opts.density,
         });
+        body.setUserData({offset, tag: opts.tag});
         const def: Planck.FrictionJointDef = {
             bodyA: this.ground,
             bodyB: body,
             localAnchorA: new Planck.Vec2(0,0),
             localAnchorB: new Planck.Vec2(0,0),
             collideConnected: false,
-            maxForce: 20 * (opts.friction ?? 1),
+            maxForce: 20 * (opts.friction),
         };
         this.world.createJoint(Planck.FrictionJoint(def));
 
@@ -131,6 +165,21 @@ export default class PhysicsManager {
         } else {
             this.listeners.get(fixture).push({enter, exit});
         }
+    }
+
+    public rayCast(from: Vector, to: Vector, tags?: TAG[]): RaycastData {
+        let rayCastData: RaycastData;
+        this.world.rayCast(from.toVec2(), to.toVec2(), (fixture, point, normal, fraction): number => {
+            const tag = (fixture.getBody().getUserData() as BodyUserData)?.tag;
+            if (tag === TAG.Ground) return;
+            if (tags && !tags?.includes(tag)) return;
+            rayCastData = {fixture, point: Vector.FromVec2(point), normal: Vector.FromVec2(normal), fraction};
+
+            console.log("Raycast from " + from + " to " + to + " returned object");
+            return fraction;
+        });
+        console.log("Raycast from " + from + " to " + to + " returned nothing");
+        return rayCastData;
     }
 
     private drawDebug(): void {

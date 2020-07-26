@@ -3,31 +3,27 @@ import { Vector } from "engine";
 import { Collider } from "engine/managers";
 import * as Planck from "planck-js";
 import { Entity } from "..";
+import { TAG } from "engine/consts";
+import { BodyUserData } from "engine/managers/PhysicsManager";
 
 export default class PhysicsSystem extends System {
-    id = SYSTEM.PHYSICS_SYSTEM;
+    public id = SYSTEM.PHYSICS_SYSTEM;
 
-    collider: Collider;
-    isDynamic: boolean;
-    density: number;
-    body: Planck.Body;
+    public body: Planck.Body;
 
-    lastPosition: Vector;
+    private lastPosition: Vector;
 
-    constructor(collider: Collider, isDynamic: boolean, density = 10) {
+    public constructor(private collider: Collider, private isDynamic: boolean, private density = 10, public tag = TAG.Entity) {
         super();
-
-        this.collider = collider;
-        this.isDynamic = isDynamic;
-        this.density = density;
     }
 
-    start(entity: Entity): void {
+    public start(entity: Entity): void {
         super.start(entity);
 
         this.body = this.game.physicsManager.createPhysicsObject({
             position: this.entity.position,
             collider: this.collider,
+            tag: this.tag,
             isDynamic: this.isDynamic,
             density: this.density,
         });
@@ -35,18 +31,20 @@ export default class PhysicsSystem extends System {
         this.lastPosition = this.entity.position;
     }
 
-    update(delta: number): void {
+    public update(delta: number): void {
         super.update(delta);
+        const offset = (this.body.getUserData() as BodyUserData).offset
+
         if (this.entity.position !== this.lastPosition) {
             // Position has been altered somewhere, compensate
-            this.body.setPosition(this.entity.position.toVec2());
+            this.body.setPosition(this.entity.position.add(offset).toVec2());
         }
 
-        this.entity.position = Vector.FromVec2(this.body.getPosition());
+        this.entity.position = Vector.FromVec2(this.body.getPosition()).subtract(offset);
         this.lastPosition = this.entity.position;
     }
 
-    addForce(force: Vector): void {
+    public addForce(force: Vector): void {
         this.body.applyForceToCenter(force.toVec2(), true);
     }
 }

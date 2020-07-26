@@ -8,11 +8,11 @@ const TRIGGER_DISTANCE = 0.3;
 const AVOID_STRENGTH = 30;
 
 export default class WallAvoidanceSystem extends System {
-    id = SYSTEM.WALL_AVOIDANCE_SYSTEM;
+    public id = SYSTEM.WALL_AVOIDANCE_SYSTEM;
 
-    physics: PhysicsSystem;
+    private physics: PhysicsSystem;
 
-    walls: Planck.Fixture[];
+    private walls: Planck.Fixture[];
 
     public start(entity: Entity): void {
         super.start(entity);

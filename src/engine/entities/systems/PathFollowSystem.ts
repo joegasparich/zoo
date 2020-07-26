@@ -2,15 +2,17 @@ import { PhysicsSystem, SYSTEM, System } from ".";
 import { Vector } from "engine";
 import { Entity } from "..";
 import Debug from "engine/Debug";
+import Mediator from "engine/Mediator";
+import { MapEvent } from "engine/consts";
 
 const DISTANCE_TO_NODE = 0.3;
 
 export default class PathFollowSystem extends System {
 
-    physics: PhysicsSystem;
+    private physics: PhysicsSystem;
 
-    path: Vector[];
-    currentNode: Vector;
+    private path: Vector[];
+    private currentNode: Vector;
 
     public start(entity: Entity): void {
         super.start(entity);
@@ -19,6 +21,23 @@ export default class PathFollowSystem extends System {
         if (!this.physics) {
             console.error("PathFollowSystem requires PhysicsSystem");
         }
+
+        Mediator.on(MapEvent.PLACE_SOLID, () => {
+            if (!this.path) return;
+
+            if (!entity.game.map.checkPath([this.entity.position, this.currentNode, ...this.path])) {
+                this.pathTo(this.path.pop());
+            }
+        });
+    }
+
+    public async pathTo(location: Vector): Promise<boolean> {
+        this.path = undefined;
+        const path = await this.entity.game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: true});
+        if (!path) return false;
+
+        this.setPath(path);
+        return true;
     }
 
     public setPath(path: Vector[]): void {
@@ -62,6 +81,7 @@ export default class PathFollowSystem extends System {
             this.currentNode.y * cellSize);
 
         let lastNode = this.currentNode;
+        Debug.drawCircle(lastNode.multiply(cellSize), 2);
         this.path.forEach(node => {
             Debug.drawLine(
                 lastNode.x * cellSize,
@@ -69,6 +89,7 @@ export default class PathFollowSystem extends System {
                 node.x * cellSize,
                 node.y * cellSize,
             );
+            Debug.drawCircle(node.multiply(cellSize), 2);
             lastNode = node;
         });
     }

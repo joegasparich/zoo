@@ -1,7 +1,7 @@
 import { js as Pathfinder, Direction } from "easystarjs";
 
-import { Vector } from "engine";
-import { Side } from "engine/consts";
+import { Game, Vector } from "engine";
+import { Side, TAG } from "engine/consts";
 
 const allDirections: Direction[] = ["BOTTOM", "BOTTOM_LEFT", "BOTTOM_RIGHT", "LEFT", "RIGHT", "TOP", "TOP_LEFT", "TOP_RIGHT"];
 
@@ -10,7 +10,7 @@ export default class PathfindingGrid {
 
     private grid: number[][];
 
-    public constructor(rows: number, cols: number) {
+    public constructor(public game: Game, rows: number, cols: number) {
         this.grid = this.generateGrid(rows, cols);
 
         this.pathFinder = new Pathfinder();
@@ -63,10 +63,11 @@ export default class PathfindingGrid {
     }
 
     public getPath(start: Vector, end: Vector): Promise<Vector[] | void> {
-        // if start is on a solid tile then return (TODO: start from next nearest tile?)
-        if (this.grid[start.x][start.y]) return Promise.resolve();
-        // if end is on a solid tile then return (TODO: potentially pick adjacent tile?)
-        if (this.grid[end.x][end.y]) return Promise.resolve();
+        if (!this.isPositionInGrid(start.x, start.y) ||
+            !this.isPositionInGrid(end.x, end.y)) return Promise.resolve();
+        if (this.grid[start.x][start.y]) return Promise.resolve(); //(TODO: start from next nearest tile?)
+        if (this.grid[end.x][end.y]) return Promise.resolve(); //(TODO: potentially pick adjacent tile?)
+        if (start.equals(end)) return Promise.resolve();
 
         console.log("Getting path from " + start + " to " + end);
         return new Promise((resolve) => {
@@ -93,7 +94,7 @@ export default class PathfindingGrid {
         let nextNode: Vector;
         while (path.length) {
             nextNode = path.shift();
-            if (!this.isPathWalkable(currentNode, nextNode)) {
+            if (!this.isLineWalkable(currentNode, nextNode)) {
                 // We can't skip this node
                 newPath.push(checkNode);
                 currentNode = checkNode;
@@ -106,36 +107,10 @@ export default class PathfindingGrid {
         return newPath;
     }
 
-    // http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
-    public isPathWalkable(a: Vector, b: Vector): boolean {
-        let dx = Math.abs(b.x - a.x);
-        let dy = Math.abs(b.y - a.y);
-        let x = a.x;
-        let y = a.y;
-        let n = 1 + dx + dy;
-        const xinc = (b.x > a.x) ? 1 : -1;
-        const yinc = (b.y > a.y) ? 1 : -1;
-        let error = dx - dy;
-        dx *= 2;
-        dy *= 2;
-
-        for (; n > 0; --n) {
-            if (!this.isWalkable(x, y)) {
-                return false;
-            }
-
-            if (error > 0) {
-                x += xinc;
-                error -= dy;
-            }
-            else if (error < 0) {
-                y += yinc;
-                error += dx;
-            } else {
-                x += xinc;
-                y += yinc;
-                error += dx + dx;
-            }
+    public isLineWalkable(a: Vector, b: Vector): boolean {
+        const hit = this.game.physicsManager.rayCast(b, a, [TAG.Solid]);
+        if (hit) {
+            return false;
         }
         return true;
     }
@@ -144,6 +119,13 @@ export default class PathfindingGrid {
         if (x < 0 || x >= this.grid.length) return false;
         if (y < 0 || y >= this.grid[0].length) return false;
         return !this.grid[x][y];
+    }
+
+    public isPositionInGrid(x: number, y: number): boolean {
+        return x >= 0 &&
+               x < this.grid.length &&
+               y >= 0 &&
+               y < this.grid[0].length;
     }
 
     public getGrid(): number[][] {

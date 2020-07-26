@@ -31,10 +31,10 @@ export default class ZooGame extends Game {
         this.camera.scale = Config.CAMERA_SCALE;
 
         // Create Player
-        this.player = new Player(
+        this.player = this.registerEntity(new Player(
             this,
             new Vector(4, 4),
-        );
+        )) as Player;
         this.player.render.scale = 0.5;
 
         this.createUI();
@@ -51,28 +51,23 @@ export default class ZooGame extends Game {
 
         this.pollInput();
 
-        this.toolbarRef.current.update();
+        this.toolbarRef?.current?.update();
         this.world.postUpdate(delta);
     }
 
     protected postUpdate(delta: number): void {
-        this.toolbarRef.current.postUpdate();
+        this.toolbarRef?.current?.postUpdate();
 
         super.postUpdate(delta);
     }
 
     private pollInput(): void {
-        if (this.toolbarRef.current.hasFocus()) return;
+        if (this.toolbarRef?.current?.hasFocus()) return;
 
         if (this.input.isInputPressed(Inputs.RightMouse)) {
             const mousePos: Vector = this.camera.screenToWorldPosition(this.input.getMousePos());
 
-            this.map.getPath(this.player.position.floor(), mousePos.floor(), {optimise: true})
-                .then(path => {
-                    if (!path) return;
-
-                    this.player.pather.setPath(path);
-                });
+            this.player.pather.pathTo(mousePos.floor());
         }
     }
 

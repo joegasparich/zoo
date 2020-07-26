@@ -10,15 +10,14 @@ export enum ActorStateInput {
 };
 
 export default class Actor extends Entity {
-    input: InputSystem;
-    physics: PhysicsSystem;
-    render: RenderSystem;
+    public input: InputSystem;
+    public physics: PhysicsSystem;
+    public render: RenderSystem;
+    public state: StateMachine;
 
-    state: StateMachine;
+    protected accelleration = 50; // Temp
 
-    accelleration = 50; // Temp
-
-    constructor(game: Game, pos: Vector, inputSystem: InputSystem, physicsSystem: PhysicsSystem, renderSystem: RenderSystem) {
+    public constructor(game: Game, pos: Vector, inputSystem: InputSystem, physicsSystem: PhysicsSystem, renderSystem: RenderSystem) {
         super(game, pos);
 
         this.input = this.addSystem(inputSystem);
@@ -28,12 +27,12 @@ export default class Actor extends Entity {
         this.state = new StateMachine(Actor.idle);
     }
 
-    update(delta: number): void {
+    public update(delta: number): void {
         super.update(delta);
         this.state.update(delta, this);
     }
 
-    static idle: State = {
+    public static idle: State = {
         handleInput(input) {
             switch(input) {
                 case ActorStateInput.MOVE:
@@ -44,7 +43,7 @@ export default class Actor extends Entity {
         },
     };
 
-    static walking: State = {
+    public static walking: State = {
         handleInput(input) {
             switch(input) {
                 case ActorStateInput.STILL:

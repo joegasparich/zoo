@@ -1,12 +1,13 @@
 import { Camera, Debug, Game, Layers, Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { MapGrid } from "engine/map";
-import { Side } from "engine/consts";
+import { GameEvent, MapEvent, Side } from "engine/consts";
 
 import World from "./World";
 import Wall from "./Wall";
 import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
+import Mediator from "engine/Mediator";
 
 export default class WallGrid {
     private game: Game;
@@ -14,8 +15,7 @@ export default class WallGrid {
     private map: MapGrid;
     private camera: Camera;
 
-    private wallGrid: Wall[][];
-    // private wallTileMap: PIXI.tilemap.CompositeRectTileLayer;
+    private wallGrid: (Wall | undefined)[][];
 
     public constructor(world: World) {
         this.game = world.game;
@@ -31,7 +31,7 @@ export default class WallGrid {
             const orientation = col % 2;
             this.wallGrid[col] = [];
             for (let row = 0; row < this.map.rows + orientation; row++) {
-                this.wallGrid[col][row] = new Wall(orientation);
+                this.wallGrid[col][row] = new Wall(this.game, orientation, Wall.wallToWorldPos(new Vector(col, row)));
             }
         }
     }
@@ -50,7 +50,7 @@ export default class WallGrid {
             const orientation = col % 2;
             for (let row = 0; row < this.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
-                if (!wall.data) { continue; }
+                if (!wall?.data) { continue; }
 
                 // Texture
                 let wallPos;
@@ -95,10 +95,10 @@ export default class WallGrid {
     public getWalledSides(tilePos: Vector): Side[] {
         const edges: Side[] = [];
 
-        if (this.wallGrid[(tilePos.x * 2) + 1][tilePos.y].data?.solid) edges.push(Side.North);
-        if (this.wallGrid[(tilePos.x * 2) + 2][tilePos.y].data?.solid) edges.push(Side.East);
-        if (this.wallGrid[(tilePos.x * 2) + 1][tilePos.y + 1].data?.solid) edges.push(Side.South);
-        if (this.wallGrid[tilePos.x * 2][tilePos.y].data?.solid) edges.push(Side.West);
+        if (this.wallGrid[(tilePos.x * 2) + 1][tilePos.y]?.data?.solid) edges.push(Side.North);
+        if (this.wallGrid[(tilePos.x * 2) + 2][tilePos.y]?.data?.solid) edges.push(Side.East);
+        if (this.wallGrid[(tilePos.x * 2) + 1][tilePos.y + 1]?.data?.solid) edges.push(Side.South);
+        if (this.wallGrid[tilePos.x * 2][tilePos.y]?.data?.solid) edges.push(Side.West);
 
         return edges;
     }
@@ -133,7 +133,7 @@ export default class WallGrid {
                 break;
         }
 
-        const wall = new Wall(orientation, wallData);
+        const wall = new Wall(this.game, orientation, Wall.wallToWorldPos(new Vector(x, y)), wallData);
         this.wallGrid[x][y] = wall;
 
         const texture = wall.spriteSheet.getTextureById(orientation ? 0 : 1);
@@ -160,6 +160,8 @@ export default class WallGrid {
         this.game.app.stage.addChild(wall.sprite);
         wall.sprite.parentGroup = Layers.ENTITIES;
         wall.sprite.anchor.set(0.5, 1);
+
+        Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y))});
 
         return wall;
     }

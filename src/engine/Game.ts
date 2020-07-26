@@ -181,8 +181,10 @@ export default class Game {
         this.camera.update();
     }
 
-    public registerEntity(entity: Entity): void {
+    public registerEntity(entity: Entity): Entity {
         this.entitiesToAdd.push(entity);
+        entity.start();
+        return entity;
     }
 
     public deleteEntity(id: string): void {
@@ -193,7 +195,6 @@ export default class Game {
         this.entitiesToAdd.forEach(entity => {
             this.entities.set(entity.id, entity);
             console.log("Creating entity");
-            entity.start();
         });
         this.entitiesToAdd = [];
     }
