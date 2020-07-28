@@ -168,6 +168,7 @@ export default class WallGrid {
     }
 
     private drawDebug(): void {
+    public drawDebug(): void {
         const xOffset =  this.map.position.x;
         const yOffset = this.map.position.y;
 

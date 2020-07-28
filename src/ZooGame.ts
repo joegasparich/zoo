@@ -1,4 +1,4 @@
-import * as React from "react";
+
 
 import { Game, Vector } from "engine";
 import Player from "entities/Player";
@@ -7,17 +7,34 @@ import TileObject from "entities/TileObject";
 import { TileObjectData } from "types/AssetTypes";
 import World from "world/World";
 import { Config, Inputs } from "consts";
-import { Toolbar } from "ui/components";
 import { AssetManager } from "engine/managers";
+import Tools from "ui/Tools";
+
+type DebugSettings = {
+    showMapGrid: boolean;
+    showPathfinding: boolean;
+    showWallGrid: boolean;
+    showPhysics: boolean;
+};
+
+const defaultSettings: DebugSettings = {
+    showMapGrid: false,
+    showPathfinding: false,
+    showWallGrid: false,
+    showPhysics: false,
+};
 
 export default class ZooGame extends Game {
     public world: World;
     public player: Player;
 
-    private toolbarRef: React.RefObject<Toolbar>;
+    private tools: Tools;
+    public debugSettings: DebugSettings;
 
     protected async setup(): Promise<void> {
         super.setup();
+
+        this.debugSettings = defaultSettings;
 
         // Load Map
         this.world = new World(this);
@@ -41,9 +58,7 @@ export default class ZooGame extends Game {
     }
 
     private createUI(): void {
-        this.toolbarRef = React.createRef<Toolbar>();
-        this.canvas.addChild(<Toolbar key="toolbar" ref={this.toolbarRef} />);
-        this.toolbarRef.current.start(this);
+        this.tools = new Tools(this);
     }
 
     protected update(delta: number): void {
@@ -51,18 +66,23 @@ export default class ZooGame extends Game {
 
         this.pollInput();
 
-        this.toolbarRef?.current?.update();
+        this.tools.update();
         this.world.postUpdate(delta);
     }
 
     protected postUpdate(delta: number): void {
-        this.toolbarRef?.current?.postUpdate();
+        this.tools.postUpdate();
+
+        if (this.debugSettings.showMapGrid) this.map.drawDebug();
+        if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();
+        if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
+        if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
 
         super.postUpdate(delta);
     }
 
     private pollInput(): void {
-        if (this.toolbarRef?.current?.hasFocus()) return;
+        if (this.tools.hasFocus()) return;
 
         if (this.input.isInputPressed(Inputs.RightMouse)) {
             const mousePos: Vector = this.camera.screenToWorldPosition(this.input.getMousePos());

@@ -110,7 +110,6 @@ export default class PhysicsManager {
 
     public update(delta: number): void {
         this.world.step(delta / FRAME_RATE);
-        this.drawDebug();
     }
 
     public setGravity(direction: Vector): void {
@@ -180,7 +179,7 @@ export default class PhysicsManager {
         return rayCastData;
     }
 
-    private drawDebug(): void {
+    public drawDebug(): void {
         for (let body = this.world.getBodyList(); body; body = body.getNext()) {
             for (let fixture = body.getFixtureList(); fixture; fixture = fixture.getNext()) {
                 Debug.setLineStyle(1, 0xFF0000);

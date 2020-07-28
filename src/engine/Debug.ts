@@ -2,19 +2,28 @@ import { Game, Camera, Vector, Layers } from ".";
 
 class Debug {
     private graphics: PIXI.Graphics;
+    private game: Game;
     private camera: Camera;
 
     public init(game: Game): void {
+        this.game = game;
+        this.camera = game.camera;
+
         this.graphics = new PIXI.Graphics();
         this.graphics.parentGroup = Layers.DEBUG;
         game.stage.addChild(this.graphics);
-        this.camera = game.camera;
         this.graphics.position = this.camera.offset.toPoint();
     }
 
     public preUpdate(): void {
         if (!this.graphics) return;
         this.graphics.clear();
+
+        if (this.game.opts.enableDebug) {
+            this.graphics.visible = true;
+        } else {
+            this.graphics.visible = false;
+        }
     }
 
     public postUpdate(): void {

@@ -103,9 +103,7 @@ export default class Game {
 
         this.physicsManager.setup();
 
-        if (this.opts.enableDebug) {
-            Debug.init(this);
-        }
+        Debug.init(this);
 
         Mediator.fire(Events.GameEvent.SETUP_COMPLETE);
     }
@@ -175,6 +173,7 @@ export default class Game {
 
         this.map.postUpdate();
         Debug.postUpdate();
+        // Camera should be last to avoid stuttering
         this.camera.update();
     }
 

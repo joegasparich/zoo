@@ -38,10 +38,6 @@ export default class PathfindingGrid {
         return grid;
     }
 
-    public postUpdate(): void {
-        this.drawDebugPathGrid();
-    }
-
     /**
      * Disables entry to a node from the specified sides
      * @param x The x co ordinate of the node
@@ -176,7 +172,7 @@ export default class PathfindingGrid {
      * Draws green & red Xs to show which nodes are pathable
      * TODO: Move to PathfindingGrid.js?
      */
-    private drawDebugPathGrid(): void {
+    public drawDebugPathGrid(): void {
         const xOffset = Config.WORLD_SCALE / 2;
         const yOffset = Config.WORLD_SCALE / 2;
 

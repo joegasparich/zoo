@@ -3,7 +3,7 @@ import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
 export interface UIComponentProps {
-    key: string;
+    id?: string;
     className?: string;
     hidden?: boolean;
 }
@@ -28,7 +28,7 @@ export default abstract class UIComponent<P extends UIComponentProps, S> extends
         `;
 
         return (
-            <div css={style} className={(this.props.className ?? "") + (this.props.hidden ? " hidden" : "")}>
+            <div id={this.props.id} css={style} className={(this.props.className ?? "") + (this.props.hidden ? " hidden" : "")}>
                 {this.getContent()}
             </div>
         );

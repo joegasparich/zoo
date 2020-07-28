@@ -6,6 +6,7 @@ import { UIComponent, UIComponentProps } from "engine/ui";
 
 interface FloatingPanelProps extends UIComponentProps {
     showTriangle: boolean;
+    layout: "horizontal" | "vertical";
 }
 
 export default class FloatingPanel extends UIComponent<FloatingPanelProps, {}> {
@@ -33,7 +34,7 @@ export default class FloatingPanel extends UIComponent<FloatingPanelProps, {}> {
 
         return css`
             min-width: 40px;
-            height: 40px;
+            min-height: 40px;
             position: absolute;
             top: 45px;
             border-radius: 5px;
@@ -48,6 +49,7 @@ export default class FloatingPanel extends UIComponent<FloatingPanelProps, {}> {
 
             .container {
                 display: flex;
+                flex-direction: ${this.props.layout === "horizontal" ? "row" : "column"};
             }
         `;
     }

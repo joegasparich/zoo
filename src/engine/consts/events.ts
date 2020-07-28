@@ -13,3 +13,8 @@ export enum MapEvent {
     MAP_LOAD_COMPLETE = "MAP_LOAD_COMPLETE",
     PLACE_SOLID = "PLACE_SOLID",
 };
+
+export enum UIEvent {
+    FOCUS = "FOCUS",
+    UNFOCUS = "UNFOCUS",
+}

@@ -56,10 +56,7 @@ export default class MapGrid {
     }
 
     public postUpdate(): void {
-        this.drawDebug();
-
         this.tileGrid?.postUpdate();
-        this.pathfindingGrid?.postUpdate();
     }
 
     /**
@@ -195,7 +192,7 @@ export default class MapGrid {
     /**
      * Draws a grid showing the map cells
      */
-    private drawDebug(): void {
+    public drawDebug(): void {
         Debug.setLineStyle(1, 0xFFFFFF);
         const xOffset =  this.position.x;
         const yOffset = this.position.y;
@@ -217,5 +214,9 @@ export default class MapGrid {
                 this.rows * this.cellSize + yOffset,
             );
         }
+    }
+
+    public drawPathfinderDebug(): void {
+        this.pathfindingGrid.drawDebugPathGrid();
     }
 }
