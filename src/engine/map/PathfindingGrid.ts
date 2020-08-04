@@ -94,15 +94,15 @@ export default class PathfindingGrid {
     public getPath(start: Vector, end: Vector): Promise<Vector[] | void> {
         if (!this.isPositionInGrid(start.x, start.y) ||
             !this.isPositionInGrid(end.x, end.y)) return Promise.resolve();
-        if (this.grid[start.x][start.y]) return Promise.resolve(); //(TODO: start from next nearest tile?)
-        if (this.grid[end.x][end.y]) return Promise.resolve(); //(TODO: potentially pick adjacent tile?)
+        if (this.grid[start.x][start.y]) return Promise.resolve(); // TODO: start from next nearest tile?
+        if (this.grid[end.x][end.y]) return Promise.resolve(); // TODO: potentially pick adjacent tile?
         if (start.equals(end)) return Promise.resolve();
 
         console.log("Getting path from " + start + " to " + end);
         return new Promise((resolve) => {
-            // Note that the pathfinder expects the grid to be the inverse of what we have it here.
-            // I have set it up so that the grid is in the format [x][y] for readability
-            // But we need to swap it here for the pathfinder
+            // ! Note that the pathfinder expects the grid to be the inverse of what we have it here.
+            // ! I have set it up so that the grid is in the format [x][y] for readability
+            // ! But we need to swap it here for the pathfinder
             this.pathFinder.findPath(start.y, start.x, end.y, end.x, (path) => {
                 if (path === null) {
                     resolve();
@@ -170,7 +170,6 @@ export default class PathfindingGrid {
 
     /**
      * Draws green & red Xs to show which nodes are pathable
-     * TODO: Move to PathfindingGrid.js?
      */
     public drawDebugPathGrid(): void {
         const xOffset = Config.WORLD_SCALE / 2;

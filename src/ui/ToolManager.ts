@@ -4,14 +4,11 @@ import { Vector } from "engine";
 import Mediator from "engine/Mediator";
 import { UIEvent } from "engine/consts/events";
 
-import { Inputs } from "consts";
-import { PlacementGhost } from "ui";
 import ZooGame from "ZooGame";
+import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import TreeTool from "./tools/TreeTool";
-import WallTool from "./tools/WallTool";
-import BiomeTool from "./tools/BiomeTool";
-import { NoTool, Tool, ToolType } from "./tools";
+import { BiomeTool, NoTool, Tool, ToolType, TreeTool, WallTool } from "./tools";
+import PlacementGhost from "./PlacementGhost";
 
 export default class ToolManager {
     public game: ZooGame;

@@ -4,13 +4,10 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 
 import { UIComponent, UIComponentProps } from "engine/ui";
 
-import { Button } from "ui/components";
-import FloatingPanel from "./FloatingPanel";
-import { Assets } from "consts";
-import BiomeTools from "./BiomeTools";
-import ToolManager from "ui/ToolManager";
-import DebugControls from "./DebugControls";
 import ZooGame from "ZooGame";
+import { Assets } from "consts";
+import { Button, DebugControls, FloatingPanel, BiomeControls } from "ui/components";
+import ToolManager from "ui/ToolManager";
 import { ToolType } from "ui/tools";
 
 interface ToolbarProps extends UIComponentProps {
@@ -95,7 +92,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                             this.setTool(ToolType.Wall);
                         }}
                     />
-                    <BiomeTools
+                    <BiomeControls
                         setTool={this.setTool.bind(this)}
                     />
                     <DebugControls

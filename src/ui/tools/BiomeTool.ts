@@ -1,6 +1,6 @@
 import { Config, Inputs } from "consts";
 import { Debug } from "engine";
-import { PlacementGhost } from "ui";
+import PlacementGhost from "ui/PlacementGhost";
 import { Biome } from "world/BiomeGrid";
 import { Tool, ToolType } from ".";
 

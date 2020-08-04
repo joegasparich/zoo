@@ -4,9 +4,8 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 
 import { UIComponent, UIComponentProps } from "engine/ui";
 
-import { Button } from "ui/components";
+import { Button, FloatingPanel } from "ui/components";
 import { Assets } from "consts";
-import FloatingPanel from "./FloatingPanel";
 import Mediator from "engine/Mediator";
 import { UIEvent } from "engine/consts/events";
 import ZooGame from "ZooGame";

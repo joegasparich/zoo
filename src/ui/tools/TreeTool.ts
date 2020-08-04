@@ -1,8 +1,9 @@
-import { Assets, Inputs } from "consts";
 import { Vector } from "engine";
 import { AssetManager } from "engine/managers";
+
+import { Assets, Inputs } from "consts";
 import { TileObjectData } from "types/AssetTypes";
-import { PlacementGhost } from "ui";
+import PlacementGhost from "ui/PlacementGhost";
 import { Tool, ToolType } from ".";
 
 export default class TreeTool extends Tool {

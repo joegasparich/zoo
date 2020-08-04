@@ -1,11 +1,12 @@
-import { Assets, Inputs } from "consts";
 import { Vector } from "engine";
 import { Side } from "engine/consts";
 import { AssetManager } from "engine/managers";
+
+import { Assets, Inputs } from "consts";
 import { WallData } from "types/AssetTypes";
-import { PlacementGhost } from "ui";
 import Wall from "world/Wall";
 import { Tool, ToolType } from ".";
+import PlacementGhost from "ui/PlacementGhost";
 
 export default class WallTool extends Tool {
     public type = ToolType.Wall;

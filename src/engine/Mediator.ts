@@ -1,19 +1,19 @@
 class Mediator {
 
-    listeners: Map<string, Function[]>;
+    private listeners: Map<string, Function[]>;
 
-    constructor() {
+    public constructor() {
         this.listeners = new Map();
     }
 
-    on(event: string, callback: Function): void {
+    public on(event: string, callback: Function): void {
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
         }
         this.listeners.get(event).push(callback);
     }
 
-    fire(event: string, data?: Object): void {
+    public fire(event: string, data?: Object): void {
         this.listeners.get(event)?.forEach(callback => callback(data));
     }
 }

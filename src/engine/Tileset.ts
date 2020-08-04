@@ -11,9 +11,9 @@ export interface TileData {
 }
 
 export default class TileSet extends SpriteSheet {
-    tiles: Map<number, TileData>;
+    public tiles: Map<number, TileData>;
 
-    constructor(data: TileSetData) {
+    public constructor(data: TileSetData) {
         super(data);
 
         this.tiles = new Map();
@@ -22,7 +22,7 @@ export default class TileSet extends SpriteSheet {
         });
     }
 
-    getTileData(id: number): TileData {
+    public getTileData(id: number): TileData {
         return this.tiles.get(id);
     }
 }

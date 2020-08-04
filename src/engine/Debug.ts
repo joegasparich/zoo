@@ -1,5 +1,6 @@
 import { Game, Camera, Vector, Layers } from ".";
 
+// TODO: Refactor into Draw class and then inherit from it and include logging features
 class Debug {
     private graphics: PIXI.Graphics;
     private game: Game;

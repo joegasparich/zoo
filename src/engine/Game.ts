@@ -173,7 +173,7 @@ export default class Game {
 
         this.map.postUpdate();
         Debug.postUpdate();
-        // Camera should be last to avoid stuttering
+        // ! Camera should be last to avoid stuttering
         this.camera.update();
     }
 

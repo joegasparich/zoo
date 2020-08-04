@@ -12,21 +12,21 @@ import Mediator from "engine/Mediator";
 import { UIEvent } from "engine/consts/events";
 import { ToolType } from "ui/tools";
 
-interface BiomeToolsProps extends UIComponentProps {
+interface BiomeControlsProps extends UIComponentProps {
     setTool: (tool: ToolType, data?: Object) => void;
 };
-interface BiomeToolsState {
+interface BiomeControlsState {
     panelOpen: boolean;
 };
-const defaultState: BiomeToolsState = {
+const defaultState: BiomeControlsState = {
     panelOpen: false,
 };
 
-export default class BiomeTools extends UIComponent<BiomeToolsProps, BiomeToolsState> {
+export default class BiomeControls extends UIComponent<BiomeControlsProps, BiomeControlsState> {
 
     public focusID = "BIOME_TOOLS";
 
-    public constructor(props: BiomeToolsProps) {
+    public constructor(props: BiomeControlsProps) {
         super(props);
 
         this.state = defaultState;

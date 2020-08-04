@@ -1,4 +1,4 @@
-import { PlacementGhost } from "ui";
+import PlacementGhost from "ui/PlacementGhost";
 import ToolManager from "ui/ToolManager";
 import ZooGame from "ZooGame";
 
