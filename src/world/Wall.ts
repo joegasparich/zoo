@@ -10,11 +10,14 @@ export default class Wall {
     public data: WallData | undefined;
     public spriteSheet: SpriteSheet;
     public sprite: PIXI.Sprite;
+    public exists: boolean;
 
-    public constructor(public game: Game, public orientation: number, public position: Vector, data?: WallData) {
+    public constructor(public game: Game, public orientation: number, public position: Vector, public gridPos: Vector, data?: WallData) {
+        this.exists = false;
         if (data) {
             this.data = data;
             this.spriteSheet = Wall.wallSprites.get(this.data.spriteSheet);
+            this.exists = true;
 
             if (data.solid) {
                 game.physicsManager.createPhysicsObject({
@@ -48,7 +51,13 @@ export default class Wall {
         return data;
     }
 
-    public static wallToWorldPos(wallPos: Vector): Vector {
-        return new Vector(wallPos.x / 2, wallPos.y);
+    public static wallToWorldPos(wallPos: Vector, orientation: number): Vector {
+        if (orientation) {
+            // Horizontal
+            return new Vector(wallPos.x / 2, wallPos.y);
+        } else {
+            // Vertical
+            return new Vector(wallPos.x / 2, wallPos.y + 0.5);
+        }
     }
 }

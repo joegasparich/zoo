@@ -63,14 +63,14 @@ export default class TileGrid {
 
                 // Collision
                 if (tile.isSolid) {
-                    this.map.setTileSolid(new Vector(tile.x, tile.y), true);
+                    this.map.setTileSolid(tile.position, true);
                     this.game.physicsManager.createPhysicsObject({
                         collider: {
                             type: ColliderType.Rect,
                             height: 1,
                             width: 1,
                         },
-                        position: new Vector(tile.x + 0.5, tile.y + 0.5),
+                        position: tile.position.add(new Vector(0.5)),
                         tag: TAG.Solid,
                         isDynamic: false,
                     });

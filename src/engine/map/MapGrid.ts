@@ -6,8 +6,7 @@ import Mediator from "engine/Mediator";
 import TileGrid from "./TileGrid";
 
 export class MapCell {
-    public x: number;
-    public y: number;
+    public position: Vector;
 
     public isSolid: boolean;
     public texture?: PIXI.Texture;
@@ -101,7 +100,8 @@ export default class MapGrid {
      * @param position The position to check
      */
     public isPositionInMap(position: Vector): boolean {
-        return position.x >= 0 &&
+        return position &&
+               position.x >= 0 &&
                position.x < this.cols &&
                position.y >= 0 &&
                position.y < this.rows;
@@ -112,9 +112,61 @@ export default class MapGrid {
      * @param position The position to look for the map cell
      */
     public getCell(position: Vector): MapCell {
-        if (!this.isPositionInMap) return undefined;
+        if (!this.isPositionInMap(position)) return undefined;
 
         return this.grid[position.x][position.y];
+    }
+
+    public getCellInDirection(position: Vector, direction: Side): MapCell {
+        if (!this.isPositionInMap(position)) return undefined;
+
+        switch(direction) {
+            case Side.West: return this.isPositionInMap(new Vector(position.x - 1, position.y)) ? this.grid[position.x - 1][position.y] : undefined;
+            case Side.East: return this.isPositionInMap(new Vector(position.x + 1, position.y)) ? this.grid[position.x + 1][position.y] : undefined;
+            case Side.North: return this.isPositionInMap(new Vector(position.x, position.y - 1)) ? this.grid[position.x][position.y - 1] : undefined;
+            case Side.South: return this.isPositionInMap(new Vector(position.x, position.y + 1)) ? this.grid[position.x][position.y + 1] : undefined;
+        }
+    }
+
+    /**
+     * Returns the four cells in the adjacent directions if they exist
+     * @param position The position of the cell to get adjacent cells from
+     */
+    public getAdjacentCells(position: Vector): MapCell[] {
+        if (!this.isPositionInMap(position)) return [];
+
+        const adjacentCells: MapCell[] = [];
+
+        if (this.isPositionInMap(new Vector(position.x - 1, position.y))) adjacentCells.push(this.grid[position.x - 1][position.y]);
+        if (this.isPositionInMap(new Vector(position.x + 1, position.y))) adjacentCells.push(this.grid[position.x + 1][position.y]);
+        if (this.isPositionInMap(new Vector(position.x, position.y - 1))) adjacentCells.push(this.grid[position.x][position.y - 1]);
+        if (this.isPositionInMap(new Vector(position.x, position.y + 1))) adjacentCells.push(this.grid[position.x][position.y + 1]);
+
+        return adjacentCells;
+    }
+
+    public getTileQuadrantAtPos(pos: Vector): Side {
+        const xrel = ((pos.x + 10000) % 1) - 0.5;
+        const yrel = ((pos.y + 10000) % 1) - 0.5;
+
+        if (yrel < 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.North;
+        if (xrel > 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.East;
+        if (yrel > 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.South;
+        if (xrel < 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.West;
+    }
+
+    /**
+     * Returns an array of all the cells in the map
+     */
+    public getAllCells(): MapCell[] {
+        const cells: MapCell[] = [];
+        for (let i = 0; i < this.cols; i++) {
+            for (let j = 0; j < this.rows; j++) {
+                cells.push(this.grid[i][j]);
+            }
+        }
+
+        return cells;
     }
 
     //-- Pathfinding --//
@@ -129,7 +181,7 @@ export default class MapGrid {
         let path = await this.pathfindingGrid?.getPath(start, end);
         if (!path) return;
 
-        if (opts.optimise) path = this.pathfindingGrid?.optimisePath(path, this.isLineWalkable);
+        if (opts.optimise) path = this.pathfindingGrid?.optimisePath(path, this.isLineWalkable.bind(this));
         return path.map(node => node.add(new Vector(0.5, 0.5)));
     }
 

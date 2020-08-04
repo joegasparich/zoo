@@ -8,17 +8,18 @@ import { Button } from "ui/components";
 import FloatingPanel from "./FloatingPanel";
 import { Assets } from "consts";
 import BiomeTools from "./BiomeTools";
-import Tools, { Tool } from "ui/Tools";
+import ToolManager from "ui/ToolManager";
 import DebugControls from "./DebugControls";
 import ZooGame from "ZooGame";
+import { ToolType } from "ui/tools";
 
 interface ToolbarProps extends UIComponentProps {
     game: ZooGame;
-    tools: Tools;
+    toolManager: ToolManager;
 }
 
 interface ToolbarState {
-    activeTool: Tool;
+    activeTool: ToolType;
     radius: number;
 }
 const defaultState: ToolbarState = {
@@ -33,7 +34,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
 
         this.state = defaultState;
 
-        props.tools.radius = this.state.radius;
+        props.toolManager.radius = this.state.radius;
     }
 
     protected getStyles(): SerializedStyles {
@@ -84,14 +85,14 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         key="treeButton"
                         image={Assets.SPRITES.TREE}
                         onClick={(): void => {
-                            this.setTool(Tool.Tree);
+                            this.setTool(ToolType.Tree);
                         }}
                     />
                     <Button
                         key="wallButton"
                         image={Assets.UI.IRON_BAR_FENCE}
                         onClick={(): void => {
-                            this.setTool(Tool.Wall);
+                            this.setTool(ToolType.Wall);
                         }}
                     />
                     <BiomeTools
@@ -104,7 +105,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                 <FloatingPanel
                     key="brushSize"
                     className="resize-panel"
-                    hidden={this.state?.activeTool !== Tool.Biome}
+                    hidden={this.state?.activeTool !== ToolType.Biome}
                     layout="horizontal"
                     showTriangle={false}
                 >
@@ -113,7 +114,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         onClick={(): void => {
                             const radius = Math.max(this.state.radius - 0.25, 0.5);
                             this.setState({radius: radius});
-                            this.props.tools.radius = radius;
+                            this.props.toolManager.radius = radius;
                         }}
                     >-</Button>
                     <span className="radius">{this.state.radius}</span>
@@ -122,7 +123,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         onClick={(): void => {
                             const radius = Math.min(this.state.radius + 0.25, 5);
                             this.setState({radius: radius});
-                            this.props.tools.radius = radius;
+                            this.props.toolManager.radius = radius;
                         }}
                     >+</Button>
                 </FloatingPanel>
@@ -130,8 +131,8 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
         );
     }
 
-    private setTool(tool: Tool, data?: Record<string, any>): void {
+    private setTool(tool: ToolType, data?: Record<string, any>): void {
         this.setState({activeTool: tool});
-        this.props.tools.setTool(tool, data);
+        this.props.toolManager.setTool(tool, data);
     }
 }

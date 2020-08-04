@@ -92,8 +92,7 @@ export async function loadMapFile(location: string, onProgress?: Function): Prom
         for  (let j = 0; j < tiledMap.width; j++) {
             const tileIndex = tiledMap.tileData[j * tiledMap.width + i] - 1;
             cells[i][j] = {
-                x: i,
-                y: j,
+                position: new Vector(i, j),
                 texture: tiledMap.tileSet.getTextureById(tileIndex),
                 isSolid: tiledMap.tileSet.tiles.get(tileIndex).solid,
             };

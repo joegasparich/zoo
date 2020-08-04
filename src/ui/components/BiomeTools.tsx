@@ -8,12 +8,12 @@ import { Button } from "ui/components";
 import { Assets } from "consts";
 import FloatingPanel from "./FloatingPanel";
 import { Biome } from "world/BiomeGrid";
-import { Tool } from "ui/Tools";
 import Mediator from "engine/Mediator";
 import { UIEvent } from "engine/consts/events";
+import { ToolType } from "ui/tools";
 
 interface BiomeToolsProps extends UIComponentProps {
-    setTool: (tool: Tool, data?: Object) => void;
+    setTool: (tool: ToolType, data?: Object) => void;
 };
 interface BiomeToolsState {
     panelOpen: boolean;
@@ -62,17 +62,17 @@ export default class BiomeTools extends UIComponent<BiomeToolsProps, BiomeToolsS
                         <Button
                             key="grassButton"
                             image={Assets.UI.GRASS}
-                            onClick={(): void => { this.props.setTool(Tool.Biome, {biome: Biome.Grass} ); }}
+                            onClick={(): void => { this.props.setTool(ToolType.Biome, {biome: Biome.Grass} ); }}
                         />
                         <Button
                             key="snowButton"
                             image={Assets.UI.SNOW}
-                            onClick={(): void => { this.props.setTool(Tool.Biome, {biome: Biome.Snow} ); }}
+                            onClick={(): void => { this.props.setTool(ToolType.Biome, {biome: Biome.Snow} ); }}
                         />
                         <Button
                             key="sandButton"
                             image={Assets.UI.SAND}
-                            onClick={(): void => { this.props.setTool(Tool.Biome, {biome: Biome.Sand} ); }}
+                            onClick={(): void => { this.props.setTool(ToolType.Biome, {biome: Biome.Sand} ); }}
                         />
                     </FloatingPanel>
                 </div>

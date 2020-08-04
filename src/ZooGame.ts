@@ -8,7 +8,7 @@ import { TileObjectData } from "types/AssetTypes";
 import World from "world/World";
 import { Config, Inputs } from "consts";
 import { AssetManager } from "engine/managers";
-import Tools from "ui/Tools";
+import ToolManager from "ui/ToolManager";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -28,7 +28,7 @@ export default class ZooGame extends Game {
     public world: World;
     public player: Player;
 
-    private tools: Tools;
+    private tools: ToolManager;
     public debugSettings: DebugSettings;
 
     protected async setup(): Promise<void> {
@@ -58,7 +58,7 @@ export default class ZooGame extends Game {
     }
 
     private createUI(): void {
-        this.tools = new Tools(this);
+        this.tools = new ToolManager(this);
     }
 
     protected update(delta: number): void {

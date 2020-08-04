@@ -1,4 +1,4 @@
-import { Scene } from "engine";
+import { Scene, Vector } from "engine";
 import { MapGrid, MapCell } from "engine/map";
 
 import World from "world/World";
@@ -24,10 +24,9 @@ export default class EmptyScene extends Scene {
         // Place Grass
         for (let i = 0; i < MAP_SIZE; i++) {
             cells[i] = [];
-            for (let j = 0; j < MAP_SIZE + 3; j++) {
+            for (let j = 0; j < MAP_SIZE; j++) {
                 cells[i][j] = {
-                    x: i,
-                    y: j,
+                    position: new Vector(i, j),
                     isSolid: false,
                 };
             }
