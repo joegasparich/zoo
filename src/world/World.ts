@@ -1,7 +1,7 @@
 import { Config } from "consts";
-import { Game, Vector } from "engine";
+import { Debug, Game, Vector } from "engine";
 import { Side } from "engine/consts";
-import { randomInt } from "engine/helpers/math";
+import { randomInt, rgbToHex } from "engine/helpers/math";
 import { MapCell, MapGrid } from "engine/map";
 
 import TileObject from "entities/TileObject";
@@ -19,7 +19,7 @@ export default class World {
     public wallGrid: WallGrid;
     private tileObjects: Map<string, TileObject>;
     private areas: Map<string, Area>;
-    private tileAreaMap: Map<{x: number; y: number}, Area>;
+    private tileAreaMap: Map<string, Area>;
 
     public constructor(game: Game) {
         this.game = game;
@@ -44,8 +44,9 @@ export default class World {
         this.biomeGrid.setup();
         this.wallGrid.setup();
 
-        zooArea.setCells(this.floodFill(this.map.getCell(new Vector(1))));
-        console.log(zooArea);
+        const zooCells = this.floodFill(this.map.getCell(new Vector(1)));
+        zooArea.setCells(zooCells);
+        zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
     }
 
     public postUpdate(delta: number): void {
@@ -97,7 +98,7 @@ export default class World {
         // Current solution is to ensure that the map is already surrounded by walls
         if (tiles.length < 2) return;
 
-        const oldArea = this.tileAreaMap.get(tiles[0]);
+        const oldArea = this.tileAreaMap.get(tiles[0].toString());
         const newArea = new Area(uuid());
         // TODO: Autogenerate a good name
         this.areas.set(newArea.name, newArea);
@@ -106,13 +107,13 @@ export default class World {
             areasCells.push(this.floodFill(this.map.getCell(tilePos)));
         });
 
-        const larger = areasCells[0].length > areasCells[1].length ? areasCells[0] : areasCells[1];
+        const larger = areasCells[0].length >= areasCells[1].length ? areasCells[0] : areasCells[1];
         const smaller = areasCells[0].length < areasCells[1].length ? areasCells[0] : areasCells[1];
 
         oldArea.setCells(larger);
-        larger.forEach(cell => this.tileAreaMap.set(cell.position, oldArea));
+        larger.forEach(cell => this.tileAreaMap.set(cell.position.toString(), oldArea));
         newArea.setCells(smaller);
-        smaller.forEach(cell => this.tileAreaMap.set(cell.position, newArea));
+        smaller.forEach(cell => this.tileAreaMap.set(cell.position.toString(), newArea));
 
         return [oldArea, newArea];
     }
@@ -125,7 +126,7 @@ export default class World {
 
     private deleteArea(area: Area): void {
         this.areas.delete(area.name);
-        area.getCells().forEach(cell => this.tileAreaMap.set(cell.position, this.areas.get("zoo")));
+        area.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), this.areas.get("zoo")));
     }
 
     /**
@@ -163,5 +164,19 @@ export default class World {
             .filter(side => !this.wallGrid.getWallAtTile(cell.position, side).exists)
             .filter(side => this.map.isPositionInMap(this.map.getCellInDirection(cell.position, side)?.position))
             .map(side => this.map.getCellInDirection(cell.position, side));
+    }
+
+    public drawDebugAreas(): void {
+        this.areas.forEach(area => {
+            area.getCells().forEach(cell => {
+                const vertices = [
+                    cell.position.multiply(Config.WORLD_SCALE),
+                    cell.position.add(new Vector(0, 1)).multiply(Config.WORLD_SCALE),
+                    cell.position.add(new Vector(1, 1)).multiply(Config.WORLD_SCALE),
+                    cell.position.add(new Vector(1, 0)).multiply(Config.WORLD_SCALE),
+                ];
+                Debug.drawPolygon(vertices, area.colour, 0.5);
+            });
+        });
     }
 }

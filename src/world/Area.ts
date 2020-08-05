@@ -1,7 +1,12 @@
+import { rgbToHex } from "engine/helpers/math";
 import { MapCell } from "engine/map";
 
 export default class Area {
-    public constructor(public name: string, private cells?: MapCell[]) {}
+    public colour: number;
+
+    public constructor(public name: string, private cells?: MapCell[]) {
+        this.colour = rgbToHex(Math.random() * 255, Math.random() * 255, Math.random() * 255);
+    }
 
     public addCell(cell: MapCell): void {
         if (!this.cells) this.cells = [];

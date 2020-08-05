@@ -79,6 +79,11 @@ export default class DebugControls extends UIComponent<DebugProps, DebugState> {
                             image={Assets.UI.SAND}
                             onClick={(): void => { this.props.game.debugSettings.showWallGrid = !this.props.game.debugSettings.showWallGrid; }}
                         />
+                        <Button
+                            key="areaButton"
+                            image={Assets.UI.SNOW}
+                            onClick={(): void => { this.props.game.debugSettings.showAreas = !this.props.game.debugSettings.showAreas; }}
+                        />
                     </FloatingPanel>
                 </div>
             </React.Fragment>

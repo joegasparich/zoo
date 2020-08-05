@@ -63,7 +63,7 @@ export default class Vector {
         return `[${this.x}, ${this.y}]`;
     }
 
-    public toPoint(): IPoint {
+    public toPoint(): Point {
         return new Point(this.x, this.y);
     }
 
@@ -82,7 +82,7 @@ export default class Vector {
         );
     }
 
-    public static FromPoint(point: IPoint): Vector {
+    public static FromPoint(point: Point): Vector {
         return new Vector(point.x, point.y);
     }
 

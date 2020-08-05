@@ -75,6 +75,13 @@ class Debug {
         if (fill) this.graphics.endFill();
     }
 
+    public drawPolygon(vertices: Vector[], fill?: number, fillAlpha = 1): void {
+        if (!this.graphics) return;
+        if (fill) this.graphics.beginFill(fill, fillAlpha);
+        this.graphics.drawPolygon(vertices.map(vertex => vertex.toPoint()));
+        if (fill) this.graphics.endFill();
+    }
+
     public drawX(pos: Vector, size: number): void {
         if (!this.graphics) return;
         this.drawLine(pos.x - size, pos.y - size, pos.x + size, pos.y + size);
