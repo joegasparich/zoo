@@ -4,7 +4,7 @@ import { AssetManager } from "engine/managers";
 
 import { Assets, Inputs } from "consts";
 import { WallData } from "types/AssetTypes";
-import Wall from "world/Wall";
+import Wall, { WallSpriteIndex } from "world/Wall";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
 
@@ -22,11 +22,13 @@ export default class WallTool extends Tool {
 
         this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        ghost.setSprite(spriteSheet.getTextureById(0));
+        ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
-        ghost.canPlaceFunction = (pos: Vector): boolean =>
-            this.game.world.wallGrid.isWallPosInMap(pos, this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
+        ghost.canPlaceFunction = (pos: Vector): boolean => {
+            const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
+            return wall && !wall.exists;
+        };
     }
 
     public update(): void {
@@ -37,6 +39,13 @@ export default class WallTool extends Tool {
         const horizontal = this.startWallPos?.quadrant === Side.North ||
                            this.startWallPos?.quadrant === Side.South;
         const length = (horizontal ? Math.abs(xDif) : Math.abs(yDif)) + 1;
+
+        let dragQuadrant = Side.North;
+        if (horizontal) {
+            dragQuadrant = this.game.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
+        } else {
+            dragQuadrant = this.game.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
+        }
 
         if (this.game.input.isInputPressed(Inputs.LeftMouse)) {
             const tilePos = mouseWorldPos;
@@ -59,14 +68,14 @@ export default class WallTool extends Tool {
                 ghost.setPosition(new Vector(i, j));
 
                 if (horizontal) {
-                    ghost.setSprite(spriteSheet.getTextureById(0));
+                    ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
                     i += Math.sign(mouseWorldPos.floor().x - i);
-                    if (this.startWallPos?.quadrant === Side.North) ghost.setOffset(new Vector(0.5, -1));
+                    if (dragQuadrant === Side.North) ghost.setOffset(new Vector(0.5, -1));
                     else ghost.setOffset(new Vector(0.5, 0));
                 } else {
-                    ghost.setSprite(spriteSheet.getTextureById(1));
+                    ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Vertical));
                     j += Math.sign(mouseWorldPos.floor().y - j);
-                    if (this.startWallPos?.quadrant === Side.West) ghost.setOffset(new Vector(0, 0));
+                    if (dragQuadrant === Side.West) ghost.setOffset(new Vector(0, 0));
                     else ghost.setOffset(new Vector(1, 0));
                 }
             };
@@ -74,7 +83,10 @@ export default class WallTool extends Tool {
             // Generate the ghost entities after so that they have a chance to initialise
             while (this.wallGhosts.length < length) {
                 const ghost = new PlacementGhost(this.game, false);
-                ghost.canPlaceFunction = (pos: Vector): boolean => this.game.world.wallGrid.isWallPosInMap(pos, this.startWallPos?.quadrant);
+                ghost.canPlaceFunction = (pos: Vector): boolean =>  {
+                    const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
+                    return wall && !wall.exists;
+                };
                 this.wallGhosts.push(ghost);
             }
             while (this.wallGhosts.length > length) {
@@ -88,17 +100,8 @@ export default class WallTool extends Tool {
 
             this.wallGhosts.forEach(ghost => {
                 const tilePos = ghost.getPosition().floor();
-                let quadrant = Side.North;
 
-                if (horizontal) {
-                    if (Math.abs(this.startWallPos?.pos.y % 1) < 0.5) quadrant = Side.North;
-                    else quadrant = Side.South;
-                } else {
-                    if (Math.abs(this.startWallPos?.pos.x % 1) < 0.5) quadrant = Side.West;
-                    else quadrant = Side.East;
-                }
-
-                this.game.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, quadrant);
+                this.game.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant);
                 ghost.destroy();
             });
 
@@ -115,19 +118,19 @@ export default class WallTool extends Tool {
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
         switch (quadrant) {
             case Side.North:
-                this.ghost.setSprite(spriteSheet.getTextureById(0));
+                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
                 this.ghost.setOffset(new Vector(0, -0.5));
                 break;
             case Side.South:
-                this.ghost.setSprite(spriteSheet.getTextureById(0));
+                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
                 this.ghost.setOffset(new Vector(0, 0.5));
                 break;
             case Side.West:
-                this.ghost.setSprite(spriteSheet.getTextureById(1));
+                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Vertical));
                 this.ghost.setOffset(new Vector(-0.5, 0.5));
                 break;
             case Side.East:
-                this.ghost.setSprite(spriteSheet.getTextureById(1));
+                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Vertical));
                 this.ghost.setOffset(new Vector(0.5, 0.5));
                 break;
             default:

@@ -181,6 +181,8 @@ export default class PhysicsManager {
 
     public drawDebug(): void {
         for (let body = this.world.getBodyList(); body; body = body.getNext()) {
+            if (!body.isActive()) continue;
+
             for (let fixture = body.getFixtureList(); fixture; fixture = fixture.getNext()) {
                 Debug.setLineStyle(1, 0xFF0000);
                 if (fixture.isSensor()) Debug.setLineStyle(1, 0x0000FF);
