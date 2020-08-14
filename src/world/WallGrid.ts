@@ -4,7 +4,7 @@ import { MapGrid } from "engine/map";
 import { MapEvent, Side } from "engine/consts";
 
 import World from "./World";
-import Wall from "./Wall";
+import Wall, { WallSpriteIndex } from "./Wall";
 import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
 import Mediator from "engine/Mediator";
@@ -74,10 +74,10 @@ export default class WallGrid {
      */
     public isWallPosInMap(tilePos: Vector, side: Side): boolean {
         return this.map.isPositionInMap(tilePos.floor()) ||
-               tilePos.floor().y === -1 && side === Side.South ||
-               tilePos.floor().y === this.map.rows && side === Side.North ||
-               tilePos.floor().x === -1 && side === Side.East ||
-               tilePos.floor().x === this.map.cols && side === Side.West;
+               (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) ||
+               (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) ||
+               (this.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.East) ||
+               (this.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.West);
     }
 
     /**
@@ -108,11 +108,33 @@ export default class WallGrid {
      * @param side The side of the tile
      */
     public getWallAtTile(tilePos: Vector, side: Side): Wall {
+        if (!this.isWallPosInMap(tilePos, side)) {
+            // Invert position and side if tile pos is correct but on the outside of the map
+            if (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) {
+                tilePos = tilePos.floor().add(new Vector(0, 1));
+                side = Side.North;
+            }
+            else if (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) {
+                tilePos = tilePos.floor().add(new Vector(0, -1));
+                side = Side.South;
+            }
+            else if (this.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.East) {
+                tilePos = tilePos.floor().add(new Vector(-1, 0));
+                side = Side.West;
+            }
+            else if (this.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.West) {
+                tilePos = tilePos.floor().add(new Vector(1, 0));
+                side = Side.East;
+            } else {
+                return undefined;
+            }
+        }
+
         switch(side) {
             case Side.North: return this.wallGrid[(tilePos.x * 2) + 1][tilePos.y];
             case Side.East: return this.wallGrid[(tilePos.x * 2) + 2][tilePos.y];
             case Side.South: return this.wallGrid[(tilePos.x * 2) + 1][tilePos.y + 1];
-            case Side.West: return this.wallGrid[tilePos.x * 2][tilePos.y];
+            case Side.West: return this.wallGrid[(tilePos.x * 2)][tilePos.y];
         }
     }
 
@@ -204,7 +226,7 @@ export default class WallGrid {
      */
     public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
         if (!this.isWallPosInMap(tilePos, side)) return;
-        if (this.getWallAtTile(tilePos, side).data) return;
+        if (this.getWallAtTile(tilePos, side)?.exists) return;
 
         // Get wall data if not already available
         if (typeof wallData === "string") {
@@ -259,7 +281,7 @@ export default class WallGrid {
         }
 
         // Add new sprite
-        const texture = wall.spriteSheet.getTextureById(orientation ? 0 : 1);
+        const texture = wall.spriteSheet.getTextureById(orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
         wall.sprite = new PIXI.Sprite(texture);
         this.game.app.stage.addChild(wall.sprite);
         wall.sprite.parentGroup = Layers.ENTITIES;
@@ -311,7 +333,6 @@ export default class WallGrid {
         checkedWalls.push(currentWall);
 
         let found = false;
-        // this.getAdjacentWalls(currentWall).forEach(wall => {
         for(const wall of this.getAdjacentWalls(currentWall)) {
             // console.log("  ".repeat(depth) + "" + currentWall.position + " -> " + wall.position + " === " + startWall.position);
             if (wall === startWall && depth > 1) {
@@ -319,6 +340,7 @@ export default class WallGrid {
                 return true;
             }
             if (!checkedWalls.includes(wall)) {
+                // TODO: Remove recursion to avoid callstack issues
                 found = this.checkForLoop(startWall, wall, checkedWalls, depth + 1);
             }
             if (found) break;

@@ -1,11 +1,13 @@
-import { Config } from "consts";
+import { Assets, Config } from "consts";
 import { Debug, Game, Vector } from "engine";
 import { Side } from "engine/consts";
-import { randomInt, rgbToHex } from "engine/helpers/math";
+import { randomInt } from "engine/helpers/math";
+import { AssetManager } from "engine/managers";
 import { MapCell, MapGrid } from "engine/map";
 
 import TileObject from "entities/TileObject";
 import EmptyScene from "scenes/EmptyScene";
+import { WallData } from "types/AssetTypes";
 import uuid = require("uuid");
 import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
@@ -27,23 +29,35 @@ export default class World {
         this.tileObjects = new Map();
         this.areas = new Map();
         this.tileAreaMap = new Map();
-
-        this.wallGrid = new WallGrid(this);
-        // TODO: biomegrid size based on map size
-        this.biomeGrid = new BiomeGrid(this, 10, 10, Config.BIOME_SCALE);
     }
 
     public async setup(): Promise<void> {
         // TODO: Figure out how to load map info like biomes after biomeGrid.setup
         await this.loadMap();
 
-        // TODO: Generate outer wall and make zoo area in that wall
-        const zooArea = new Area("zoo");
-        this.areas.set(zooArea.name, zooArea);
+        this.wallGrid = new WallGrid(this);
+        this.biomeGrid = new BiomeGrid(this, this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
 
         this.biomeGrid.setup();
         this.wallGrid.setup();
 
+        // TODO: Store outer fence information in scene & then generate area based on that
+        // TODO: Add unremovable fences
+        this.generateFence();
+    }
+
+    private generateFence(): void {
+        const ironFence = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
+        for (let i = 0; i < this.map.cols; i++) {
+            this.wallGrid.placeWallAtTile(ironFence, new Vector(i, 0), Side.North);
+            this.wallGrid.placeWallAtTile(ironFence, new Vector(i, this.map.rows - 1), Side.South);
+        }
+        for (let i = 0; i < this.map.rows; i++) {
+            this.wallGrid.placeWallAtTile(ironFence, new Vector(0, i), Side.West);
+            this.wallGrid.placeWallAtTile(ironFence, new Vector(this.map.cols - 1, i), Side.East);
+        }
+        const zooArea = new Area("zoo");
+        this.areas.set(zooArea.name, zooArea);
         const zooCells = this.floodFill(this.map.getCell(new Vector(1)));
         zooArea.setCells(zooCells);
         zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
@@ -64,10 +78,6 @@ export default class World {
         );
     }
 
-    public getRandomCell(): Vector {
-        return new Vector(randomInt(0, this.map.cols), randomInt(0, this.map.rows));
-    }
-
     public registerTileObject(tileObject: TileObject): void {
         this.game.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
@@ -75,6 +85,10 @@ export default class World {
         if (tileObject.blocksPath) {
             this.map.setTileSolid(tileObject.position.floor(), true);
         }
+    }
+
+    public getRandomCell(): Vector {
+        return new Vector(randomInt(0, this.map.cols), randomInt(0, this.map.rows));
     }
 
     public isTileFree(position: Vector): boolean {
@@ -89,6 +103,8 @@ export default class World {
         if (wall.exists && wall.data.solid) return false;
         return true;
     }
+
+    //*-- Areas --*//
 
     public formAreas(wall: Wall): Area[] {
         const areasCells: MapCell[][] = [];
@@ -129,26 +145,41 @@ export default class World {
         area.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), this.areas.get("zoo")));
     }
 
+    public placeDoor(wall: Wall): void {
+        wall.setDoor(true);
+
+        const [areaA, areaB] = this.wallGrid.getAdjacentTiles(wall).map(tile => this.tileAreaMap.get(tile.toString()));
+        areaA.addAreaConnection(areaB, wall);
+        areaB.addAreaConnection(areaA, wall);
+    }
+
     /**
-     * Recursively finds all cells within an area
-     * @param currentCell The cell to expand
+     * Finds all cells within an area
+     * @param startCell The cell to expand
      * @param area The area to flood fill
      */
-    private floodFill(currentCell: MapCell, tiles?: MapCell[]): MapCell[] {
-        tiles = tiles ?? [];
+    private floodFill(startCell: MapCell, cells?: MapCell[]): MapCell[] {
+        cells = cells ?? [];
+
+        const openTiles = [];
 
         //Set area
-        tiles.push(currentCell);
-        //Find neighbours
-        const neighbours = this.getAccessibleAdjacentCells(currentCell);
-        // TODO: Improve performance here?
-        neighbours.forEach(neighbour => {
-            if (!tiles.includes(neighbour)) {
-                this.floodFill(neighbour, tiles);
-            }
-        });
+        openTiles.push(startCell);
+        cells.push(startCell);
 
-        return tiles;
+        while (openTiles.length) {
+            const currentCell = openTiles.pop();
+            const neighbours = this.getAccessibleAdjacentCells(currentCell);
+
+            neighbours.forEach(neighbour => {
+                if (!cells.includes(neighbour)) {
+                    cells.push(neighbour);
+                    openTiles.push(neighbour);
+                }
+            });
+        }
+
+        return cells;
     }
 
     /**
@@ -166,6 +197,14 @@ export default class World {
             .map(side => this.map.getCellInDirection(cell.position, side));
     }
 
+    public getAreaAtPosition(position: Vector): Area {
+        if (!this.map.isPositionInMap(position)) return undefined;
+
+        return this.tileAreaMap.get(position.floor().toString());
+    }
+
+    //*-- Debug --*//
+
     public drawDebugAreas(): void {
         this.areas.forEach(area => {
             area.getCells().forEach(cell => {
@@ -178,5 +217,9 @@ export default class World {
                 Debug.drawPolygon(vertices, area.colour, 0.5);
             });
         });
+    }
+
+    public drawDebugAreaGraph(): void {
+        // TODO: Implement
     }
 }

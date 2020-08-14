@@ -75,11 +75,7 @@ export default class ZooGame extends Game {
     protected postUpdate(delta: number): void {
         this.tools.postUpdate();
 
-        if (this.debugSettings.showMapGrid) this.map.drawDebug();
-        if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();
-        if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
-        if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
-        if (this.debugSettings.showAreas) this.world.drawDebugAreas();
+        this.drawDebug();
 
         super.postUpdate(delta);
     }
@@ -107,6 +103,14 @@ export default class ZooGame extends Game {
             object,
             true,
         ));
+    }
+
+    private drawDebug(): void {
+        if (this.debugSettings.showMapGrid) this.map.drawDebug();
+        if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();
+        if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
+        if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
+        if (this.debugSettings.showAreas) this.world.drawDebugAreas();
     }
 }
 

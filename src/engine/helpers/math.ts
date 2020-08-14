@@ -7,10 +7,38 @@ export type Rectangle = {
     height: number;
 };
 
-export function inCircle(circleCentre: Vector, radius: number, point: Vector): boolean {
-    const dx = circleCentre.x - point.x;
-    const dy = circleCentre.y - point.y;
+export function pointInCircle(circlePos: Vector, radius: number, point: Vector): boolean {
+    const dx = circlePos.x - point.x;
+    const dy = circlePos.y - point.y;
     return (dx*dx + dy*dy) < radius*radius;
+}
+
+export function lineIntesectsCircle(lineStart: Vector, lineEnd: Vector, circlePos: Vector, circleRad: number): boolean {
+    const ac = new Vector(circlePos.x - lineStart.x, circlePos.y - lineStart.y);
+    const ab = new Vector(lineEnd.x - lineStart.x, lineEnd.y - lineStart.y);
+    const ab2 = Vector.Dot(ab, ab);
+    const acab = Vector.Dot(ac, ab);
+    let t = acab / ab2;
+    t = (t < 0) ? 0 : t;
+    t = (t > 1) ? 1 : t;
+    const h = new Vector((ab.x * t + lineStart.x) - circlePos.x, (ab.y * t + lineStart.y) - circlePos.y);
+    const h2 = Vector.Dot(h, h);
+    return h2 <= circleRad * circleRad;
+}
+
+export function circleIntersectsRect(boxPos: Vector, boxDim: Vector, circlePos: Vector, circleRad: number): boolean {
+    const distX = Math.abs(circlePos.x - boxPos.x-boxDim.x/2);
+    const distY = Math.abs(circlePos.y - boxPos.y-boxDim.y/2);
+
+    if (distX > (boxDim.x/2 + circleRad)) { return false; }
+    if (distY > (boxDim.y/2 + circleRad)) { return false; }
+
+    if (distX <= (boxDim.x/2)) { return true; }
+    if (distY <= (boxDim.y/2)) { return true; }
+
+    const dx=distX-boxDim.x/2;
+    const dy=distY-boxDim.y/2;
+    return (dx*dx+dy*dy<=(circleRad*circleRad));
 }
 
 /**

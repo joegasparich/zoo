@@ -3,7 +3,7 @@ import { MapGrid, MapCell } from "engine/map";
 
 import World from "world/World";
 
-const MAP_SIZE = 5;
+const MAP_SIZE = 10;
 
 export default class EmptyScene extends Scene {
     private world: World;

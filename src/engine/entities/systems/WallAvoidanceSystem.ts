@@ -41,7 +41,7 @@ export default class WallAvoidanceSystem extends System {
             contact => {
                 const other = contact.getFixtureA() === fixture ? contact.getFixtureB() : contact.getFixtureA();
                 if (other.isSensor()) return;
-                this.walls = util.removeItem(this.walls, other);
+                util.removeItem(this.walls, other);
             },
         );
     }

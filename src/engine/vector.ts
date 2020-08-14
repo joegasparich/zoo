@@ -6,7 +6,7 @@ export default class Vector {
     public x: number;
     public y: number;
 
-    public constructor(x = 0, y = 0) {
+    public constructor(x = 0, y?: number) {
         this.x = x;
         this.y = y ?? x;
     }
@@ -73,6 +73,9 @@ export default class Vector {
 
     public static Distance(vectorA: Vector, vectorB: Vector): number {
         return vectorA.subtract(vectorB).magnitude();
+    }
+    public static Dot(vectorA: Vector, vectorB: Vector): number {
+        return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
     }
 
     public static Lerp(startPos: Vector, endPos: Vector, amount: number): Vector {

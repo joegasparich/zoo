@@ -85,11 +85,11 @@ export default class InputManager {
         });
 
         document.addEventListener("keyup", (event: KeyboardEvent) => {
-            this.keys = util.removeItem(this.keys, event.key);
+            util.removeItem(this.keys, event.key);
             this.keysUp.push(event.key);
 
             const input = this.registeredInputs.get(event.key as KEY);
-            this.inputsHeld = util.removeItem(this.inputsHeld, input);
+            util.removeItem(this.inputsHeld, input);
             this.inputsUp.push(input);
         });
 
@@ -128,7 +128,7 @@ export default class InputManager {
             this.mouseButtonsUp.push(event.button);
 
             const input = this.registeredInputs.get(event.button as MOUSE_BUTTON);
-            this.inputsHeld = util.removeItem(this.inputsHeld, input);
+            util.removeItem(this.inputsHeld, input);
             this.inputsUp.push(input);
         });
     }

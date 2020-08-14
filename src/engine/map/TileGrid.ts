@@ -46,7 +46,7 @@ export default class TileGrid {
     /**
      * Clears and recreates all tiles on the map,
      * this needs to be done because the tile grid is all one big texture
-     * TODO: Chunk the map to avoid big updates
+     * TODO: Chunk the map to avoid big updates similar to biome grid
      */
     private updateTiles(): void {
         const scale = (this.game.opts.worldScale/this.map.cellSize); // Ideally this is 1 (16/16)

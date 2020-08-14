@@ -21,7 +21,7 @@ interface ToolbarState {
 }
 const defaultState: ToolbarState = {
     activeTool: 0,
-    radius: 1,
+    radius: 2.5,
 };
 
 export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
