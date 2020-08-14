@@ -149,8 +149,10 @@ export default class World {
         wall.setDoor(true);
 
         const [areaA, areaB] = this.wallGrid.getAdjacentTiles(wall).map(tile => this.tileAreaMap.get(tile.toString()));
-        areaA.addAreaConnection(areaB, wall);
-        areaB.addAreaConnection(areaA, wall);
+        if (areaA && areaB) {
+            areaA.addAreaConnection(areaB, wall);
+            areaB.addAreaConnection(areaA, wall);
+        }
     }
 
     /**

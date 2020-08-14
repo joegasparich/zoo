@@ -86,10 +86,10 @@ export default class Wall {
         this.isDoor = isDoor;
 
         if (isDoor) {
-            // TODO: Set sprite to door
+            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.DoorVertical);
             this.body.setActive(false);
         } else {
-            // TODO: Set sprite to wall
+            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
             this.body.setActive(true);
         }
     }

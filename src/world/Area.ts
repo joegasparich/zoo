@@ -1,4 +1,3 @@
-import { Vector } from "engine";
 import { rgbToHex } from "engine/helpers/math";
 import { removeItem } from "engine/helpers/util";
 import { MapCell } from "engine/map";
@@ -11,6 +10,8 @@ export default class Area {
 
     public constructor(public name: string, private cells?: MapCell[]) {
         this.colour = rgbToHex(Math.random() * 255, Math.random() * 255, Math.random() * 255);
+
+        this.connectedAreas = new Map();
     }
 
     public addCell(cell: MapCell): void {
@@ -28,7 +29,7 @@ export default class Area {
 
     public addAreaConnection(area: Area, door: Wall): void {
         if (!door.isDoor) return; // Wall isn't a door
-        if (this.connectedAreas.get(area).includes(door)) return; // Duplicate door
+        if (this.connectedAreas.get(area)?.includes(door)) return; // Duplicate door
 
         if (this.connectedAreas.has(area)) {
             this.connectedAreas.get(area).push(door);

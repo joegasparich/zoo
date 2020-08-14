@@ -92,6 +92,13 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                             this.setTool(ToolType.Wall);
                         }}
                     />
+                    <Button
+                        key="gateButton"
+                        image={Assets.UI.IRON_BAR_GATE}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Door);
+                        }}
+                    />
                     <BiomeControls
                         setTool={this.setTool.bind(this)}
                     />

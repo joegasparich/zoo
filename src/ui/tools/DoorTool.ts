@@ -24,14 +24,14 @@ export default class DoorTool extends Tool {
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
-            const wall = this.game.world.wallGrid.getWallAtTile(pos, this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
+            const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
             return wall?.exists && !wall.isDoor;
         };
     }
 
     public update(): void {
         const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
-        const wallatMousePos = this.game.world.wallGrid.getWallAtTile(mouseWorldPos, this.game.map.getTileQuadrantAtPos(mouseWorldPos));
+        const wallatMousePos = this.game.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), this.game.map.getTileQuadrantAtPos(mouseWorldPos));
 
         if (this.game.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos) {

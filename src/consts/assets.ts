@@ -9,6 +9,7 @@ export const UI = {
     SNOW: "/assets/img/snow.png",
     SAND: "/assets/img/sand.png",
     IRON_BAR_FENCE: "/assets/img/iron_bar_fence_icon.png",
+    IRON_BAR_GATE: "/assets/img/iron_bar_gate_icon.png",
 };
 
 export const SPRITESHEETS = {

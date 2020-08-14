@@ -7,7 +7,7 @@ import { UIEvent } from "engine/consts/events";
 import ZooGame from "ZooGame";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { BiomeTool, NoTool, Tool, ToolType, TreeTool, WallTool } from "./tools";
+import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TreeTool, WallTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
 
 export default class ToolManager {
@@ -59,6 +59,7 @@ export default class ToolManager {
         switch(tool) {
             case ToolType.Tree: this.activeTool = new TreeTool(this); break;
             case ToolType.Wall: this.activeTool = new WallTool(this); break;
+            case ToolType.Door: this.activeTool = new DoorTool(this); break;
             case ToolType.Biome: this.activeTool = new BiomeTool(this); break;
 
             case ToolType.None:
