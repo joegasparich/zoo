@@ -129,7 +129,7 @@ class BiomeChunk {
         for (let i = 0; i < this.width; i++) {
             this.grid[i] = [];
             for (let j = 0; j < this.height; j++) {
-                this.grid[i][j] = new Square(randomInt(0, 2) === 0 ? Biome.Grass : Biome.Snow);
+                this.grid[i][j] = new Square(Biome.Grass);
             }
         }
 
