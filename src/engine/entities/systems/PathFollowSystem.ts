@@ -50,20 +50,20 @@ export default class PathFollowSystem extends System {
         return !!this.path;
     }
 
-    private moveTowardTarget(target: Vector, speed: number): void {
+    protected moveTowardTarget(target: Vector, speed: number): void {
         this.physics.addForce(target.subtract(this.entity.position).normalize().multiply(speed));
     }
 
-    public followPath(speed: number): void {
+    public followPath(speed: number): boolean {
         if (!this.path) {
-            return;
+            return false;
         }
 
         if (Vector.Distance(this.entity.position, this.currentNode) < DISTANCE_TO_NODE) {
             if (this.path.length < 1) {
                 // Path complete
                 this.path = undefined;
-                return;
+                return true;
             }
             this.currentNode = this.path.shift();
         }
@@ -71,6 +71,8 @@ export default class PathFollowSystem extends System {
         this.moveTowardTarget(this.currentNode, speed);
 
         this.drawDebugPath();
+
+        return false;
     }
 
     private drawDebugPath(): void {

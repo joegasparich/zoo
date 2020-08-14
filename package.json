@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@emotion/core": "^10.0.28",
 		"easystarjs": "^0.4.3",
+		"node-dijkstra": "^2.5.0",
 		"pixi-inspector": "^1.0.7",
 		"pixi-layers": "^0.2.3",
 		"pixi-tilemap": "^2.0.3",
@@ -27,6 +28,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^12.12.29",
+		"@types/node-dijkstra": "^2.5.0",
 		"@types/pixi.js": "^5.0.0",
 		"@types/react": "^16.9.43",
 		"@types/react-dom": "^16.9.8",

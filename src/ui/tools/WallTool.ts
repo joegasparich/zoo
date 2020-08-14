@@ -26,6 +26,7 @@ export default class WallTool extends Tool {
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
+            // TODO: placement is incorrect on vertical walls just outside map
             const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
             return wall && !wall.exists;
         };

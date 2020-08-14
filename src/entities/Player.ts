@@ -4,7 +4,7 @@ import { Animation } from "engine/entities/systems/AnimatedRenderSystem";
 import { AssetManager, PhysicsManager } from "engine/managers";
 
 import Actor from "./Actor";
-import { PlayerInputSystem } from "./systems";
+import { AreaPathFollowSystem, PlayerInputSystem } from "./systems";
 import { Assets } from "consts";
 
 export default class Player extends Actor {
@@ -33,7 +33,7 @@ export default class Player extends Actor {
             ], undefined, new Vector(0.5, 1)),
         );
         this.addSystem(new CameraFollowSystem());
-        this.pather = this.addSystem(new PathFollowSystem());
+        this.pather = this.addSystem(new AreaPathFollowSystem());
         this.wallAvoid = this.addSystem(new WallAvoidanceSystem());
         this.animator = this.getSystem(SYSTEM.ANIMATED_RENDER_SYSTEM) as AnimatedRenderSystem;
     }

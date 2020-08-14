@@ -6,6 +6,7 @@ import { AssetManager } from "engine/managers";
 import { MapCell, MapGrid } from "engine/map";
 
 import TileObject from "entities/TileObject";
+import Graph = require("node-dijkstra");
 import EmptyScene from "scenes/EmptyScene";
 import { WallData } from "types/AssetTypes";
 import uuid = require("uuid");
@@ -153,6 +154,22 @@ export default class World {
             areaA.addAreaConnection(areaB, wall);
             areaB.addAreaConnection(areaA, wall);
         }
+    }
+
+    public findAreaPath(startArea: Area, endArea: Area): Area[] {
+        const areaGraph: any = {};
+        this.areas.forEach(area => {
+            const connections: any = {};
+            area.connectedAreas.forEach((walls, area) => {
+                connections[area.name] = 1;
+            });
+            areaGraph[area.name] = connections;
+        });
+
+        const graph = new Graph(areaGraph);
+        const route = graph.path(startArea.name, endArea.name) as string[];
+
+        return route.map(areaName => this.areas.get(areaName));
     }
 
     /**
