@@ -36,7 +36,8 @@ export default class DoorTool extends Tool {
 
         if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos) {
-                ZooGame.world.placeDoor(wallatMousePos);
+                // ZooGame.world.placeDoor(wallatMousePos);
+                ZooGame.world.wallGrid.deleteWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
             }
         }
     }

@@ -33,6 +33,7 @@ export default class Area {
     public addAreaConnection(area: Area, door: Wall): void {
         if (!door.isDoor) return; // Wall isn't a door
         if (this.connectedAreas.get(area)?.includes(door)) return; // Duplicate door
+        if (area === this) return; // Don't add connection to itself
 
         if (this.connectedAreas.has(area)) {
             this.connectedAreas.get(area).push(door);

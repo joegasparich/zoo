@@ -79,6 +79,8 @@ export default class PhysicsManager {
     private entityBody: Map<Entity, Planck.Body>;
     private bodyEntity: Map<Planck.Body, Entity>;
 
+    private bodiesToRemove: Planck.Body[];
+
     private listeners: Map<Planck.Fixture, {
         enter: ((contact: Planck.Contact) => void);
         exit: ((contact: Planck.Contact) => void);
@@ -90,6 +92,7 @@ export default class PhysicsManager {
         this.listeners = new Map();
         this.entityBody = new Map();
         this.bodyEntity = new Map();
+        this.bodiesToRemove = [];
     }
 
     public setup(): void {
@@ -110,6 +113,11 @@ export default class PhysicsManager {
 
     public update(delta: number): void {
         this.world.step(delta / FRAME_RATE);
+
+        while (this.bodiesToRemove.length) {
+            const body = this.bodiesToRemove.pop();
+            this.world.destroyBody(body);
+        }
     }
 
     public setGravity(direction: Vector): void {
@@ -119,6 +127,14 @@ export default class PhysicsManager {
     public registerBody(entity: Entity, body: Planck.Body): void {
         this.entityBody.set(entity, body);
         this.bodyEntity.set(body, entity);
+    }
+
+    public removeBody(body: Planck.Body): void {
+        const entity = this.bodyEntity.get(body);
+        this.entityBody.delete(entity);
+        this.bodyEntity.delete(body);
+
+        this.bodiesToRemove.push(body);
     }
 
     public getBody(entity: Entity): Planck.Body {

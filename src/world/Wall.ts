@@ -1,10 +1,11 @@
 import * as Planck from "planck-js";
 
-import { Game, SpriteSheet, Vector } from "engine";
-import { TAG } from "engine/consts";
+import { SpriteSheet, Vector } from "engine";
+import { Layers, TAG } from "engine/consts";
 import { AssetManager, ColliderType } from "engine/managers";
 
 import { WallData } from "types/AssetTypes";
+import ZooGame from "ZooGame";
 
 export enum WallSpriteIndex {
     Horizontal = 0,
@@ -52,7 +53,7 @@ export default class Wall {
     public exists: boolean;
     public isDoor: boolean;
 
-    public constructor(public game: Game, public orientation: number, public position: Vector, public gridPos: Vector, data?: WallData) {
+    public constructor(public orientation: number, public position: Vector, public gridPos: Vector, data?: WallData) {
         this.exists = false;
         if (data) {
             this.data = data;
@@ -60,7 +61,7 @@ export default class Wall {
             this.exists = true;
 
             if (data.solid) {
-                this.body = game.physicsManager.createPhysicsObject({
+                this.body = ZooGame.physicsManager.createPhysicsObject({
                     collider: {
                         type: ColliderType.Rect,
                         height: orientation ? 0.2 : 1,
@@ -73,7 +74,22 @@ export default class Wall {
                     isDynamic: false,
                 });
             }
+
+            // Add new sprite
+            const texture = this.spriteSheet.getTextureById(orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
+            this.sprite = new PIXI.Sprite(texture);
+            ZooGame.app.stage.addChild(this.sprite);
+            this.sprite.parentGroup = Layers.ENTITIES;
+            this.sprite.anchor.set(0.5, 1);
         }
+    }
+
+    public remove(): void {
+        this.data = undefined;
+        this.spriteSheet = undefined;
+        this.exists = false;
+        ZooGame.app.stage.removeChild(this.sprite);
+        ZooGame.physicsManager.removeBody(this.body);
     }
 
     /**

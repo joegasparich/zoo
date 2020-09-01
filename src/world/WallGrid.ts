@@ -30,7 +30,7 @@ export default class WallGrid {
             const orientation = col % 2;
             this.wallGrid[col] = [];
             for (let row = 0; row < this.map.rows + orientation; row++) {
-                this.wallGrid[col][row] = new Wall(ZooGame, orientation, Wall.wallToWorldPos(new Vector(col, row), orientation), new Vector(col, row));
+                this.wallGrid[col][row] = new Wall(orientation, Wall.wallToWorldPos(new Vector(col, row), orientation), new Vector(col, row));
             }
         }
     }
@@ -61,6 +61,167 @@ export default class WallGrid {
                 wall.sprite.scale.set(this.camera.scale);
             }
         }
+    }
+
+    /**
+     * Places a wall on the side of a tile
+     * @param wallData The data for the wall to be placed
+     * @param tilePos The tile to place the wall in
+     * @param side The side of the tile to place the wall on
+     */
+    public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
+        if (!this.isWallPosInMap(tilePos, side)) return;
+        if (this.getWallAtTile(tilePos, side)?.exists) return;
+
+        // Get wall data if not already available
+        if (typeof wallData === "string") {
+            wallData = AssetManager.getJSON(wallData) as WallData;
+        }
+
+        // Get grid position
+        const { orientation, x, y } = this.getGridPosition(side, tilePos);
+
+        // Create wall and put in the grid
+        const wall = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), wallData);
+        this.wallGrid[x][y] = wall;
+
+        // Update pathfinding information
+        if (side === Side.North && tilePos.y > 0) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+        }
+        if (side === Side.South && tilePos.y < this.map.rows - 1) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+        }
+        if (side === Side.West && tilePos.x > 0) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+        }
+        if (side === Side.East && tilePos.x < this.map.cols - 1) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+        }
+
+        Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
+
+        if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
+            ZooGame.world.formAreas(wall);
+        }
+
+        return wall;
+    }
+
+    public deleteWallAtTile(tilePos: Vector, side: Side): void {
+        if (!this.isWallPosInMap(tilePos, side)) return; // Return if out of map
+        if (this.getWallAtTile(tilePos, side) && !this.getWallAtTile(tilePos, side).exists) return; // Return if wall doesn't exist here
+
+        // Get grid position
+        const { orientation, x, y } = this.getGridPosition(side, tilePos);
+
+        // Set to blank wall
+        this.wallGrid[x][y].remove();
+        this.wallGrid[x][y] = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y));
+
+        ZooGame.world.joinAreas(this.wallGrid[x][y]);
+
+        // Update pathfinding information
+        if (side === Side.North && tilePos.y > 0) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+        }
+        if (side === Side.South && tilePos.y < this.map.rows - 1) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+        }
+        if (side === Side.West && tilePos.x > 0) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+        }
+        if (side === Side.East && tilePos.x < this.map.cols - 1) {
+            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            this.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+        }
+    }
+
+    /**
+     * Returns whether or not the wall could potentially have completed a loop
+     * @param wall The wall being checked
+     */
+    private shouldCheckForLoop(wall: Wall): boolean {
+        const adjacent = this.getAdjacentWalls(wall);
+        if (adjacent.length < 2) return false;
+
+        if (wall.orientation) {
+            // Horizontal
+            if (adjacent.find(adj => adj.position.x > wall.position.x) &&
+                adjacent.find(adj => adj.position.x < wall.position.x) )
+                return true;
+        } else {
+            // Vertical
+            if (adjacent.find(adj => adj.position.y > wall.position.y) &&
+                adjacent.find(adj => adj.position.y < wall.position.y) )
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Recursively loops through walls until it can't find anymore in the chain or it finds a possible loop
+     * Note that this can potentially return a false positive in a certain situation (e.g. A horizontal wall next to two walls stacked vertically)
+     * @param startWall The wall to start from
+     * @param currentWall The current wall to expand
+     * @param checkedWalls Walls that have already been expanded
+     * @param depth How deep in the recursion we are
+     */
+    private checkForLoop(startWall: Wall, currentWall?: Wall, checkedWalls: Wall[] = [], depth = 0): boolean {
+        currentWall = currentWall ?? startWall;
+
+        // Expand current Node
+        checkedWalls.push(currentWall);
+
+        let found = false;
+        for(const wall of this.getAdjacentWalls(currentWall)) {
+            // console.log("  ".repeat(depth) + "" + currentWall.position + " -> " + wall.position + " === " + startWall.position);
+            if (wall === startWall && depth > 1) {
+                // console.log("  ".repeat(depth) + "found");
+                return true;
+            }
+            if (!checkedWalls.includes(wall)) {
+                // TODO: Remove recursion to avoid callstack issues
+                found = this.checkForLoop(startWall, wall, checkedWalls, depth + 1);
+            }
+            if (found) break;
+        };
+
+        return found;
+    }
+
+    private getGridPosition(side: Side, tilePos: Vector): { orientation: number; x: number; y: number } {
+        let x: number, y: number, orientation: number;
+        switch (side) {
+            case Side.North:
+                x = (tilePos.x * 2) + 1;
+                y = tilePos.y;
+                orientation = 1;
+                break;
+            case Side.East:
+                x = (tilePos.x * 2) + 2;
+                y = tilePos.y;
+                orientation = 0;
+                break;
+            case Side.South:
+                x = (tilePos.x * 2) + 1;
+                y = tilePos.y + 1;
+                orientation = 1;
+                break;
+            case Side.West:
+                x = tilePos.x * 2;
+                y = tilePos.y;
+                orientation = 0;
+                break;
+        }
+        return { orientation, x, y };
     }
 
     /**
@@ -212,137 +373,6 @@ export default class WallGrid {
         }
 
         return adjacentTiles;
-    }
-
-    /**
-     * Places a wall on the side of a tile
-     * @param wallData The data for the wall to be placed
-     * @param tilePos The tile to place the wall in
-     * @param side The side of the tile to place the wall on
-     */
-    public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
-        if (!this.isWallPosInMap(tilePos, side)) return;
-        if (this.getWallAtTile(tilePos, side)?.exists) return;
-
-        // Get wall data if not already available
-        if (typeof wallData === "string") {
-            wallData = AssetManager.getJSON(wallData) as WallData;
-        }
-
-        // Get grid position
-        let x: number, y: number, orientation: number;
-        switch(side) {
-            case Side.North:
-                x = (tilePos.x * 2) + 1;
-                y = tilePos.y;
-                orientation = 1;
-                break;
-            case Side.East:
-                x = (tilePos.x * 2) + 2;
-                y = tilePos.y;
-                orientation = 0;
-                break;
-            case Side.South:
-                x = (tilePos.x * 2) + 1;
-                y = tilePos.y + 1;
-                orientation = 1;
-                break;
-            case Side.West:
-                x = tilePos.x * 2;
-                y = tilePos.y;
-                orientation = 0;
-                break;
-        }
-
-        // Create wall and put in the grid
-        const wall = new Wall(ZooGame, orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), wallData);
-        this.wallGrid[x][y] = wall;
-
-        // Update pathfinding information
-        if (side === Side.North && tilePos.y > 0) {
-            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
-        }
-        if (side === Side.South && tilePos.y < this.map.rows - 1) {
-            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
-        }
-        if (side === Side.West && tilePos.x > 0) {
-            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            this.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
-        }
-        if (side === Side.East && tilePos.x < this.map.cols - 1) {
-            this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            this.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
-        }
-
-        // Add new sprite
-        const texture = wall.spriteSheet.getTextureById(orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
-        wall.sprite = new PIXI.Sprite(texture);
-        ZooGame.app.stage.addChild(wall.sprite);
-        wall.sprite.parentGroup = Layers.ENTITIES;
-        wall.sprite.anchor.set(0.5, 1);
-
-        Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
-
-        if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
-            ZooGame.world.formAreas(wall);
-        }
-
-        return wall;
-    }
-
-    /**
-     * Returns whether or not the wall could potentially have completed a loop
-     * @param wall The wall being checked
-     */
-    private shouldCheckForLoop(wall: Wall): boolean {
-        const adjacent = this.getAdjacentWalls(wall);
-        if (adjacent.length < 2) return false;
-
-        if (wall.orientation) {
-            // Horizontal
-            if (adjacent.find(adj => adj.position.x > wall.position.x) &&
-                adjacent.find(adj => adj.position.x < wall.position.x) )
-                return true;
-        } else {
-            // Vertical
-            if (adjacent.find(adj => adj.position.y > wall.position.y) &&
-                adjacent.find(adj => adj.position.y < wall.position.y) )
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Recursively loops through walls until it can't find anymore in the chain or it finds a possible loop
-     * Note that this can potentially return a false positive in a certain situation (e.g. A horizontal wall next to two walls stacked vertically)
-     * @param startWall The wall to start from
-     * @param currentWall The current wall to expand
-     * @param checkedWalls Walls that have already been expanded
-     * @param depth How deep in the recursion we are
-     */
-    private checkForLoop(startWall: Wall, currentWall?: Wall, checkedWalls: Wall[] = [], depth = 0): boolean {
-        currentWall = currentWall ?? startWall;
-
-        // Expand current Node
-        checkedWalls.push(currentWall);
-
-        let found = false;
-        for(const wall of this.getAdjacentWalls(currentWall)) {
-            // console.log("  ".repeat(depth) + "" + currentWall.position + " -> " + wall.position + " === " + startWall.position);
-            if (wall === startWall && depth > 1) {
-                // console.log("  ".repeat(depth) + "found");
-                return true;
-            }
-            if (!checkedWalls.includes(wall)) {
-                // TODO: Remove recursion to avoid callstack issues
-                found = this.checkForLoop(startWall, wall, checkedWalls, depth + 1);
-            }
-            if (found) break;
-        };
-
-        return found;
     }
 
     /**

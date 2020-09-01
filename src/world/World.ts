@@ -1,6 +1,6 @@
 import { Assets, Config } from "consts";
 import { WorldEvents } from "consts/events";
-import { Game, Vector } from "engine";
+import { Vector } from "engine";
 import { Side } from "engine/consts";
 import { randomInt } from "engine/helpers/math";
 import { AssetManager } from "engine/managers";
@@ -144,16 +144,28 @@ export default class World {
     }
 
     public joinAreas(wall: Wall): Area {
-        // TODO: Implement;
+        const [tile1, tile2] = this.wallGrid.getAdjacentTiles(wall);
+        let area1 = this.getAreaAtPosition(tile1);
+        let area2 = this.getAreaAtPosition(tile2);
+
+        // If one of the areas is the main zoo area then ensure we keep it
+        if (area2.id === "0") {
+            const swap = area1;
+            area1 = area2;
+            area2 = swap;
+        }
+
+        // Delete area 2 and expand area 1
+        area1.setCells([...area1.getCells(), ...area2.getCells()]);
+        area2.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), area1));
+        area2.connectedAreas.forEach((doors, area) => {
+            doors.forEach(door => area1.addAreaConnection(area, door));
+        });
+
+        this.areas.delete(area2.id);
 
         Mediator.fire(WorldEvents.AREAS_UPDATED);
-        return undefined;
-    }
-
-    private deleteArea(area: Area): void {
-        this.areas.delete(area.id);
-        area.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), this.areas.get("zoo")));
-        Mediator.fire(WorldEvents.AREAS_UPDATED);
+        return area1;
     }
 
     public getAreas(): Area[] {
