@@ -1,4 +1,5 @@
 import { System } from "engine/entities/systems";
+import ZooGame from "ZooGame";
 
 export default class FollowMouseSystem extends System {
     public id = "FOLLOW_MOUSE_SYSTEM";
@@ -6,6 +7,6 @@ export default class FollowMouseSystem extends System {
     public update(delta: number): void {
         super.update(delta);
 
-        this.entity.position = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+        this.entity.position = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
     }
 }

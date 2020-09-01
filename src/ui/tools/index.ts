@@ -1,6 +1,5 @@
 import PlacementGhost from "ui/PlacementGhost";
 import ToolManager from "ui/ToolManager";
-import ZooGame from "ZooGame";
 
 export enum ToolType {
     None,
@@ -11,12 +10,9 @@ export enum ToolType {
 }
 
 export abstract class Tool {
-    protected game: ZooGame;
     public abstract type: ToolType;
 
-    public constructor(public toolManager: ToolManager) {
-        this.game = toolManager.game;
-    };
+    public constructor(public toolManager: ToolManager) {};
     public abstract set(ghost: PlacementGhost, data?: Record<string, any>): void;
     public abstract update(): void;
     public abstract postUpdate(): void;

@@ -3,7 +3,7 @@ import { js as Pathfinder, Direction } from "easystarjs";
 
 import { Game, Vector } from "engine";
 import { Side } from "engine/consts";
-import Debug from "engine/Debug";
+import Graphics from "engine/Graphics";
 
 const allDirections: Direction[] = ["BOTTOM", "BOTTOM_LEFT", "BOTTOM_RIGHT", "LEFT", "RIGHT", "TOP", "TOP_LEFT", "TOP_RIGHT"];
 
@@ -178,11 +178,11 @@ export default class PathfindingGrid {
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[i].length; j++) {
                 if (this.grid[i][j] == 0) {
-                    Debug.setLineStyle(0.5, 0x00FF00);
-                    Debug.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
+                    Graphics.setLineStyle(0.5, 0x00FF00);
+                    Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
                 } else {
-                    Debug.setLineStyle(0.5, 0x000000);
-                    Debug.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
+                    Graphics.setLineStyle(0.5, 0x000000);
+                    Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
                 }
             }
         }

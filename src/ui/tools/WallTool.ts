@@ -7,6 +7,7 @@ import { WallData } from "types/AssetTypes";
 import Wall, { WallSpriteIndex } from "world/Wall";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
+import ZooGame from "ZooGame";
 
 export default class WallTool extends Tool {
     public type = ToolType.Wall;
@@ -27,13 +28,13 @@ export default class WallTool extends Tool {
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
             // TODO: placement is incorrect on vertical walls just outside map
-            const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
+            const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
             return wall && !wall.exists;
         };
     }
 
     public update(): void {
-        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
         const xDif = mouseWorldPos.floor().x - this.startWallPos?.pos.floor().x;
         const yDif = mouseWorldPos.floor().y - this.startWallPos?.pos.floor().y;
@@ -43,20 +44,20 @@ export default class WallTool extends Tool {
 
         let dragQuadrant = Side.North;
         if (horizontal) {
-            dragQuadrant = this.game.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
+            dragQuadrant = ZooGame.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
         } else {
-            dragQuadrant = this.game.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
+            dragQuadrant = ZooGame.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
         }
 
-        if (this.game.input.isInputPressed(Inputs.LeftMouse)) {
+        if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
             const tilePos = mouseWorldPos;
-            const quadrant = this.game.map.getTileQuadrantAtPos(mouseWorldPos);
+            const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
 
             this.wallGhosts = [];
 
             this.startWallPos = { pos: tilePos, quadrant };
         }
-        if (this.game.input.isInputHeld(Inputs.LeftMouse)) {
+        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
 
             this.ghost.setVisible(false);
 
@@ -83,9 +84,9 @@ export default class WallTool extends Tool {
 
             // Generate the ghost entities after so that they have a chance to initialise
             while (this.wallGhosts.length < length) {
-                const ghost = new PlacementGhost(this.game, false);
+                const ghost = new PlacementGhost(false);
                 ghost.canPlaceFunction = (pos: Vector): boolean =>  {
-                    const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
+                    const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
                     return wall && !wall.exists;
                 };
                 this.wallGhosts.push(ghost);
@@ -94,7 +95,7 @@ export default class WallTool extends Tool {
                 this.wallGhosts.pop().destroy();
             }
         }
-        if (this.game.input.isInputReleased(Inputs.LeftMouse)) {
+        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
             this.ghost.setVisible(true);
 
             if (!this.wallGhosts) return;
@@ -102,7 +103,7 @@ export default class WallTool extends Tool {
             this.wallGhosts.forEach(ghost => {
                 const tilePos = ghost.getPosition().floor();
 
-                this.game.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant);
+                ZooGame.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant);
                 ghost.destroy();
             });
 
@@ -111,11 +112,11 @@ export default class WallTool extends Tool {
     }
 
     public postUpdate(): void {
-        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
         this.wallGhosts?.forEach(ghost => ghost.postUpdate());
 
-        const quadrant = this.game.map.getTileQuadrantAtPos(mouseWorldPos);
+        const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
         switch (quadrant) {
             case Side.North:

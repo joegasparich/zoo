@@ -1,10 +1,16 @@
 import { Game, Camera, Vector, Layers } from ".";
 
-// TODO: Refactor into Draw class and then inherit from it and include logging features
-class Debug {
+enum Colour {
+    White = 0xFFFFFF,
+    Black = 0x000000,
+}
+
+class Graphics {
     private graphics: PIXI.Graphics;
     private game: Game;
     private camera: Camera;
+
+    public Colour = Colour;
 
     public init(game: Game): void {
         this.game = game;
@@ -33,7 +39,7 @@ class Debug {
         this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
     }
 
-    public setLineStyle(thickness: number, colour: number): void {
+    public setLineStyle(thickness: number, colour = Colour.Black): void {
         if (!this.graphics) return;
         this.graphics.lineStyle(thickness, colour);
     }
@@ -89,4 +95,4 @@ class Debug {
     }
 }
 
-export default new Debug();
+export default new Graphics();

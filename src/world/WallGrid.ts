@@ -1,17 +1,15 @@
-import { Camera, Debug, Game, Layers, Vector } from "engine";
+import { Camera, Graphics, Game, Layers, Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { MapGrid } from "engine/map";
 import { MapEvent, Side } from "engine/consts";
 
-import World from "./World";
 import Wall, { WallSpriteIndex } from "./Wall";
 import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
 import Mediator from "engine/Mediator";
+import ZooGame from "ZooGame";
 
 export default class WallGrid {
-    private game: Game;
-    private world: World;
     private map: MapGrid;
     private camera: Camera;
 
@@ -20,11 +18,9 @@ export default class WallGrid {
          H   H  */
     private wallGrid: (Wall | undefined)[][];
 
-    public constructor(world: World) {
-        this.game = world.game;
-        this.world = world;
-        this.map = world.map;
-        this.camera = this.game.camera;
+    public constructor() {
+        this.map = ZooGame.world.map;
+        this.camera = ZooGame.camera;
     }
 
     public setup(): void {
@@ -34,7 +30,7 @@ export default class WallGrid {
             const orientation = col % 2;
             this.wallGrid[col] = [];
             for (let row = 0; row < this.map.rows + orientation; row++) {
-                this.wallGrid[col][row] = new Wall(this.game, orientation, Wall.wallToWorldPos(new Vector(col, row), orientation), new Vector(col, row));
+                this.wallGrid[col][row] = new Wall(ZooGame, orientation, Wall.wallToWorldPos(new Vector(col, row), orientation), new Vector(col, row));
             }
         }
     }
@@ -259,7 +255,7 @@ export default class WallGrid {
         }
 
         // Create wall and put in the grid
-        const wall = new Wall(this.game, orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), wallData);
+        const wall = new Wall(ZooGame, orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), wallData);
         this.wallGrid[x][y] = wall;
 
         // Update pathfinding information
@@ -283,14 +279,14 @@ export default class WallGrid {
         // Add new sprite
         const texture = wall.spriteSheet.getTextureById(orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
         wall.sprite = new PIXI.Sprite(texture);
-        this.game.app.stage.addChild(wall.sprite);
+        ZooGame.app.stage.addChild(wall.sprite);
         wall.sprite.parentGroup = Layers.ENTITIES;
         wall.sprite.anchor.set(0.5, 1);
 
         Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
 
         if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
-            this.world.formAreas(wall);
+            ZooGame.world.formAreas(wall);
         }
 
         return wall;
@@ -359,13 +355,13 @@ export default class WallGrid {
         for (let col = 0; col < (this.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < this.map.rows + orientation; row++) {
-                Debug.setLineStyle(1, 0x00FF00);
+                Graphics.setLineStyle(1, 0x00FF00);
                 if (!this.wallGrid[col][row].data) {
-                    Debug.setLineStyle(1, 0xFF0000);
+                    Graphics.setLineStyle(1, 0xFF0000);
                 }
                 if (orientation === 0) {
                     // Vertical
-                    Debug.drawLine(
+                    Graphics.drawLine(
                         (col / 2) * Config.WORLD_SCALE + xOffset,
                         row * Config.WORLD_SCALE + yOffset,
                         (col / 2) * Config.WORLD_SCALE + xOffset,
@@ -373,7 +369,7 @@ export default class WallGrid {
                     );
                 } else {
                     // Horizontal
-                    Debug.drawLine(
+                    Graphics.drawLine(
                         ((col - 1) / 2) * Config.WORLD_SCALE + xOffset,
                         row  * Config.WORLD_SCALE + yOffset,
                         (((col - 1) / 2)  + 1) * Config.WORLD_SCALE + xOffset,

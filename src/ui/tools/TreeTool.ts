@@ -5,6 +5,7 @@ import { Assets, Inputs } from "consts";
 import { TileObjectData } from "types/AssetTypes";
 import PlacementGhost from "ui/PlacementGhost";
 import { Tool, ToolType } from ".";
+import ZooGame from "ZooGame";
 
 export default class TreeTool extends Tool {
     public type = ToolType.Tree;
@@ -17,12 +18,12 @@ export default class TreeTool extends Tool {
     }
 
     public update(): void {
-        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
-        if (this.game.input.isInputPressed(Inputs.LeftMouse)) {
+        if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
             const placePos: Vector = mouseWorldPos.floor();
 
-            this.game.placeTileObject(Assets.OBJECTS.TREE, placePos);
+            ZooGame.placeTileObject(Assets.OBJECTS.TREE, placePos);
         }
     }
 

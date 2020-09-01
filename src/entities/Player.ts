@@ -6,13 +6,14 @@ import { AssetManager, PhysicsManager } from "engine/managers";
 import Actor from "./Actor";
 import { AreaPathFollowSystem, PlayerInputSystem } from "./systems";
 import { Assets } from "consts";
+import ZooGame from "ZooGame";
 
 export default class Player extends Actor {
     private animator: AnimatedRenderSystem;
     public pather: PathFollowSystem;
     public wallAvoid: WallAvoidanceSystem;
 
-    public constructor(game: Game, position: Vector) {
+    public constructor(position: Vector) {
         const spritesheet = new SpriteSheet({
             image: AssetManager.getTexture(Assets.SPRITESHEETS.DUDE_RUN),
             cellHeight: 24,
@@ -20,7 +21,6 @@ export default class Player extends Actor {
         });
 
         super(
-            game,
             position,
             new PlayerInputSystem(),
             new PhysicsSystem({

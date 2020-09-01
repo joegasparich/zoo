@@ -1,14 +1,14 @@
 
 
 import { Game, Vector } from "engine";
+import { AssetManager } from "engine/managers";
+
 import Player from "entities/Player";
 import TileObject from "entities/TileObject";
-
 import { TileObjectData } from "types/AssetTypes";
 import World from "world/World";
 import { Config, Inputs } from "consts";
-import { AssetManager } from "engine/managers";
-import ToolManager from "ui/ToolManager";
+import UIManager from "ui/UIManager";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -26,11 +26,10 @@ const defaultSettings: DebugSettings = {
     showAreas: false,
 };
 
-export default class ZooGame extends Game {
+class ZooGame extends Game {
     public world: World;
     public player: Player;
 
-    private tools: ToolManager;
     public debugSettings: DebugSettings;
 
     protected async setup(): Promise<void> {
@@ -39,7 +38,7 @@ export default class ZooGame extends Game {
         this.debugSettings = defaultSettings;
 
         // Load Map
-        this.world = new World(this);
+        this.world = new World();
         await this.world.setup();
 
         // Register inputs
@@ -51,16 +50,11 @@ export default class ZooGame extends Game {
 
         // Create Player
         this.player = this.registerEntity(new Player(
-            this,
             new Vector(4, 4),
         )) as Player;
         this.player.render.scale = 0.5;
 
-        this.createUI();
-    }
-
-    private createUI(): void {
-        this.tools = new ToolManager(this);
+        UIManager.setup();
     }
 
     protected update(delta: number): void {
@@ -68,12 +62,12 @@ export default class ZooGame extends Game {
 
         this.pollInput();
 
-        this.tools.update();
+        UIManager.update(delta);
         this.world.postUpdate(delta);
     }
 
     protected postUpdate(delta: number): void {
-        this.tools.postUpdate();
+        UIManager.postUpdate(delta);
 
         this.drawDebug();
 
@@ -81,8 +75,9 @@ export default class ZooGame extends Game {
     }
 
     private pollInput(): void {
-        if (this.tools.hasFocus()) return;
+        if (UIManager.hasFocus()) return;
 
+        // Test code
         if (this.input.isInputPressed(Inputs.RightMouse)) {
             const mousePos: Vector = this.camera.screenToWorldPosition(this.input.getMousePos());
 
@@ -98,7 +93,6 @@ export default class ZooGame extends Game {
         }
 
         this.world.registerTileObject(new TileObject(
-            this,
             position,
             object,
             true,
@@ -110,7 +104,13 @@ export default class ZooGame extends Game {
         if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();
         if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
         if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
-        if (this.debugSettings.showAreas) this.world.drawDebugAreas();
+        // if (this.debugSettings.showAreas) this.world.drawDebugAreas();
     }
 }
 
+export default new ZooGame({
+    windowWidth: Config.WINDOW_WIDTH,
+    windowHeight: Config.WINDOW_HEIGHT,
+    enableDebug: Config.ENABLE_DEBUG,
+    worldScale: 16,
+});

@@ -3,6 +3,7 @@ import { InputSystem } from "engine/entities/systems";
 
 import Actor, { ActorStateInput } from "entities/Actor";
 import { Inputs } from "consts";
+import ZooGame from "ZooGame";
 
 export default class PlayerInputSystem extends InputSystem {
     public id = "PLAYER_INPUT_SYSTEM";
@@ -13,25 +14,25 @@ export default class PlayerInputSystem extends InputSystem {
         const actor = this.entity as Actor;
 
         this.inputVector = new Vector(
-            +this.game.input.isInputHeld(Inputs.Right) - +this.game.input.isInputHeld(Inputs.Left),
-            +this.game.input.isInputHeld(Inputs.Down) - +this.game.input.isInputHeld(Inputs.Up),
+            +ZooGame.input.isInputHeld(Inputs.Right) - +ZooGame.input.isInputHeld(Inputs.Left),
+            +ZooGame.input.isInputHeld(Inputs.Down) - +ZooGame.input.isInputHeld(Inputs.Up),
         ).truncate(1);
 
         // Movement
-        if (this.game.input.isInputHeld(Inputs.Up) ||
-            this.game.input.isInputHeld(Inputs.Down) ||
-            this.game.input.isInputHeld(Inputs.Left) ||
-            this.game.input.isInputHeld(Inputs.Right) &&
-            !(this.game.input.isInputHeld(Inputs.Up) && this.game.input.isInputHeld(Inputs.Down)) &&
-            !(this.game.input.isInputHeld(Inputs.Left) && this.game.input.isInputHeld(Inputs.Right))
+        if (ZooGame.input.isInputHeld(Inputs.Up) ||
+            ZooGame.input.isInputHeld(Inputs.Down) ||
+            ZooGame.input.isInputHeld(Inputs.Left) ||
+            ZooGame.input.isInputHeld(Inputs.Right) &&
+            !(ZooGame.input.isInputHeld(Inputs.Up) && ZooGame.input.isInputHeld(Inputs.Down)) &&
+            !(ZooGame.input.isInputHeld(Inputs.Left) && ZooGame.input.isInputHeld(Inputs.Right))
         ) {
             actor.state.handleInput(ActorStateInput.MOVE);
         }
 
-        if (!this.game.input.isInputHeld(Inputs.Up) &&
-            !this.game.input.isInputHeld(Inputs.Down) &&
-            !this.game.input.isInputHeld(Inputs.Left) &&
-            !this.game.input.isInputHeld(Inputs.Right)
+        if (!ZooGame.input.isInputHeld(Inputs.Up) &&
+            !ZooGame.input.isInputHeld(Inputs.Down) &&
+            !ZooGame.input.isInputHeld(Inputs.Left) &&
+            !ZooGame.input.isInputHeld(Inputs.Right)
         ) {
             actor.state.handleInput(ActorStateInput.STILL);
         }

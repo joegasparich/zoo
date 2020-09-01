@@ -4,7 +4,7 @@ import "pixi-layers";
 
 import "./app.scss";
 
-import { Debug, Camera, Vector, Events, Layers } from ".";
+import { Graphics, Camera, Vector, Events, Layers } from ".";
 import { AssetManager, InputManager, PhysicsManager, SceneManager } from "./managers";
 import Mediator from "./Mediator";
 import { Entity } from "./entities";
@@ -103,7 +103,7 @@ export default class Game {
 
         this.physicsManager.setup();
 
-        Debug.init(this);
+        Graphics.init(this);
 
         Mediator.fire(Events.GameEvent.SETUP_COMPLETE);
     }
@@ -146,7 +146,7 @@ export default class Game {
         // Setup actions
         const scene = this.sceneManager.getCurrentScene();
         scene && scene.preUpdate();
-        Debug.preUpdate();
+        Graphics.preUpdate();
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
         });
@@ -172,7 +172,7 @@ export default class Game {
         });
 
         this.map.postUpdate();
-        Debug.postUpdate();
+        Graphics.postUpdate();
         // ! Camera should be last to avoid stuttering
         this.camera.update();
     }

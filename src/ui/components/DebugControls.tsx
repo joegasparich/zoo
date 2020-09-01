@@ -10,9 +10,6 @@ import Mediator from "engine/Mediator";
 import { UIEvent } from "engine/consts/events";
 import ZooGame from "ZooGame";
 
-interface DebugProps extends UIComponentProps {
-    game: ZooGame;
-}
 interface DebugState {
     panelOpen: boolean;
 }
@@ -20,21 +17,29 @@ const defaultState: DebugState = {
     panelOpen: false,
 };
 
-export default class DebugControls extends UIComponent<DebugProps, DebugState> {
+export default class DebugControls extends UIComponent<UIComponentProps, DebugState> {
 
     public focusID = "DEBUG_CONTROLS";
 
-    public constructor(props: DebugProps) {
+    private focusListener: string;
+    private unfocusListener: string;
+
+    public constructor(props: UIComponentProps) {
         super(props);
 
         this.state = defaultState;
 
-        Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
+        this.focusListener = Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
             if (id !== this.focusID) {
                 this.setState({panelOpen: false});
             }
         });
-        Mediator.on(UIEvent.UNFOCUS, () => this.setState({panelOpen: false}));
+        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.setState({panelOpen: false}));
+    }
+
+    public componentWillUnmount(): void {
+        Mediator.unsubscribe(UIEvent.FOCUS, this.focusListener);
+        Mediator.unsubscribe(UIEvent.UNFOCUS, this.unfocusListener);
     }
 
     protected getStyles(): SerializedStyles {
@@ -62,27 +67,27 @@ export default class DebugControls extends UIComponent<DebugProps, DebugState> {
                         <Button
                             key="mapGridButton"
                             image={Assets.UI.GRASS}
-                            onClick={(): void => { this.props.game.debugSettings.showMapGrid = !this.props.game.debugSettings.showMapGrid; }}
+                            onClick={(): void => { ZooGame.debugSettings.showMapGrid = !ZooGame.debugSettings.showMapGrid; }}
                         />
                         <Button
                             key="pathfindingButton"
                             image={Assets.UI.SNOW}
-                            onClick={(): void => { this.props.game.debugSettings.showPathfinding = !this.props.game.debugSettings.showPathfinding; }}
+                            onClick={(): void => { ZooGame.debugSettings.showPathfinding = !ZooGame.debugSettings.showPathfinding; }}
                         />
                         <Button
                             key="physicsButton"
                             image={Assets.UI.SAND}
-                            onClick={(): void => { this.props.game.debugSettings.showPhysics = !this.props.game.debugSettings.showPhysics; }}
+                            onClick={(): void => { ZooGame.debugSettings.showPhysics = !ZooGame.debugSettings.showPhysics; }}
                         />
                         <Button
                             key="wallButton"
                             image={Assets.UI.SAND}
-                            onClick={(): void => { this.props.game.debugSettings.showWallGrid = !this.props.game.debugSettings.showWallGrid; }}
+                            onClick={(): void => { ZooGame.debugSettings.showWallGrid = !ZooGame.debugSettings.showWallGrid; }}
                         />
                         <Button
                             key="areaButton"
                             image={Assets.UI.SNOW}
-                            onClick={(): void => { this.props.game.debugSettings.showAreas = !this.props.game.debugSettings.showAreas; }}
+                            onClick={(): void => { ZooGame.debugSettings.showAreas = !ZooGame.debugSettings.showAreas; }}
                         />
                     </FloatingPanel>
                 </div>

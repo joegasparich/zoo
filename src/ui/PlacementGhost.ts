@@ -16,7 +16,6 @@ enum Mode {
 }
 
 export default class PlacementGhost {
-    private game: ZooGame;
     private world: World;
 
     private ghost: Entity;
@@ -30,11 +29,10 @@ export default class PlacementGhost {
 
     public canPlaceFunction = this.canPlace;
 
-    public constructor(game: ZooGame, shouldFollowMouse = true) {
-        this.game = game;
-        this.world = game.world;
+    public constructor(shouldFollowMouse = true) {
+        this.world = ZooGame.world;
 
-        this.ghost = this.game.registerEntity(new Entity(this.game, this.game.input.getMousePos()));
+        this.ghost = ZooGame.registerEntity(new Entity(ZooGame, ZooGame.input.getMousePos()));
         if (shouldFollowMouse) this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
@@ -54,7 +52,7 @@ export default class PlacementGhost {
             }
         }
         if (this.mode === Mode.Draw) {
-            this.drawFunction(this.game.camera.screenToWorldPosition(this.game.input.getMousePos()));
+            this.drawFunction(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos()));
         }
     }
 

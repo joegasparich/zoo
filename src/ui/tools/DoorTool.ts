@@ -7,6 +7,7 @@ import { WallData } from "types/AssetTypes";
 import Wall, { WallSpriteIndex } from "world/Wall";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
+import ZooGame from "ZooGame";
 
 export default class DoorTool extends Tool {
     public type = ToolType.Wall;
@@ -24,26 +25,26 @@ export default class DoorTool extends Tool {
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
-            const wall = this.game.world.wallGrid.getWallAtTile(pos.floor(), this.game.map.getTileQuadrantAtPos(this.game.camera.screenToWorldPosition(this.game.input.getMousePos())));
+            const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
             return wall?.exists && !wall.isDoor;
         };
     }
 
     public update(): void {
-        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
-        const wallatMousePos = this.game.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), this.game.map.getTileQuadrantAtPos(mouseWorldPos));
+        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        const wallatMousePos = ZooGame.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
 
-        if (this.game.input.isInputReleased(Inputs.LeftMouse)) {
+        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos) {
-                this.game.world.placeDoor(wallatMousePos);
+                ZooGame.world.placeDoor(wallatMousePos);
             }
         }
     }
 
     public postUpdate(): void {
-        const mouseWorldPos = this.game.camera.screenToWorldPosition(this.game.input.getMousePos());
+        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
-        const quadrant = this.game.map.getTileQuadrantAtPos(mouseWorldPos);
+        const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
         switch (quadrant) {
             case Side.North:

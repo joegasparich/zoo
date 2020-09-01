@@ -3,11 +3,11 @@ import { AssetManager } from "engine/managers";
 import { GroundTileData } from "types/AssetTypes";
 
 export default class GroundTile {
-    tileData: GroundTileData;
+    private tileData: GroundTileData;
 
-    texture: PIXI.Texture;
+    public texture: PIXI.Texture;
 
-    constructor(tileDataPath?: string, tileData?: GroundTileData) {
+    public constructor(tileDataPath?: string, tileData?: GroundTileData) {
         if (tileDataPath) {
             tileData = AssetManager.getJSON(tileDataPath) as GroundTileData;
         }

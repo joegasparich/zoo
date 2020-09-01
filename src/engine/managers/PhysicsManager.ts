@@ -1,7 +1,7 @@
 import * as Planck from "planck-js";
 
 import { Game, Vector } from "engine";
-import Debug from "engine/Debug";
+import Graphics from "engine/Graphics";
 import { FRAME_RATE, TAG } from "engine/consts";
 import { Entity } from "engine/entities";
 
@@ -184,20 +184,20 @@ export default class PhysicsManager {
             if (!body.isActive()) continue;
 
             for (let fixture = body.getFixtureList(); fixture; fixture = fixture.getNext()) {
-                Debug.setLineStyle(1, 0xFF0000);
-                if (fixture.isSensor()) Debug.setLineStyle(1, 0x0000FF);
+                Graphics.setLineStyle(1, 0xFF0000);
+                if (fixture.isSensor()) Graphics.setLineStyle(1, 0x0000FF);
                 const shape = fixture.getShape();
                 switch(shape.getType()) {
                     case "circle":
                         const circle = shape as Planck.CircleShape;
-                        Debug.drawCircle(Vector.FromVec2(body.getPosition()).multiply(this.game.opts.worldScale), circle.getRadius() * this.game.opts.worldScale);
+                        Graphics.drawCircle(Vector.FromVec2(body.getPosition()).multiply(this.game.opts.worldScale), circle.getRadius() * this.game.opts.worldScale);
                         break;
                     case "polygon":
                         const polygon = shape as Planck.PolygonShape;
                         const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y)
                             .add(Vector.FromVec2(body.getPosition()))
                             .multiply(this.game.opts.worldScale));
-                        Debug.drawVectorList(vectorList);
+                        Graphics.drawVectorList(vectorList);
                         break;
                     default:
                         break;

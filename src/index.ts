@@ -1,25 +1,14 @@
-import { Game } from "engine";
-
 import { AssetManager } from "engine/managers";
 
-import { Assets, Config } from "./consts";
+import { Assets } from "./consts";
 import ZooGame from "ZooGame";
 import TileObject from "entities/TileObject";
 
 import "CameraControl";
 import Wall from "world/Wall";
 
-let testGame: Game;
-
 async function run(): Promise<void> {
     // Create game
-    testGame = new ZooGame({
-        windowWidth: Config.WINDOW_WIDTH,
-        windowHeight: Config.WINDOW_HEIGHT,
-        enableDebug: Config.ENABLE_DEBUG,
-        worldScale: 16,
-    });
-
     // Load Assets
     AssetManager.preLoadAssets(Object.values(Assets.SPRITES));
     AssetManager.preLoadAssets(Object.values(Assets.SPRITESHEETS));
@@ -29,7 +18,7 @@ async function run(): Promise<void> {
     await AssetManager.loadTileSetFile(Assets.TILESETS.TEST);
 
     // Load game
-    await testGame.load(progress => {
+    await ZooGame.load(progress => {
         console.log(`Game Load Progress: ${progress}%`);
     });
 }

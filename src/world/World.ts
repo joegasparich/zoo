@@ -1,22 +1,24 @@
 import { Assets, Config } from "consts";
-import { Debug, Game, Vector } from "engine";
+import { WorldEvents } from "consts/events";
+import { Game, Vector } from "engine";
 import { Side } from "engine/consts";
 import { randomInt } from "engine/helpers/math";
 import { AssetManager } from "engine/managers";
 import { MapCell, MapGrid } from "engine/map";
+import Mediator from "engine/Mediator";
 
 import TileObject from "entities/TileObject";
 import Graph = require("node-dijkstra");
 import EmptyScene from "scenes/EmptyScene";
 import { WallData } from "types/AssetTypes";
 import uuid = require("uuid");
+import ZooGame from "ZooGame";
 import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
 import Wall from "./Wall";
 import WallGrid from "./WallGrid";
 
 export default class World {
-    public game: Game;
     public map: MapGrid;
     public biomeGrid: BiomeGrid;
     public wallGrid: WallGrid;
@@ -24,9 +26,8 @@ export default class World {
     private areas: Map<string, Area>;
     private tileAreaMap: Map<string, Area>;
 
-    public constructor(game: Game) {
-        this.game = game;
-        this.map = game.map;
+    public constructor() {
+        this.map = ZooGame.map;
         this.tileObjects = new Map();
         this.areas = new Map();
         this.tileAreaMap = new Map();
@@ -36,8 +37,8 @@ export default class World {
         // TODO: Figure out how to load map info like biomes after biomeGrid.setup
         await this.loadMap();
 
-        this.wallGrid = new WallGrid(this);
-        this.biomeGrid = new BiomeGrid(this, this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
+        this.wallGrid = new WallGrid();
+        this.biomeGrid = new BiomeGrid(this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
 
         this.biomeGrid.setup();
         this.wallGrid.setup();
@@ -57,8 +58,9 @@ export default class World {
             this.wallGrid.placeWallAtTile(ironFence, new Vector(0, i), Side.West);
             this.wallGrid.placeWallAtTile(ironFence, new Vector(this.map.cols - 1, i), Side.East);
         }
-        const zooArea = new Area("zoo");
-        this.areas.set(zooArea.name, zooArea);
+        const zooArea = new Area("0", "zoo");
+        this.areas.set(zooArea.id, zooArea);
+        Mediator.fire(WorldEvents.AREAS_UPDATED);
         const zooCells = this.floodFill(this.map.getCell(new Vector(1)));
         zooArea.setCells(zooCells);
         zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
@@ -67,10 +69,14 @@ export default class World {
     public postUpdate(delta: number): void {
         this.biomeGrid.postUpdate();
         this.wallGrid.postUpdate();
+
+        this.areas.forEach(area => {
+            area.postUpdate();
+        });
     }
 
     private async loadMap(): Promise<void> {
-        await this.game.sceneManager.loadScene(
+        await ZooGame.sceneManager.loadScene(
             new EmptyScene(this),
             // new TestScene(),
             (progress: number) => {
@@ -80,7 +86,7 @@ export default class World {
     }
 
     public registerTileObject(tileObject: TileObject): void {
-        this.game.registerEntity(tileObject);
+        ZooGame.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {
@@ -116,9 +122,9 @@ export default class World {
         if (tiles.length < 2) return;
 
         const oldArea = this.tileAreaMap.get(tiles[0].toString());
-        const newArea = new Area(uuid());
+        const newArea = new Area(uuid(), "New Area");
         // TODO: Autogenerate a good name
-        this.areas.set(newArea.name, newArea);
+        this.areas.set(newArea.id, newArea);
 
         tiles.forEach(tilePos =>{
             areasCells.push(this.floodFill(this.map.getCell(tilePos)));
@@ -132,18 +138,30 @@ export default class World {
         newArea.setCells(smaller);
         smaller.forEach(cell => this.tileAreaMap.set(cell.position.toString(), newArea));
 
+        Mediator.fire(WorldEvents.AREAS_UPDATED);
+
         return [oldArea, newArea];
     }
 
     public joinAreas(wall: Wall): Area {
         // TODO: Implement;
 
+        Mediator.fire(WorldEvents.AREAS_UPDATED);
         return undefined;
     }
 
     private deleteArea(area: Area): void {
-        this.areas.delete(area.name);
+        this.areas.delete(area.id);
         area.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), this.areas.get("zoo")));
+        Mediator.fire(WorldEvents.AREAS_UPDATED);
+    }
+
+    public getAreas(): Area[] {
+        return Array.from(this.areas.values());
+    }
+
+    public getAreaById(id: string): Area {
+        return this.areas.get(id);
     }
 
     public placeDoor(wall: Wall): void {
@@ -161,13 +179,13 @@ export default class World {
         this.areas.forEach(area => {
             const connections: any = {};
             area.connectedAreas.forEach((walls, area) => {
-                connections[area.name] = 1;
+                connections[area.id] = 1;
             });
-            areaGraph[area.name] = connections;
+            areaGraph[area.id] = connections;
         });
 
         const graph = new Graph(areaGraph);
-        const route = graph.path(startArea.name, endArea.name) as string[];
+        const route = graph.path(startArea.id, endArea.id) as string[];
 
         return route.map(areaName => this.areas.get(areaName));
     }
@@ -222,23 +240,4 @@ export default class World {
         return this.tileAreaMap.get(position.floor().toString());
     }
 
-    //*-- Debug --*//
-
-    public drawDebugAreas(): void {
-        this.areas.forEach(area => {
-            area.getCells().forEach(cell => {
-                const vertices = [
-                    cell.position.multiply(Config.WORLD_SCALE),
-                    cell.position.add(new Vector(0, 1)).multiply(Config.WORLD_SCALE),
-                    cell.position.add(new Vector(1, 1)).multiply(Config.WORLD_SCALE),
-                    cell.position.add(new Vector(1, 0)).multiply(Config.WORLD_SCALE),
-                ];
-                Debug.drawPolygon(vertices, area.colour, 0.5);
-            });
-        });
-    }
-
-    public drawDebugAreaGraph(): void {
-        // TODO: Implement
-    }
 }

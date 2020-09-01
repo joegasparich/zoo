@@ -1,17 +1,18 @@
 import { Entity } from "engine/entities";
 import { RenderSystem, PhysicsSystem } from "engine/entities/systems";
-import { Game, Vector } from "engine";
+import { Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
 import { TAG } from "engine/consts";
+import ZooGame from "ZooGame";
 
 export default class TileObject extends Entity {
     private render: RenderSystem;
     private physics: PhysicsSystem;
     public blocksPath: boolean;
 
-    public constructor(game: Game, pos: Vector, data: TileObjectData, blocksPath = false) {
-        super(game, pos);
+    public constructor(pos: Vector, data: TileObjectData, blocksPath = false) {
+        super(ZooGame, pos);
 
         const sprite = data.sprite;
 

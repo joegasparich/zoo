@@ -17,9 +17,14 @@ export default abstract class UIComponent<P extends UIComponentProps, S> extends
             display: none;
         }
     `;
+    private componentRef = React.createRef<HTMLDivElement>();
 
     protected getStyles(): SerializedStyles | void {};
     protected abstract getContent(): JSX.Element;
+
+    protected getRootElement(): HTMLDivElement {
+        return this.componentRef.current;
+    }
 
     public render(): JSX.Element {
         const style = css`
@@ -28,7 +33,12 @@ export default abstract class UIComponent<P extends UIComponentProps, S> extends
         `;
 
         return (
-            <div id={this.props.id} css={style} className={(this.props.className ?? "") + (this.props.hidden ? " hidden" : "")}>
+            <div
+                id={this.props.id}
+                css={style}
+                className={(this.props.className ?? "") + (this.props.hidden ? " hidden" : "")}
+                ref={this.componentRef}
+            >
                 {this.getContent()}
             </div>
         );

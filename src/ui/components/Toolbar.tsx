@@ -4,14 +4,15 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 
 import { UIComponent, UIComponentProps } from "engine/ui";
 
-import ZooGame from "ZooGame";
 import { Assets } from "consts";
 import { Button, DebugControls, FloatingPanel, BiomeControls } from "ui/components";
 import ToolManager from "ui/ToolManager";
 import { ToolType } from "ui/tools";
+import UIManager from "ui/UIManager";
+import { Vector } from "engine";
+import AreaList from "./AreaList";
 
 interface ToolbarProps extends UIComponentProps {
-    game: ZooGame;
     toolManager: ToolManager;
 }
 
@@ -99,12 +100,17 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                             this.setTool(ToolType.Door);
                         }}
                     />
+                    <Button
+                        key="areasButton"
+                        image={Assets.UI.IRON_BAR_GATE}
+                        onClick={(): void => {
+                            UIManager.openWindow("areaList", "Areas", new Vector(0, 400), <AreaList />);
+                        }}
+                    />
                     <BiomeControls
                         setTool={this.setTool.bind(this)}
                     />
-                    <DebugControls
-                        game={this.props.game}
-                    />
+                    <DebugControls />
                 </div>
                 <FloatingPanel
                     key="brushSize"

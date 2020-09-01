@@ -11,8 +11,6 @@ import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TreeTool, WallTool } from 
 import PlacementGhost from "./PlacementGhost";
 
 export default class ToolManager {
-    public game: ZooGame;
-
     private activeTool: Tool;
     public radius: number;
 
@@ -20,24 +18,21 @@ export default class ToolManager {
 
     private toolbarRef: React.RefObject<Toolbar>;
 
-    public constructor(game: ZooGame) {
-        this.game = game;
-
-        this.ghost = new PlacementGhost(this.game);
+    public constructor() {
+        this.ghost = new PlacementGhost();
 
         this.setTool(ToolType.None);
 
         this.toolbarRef = React.createRef();
-        this.game.canvas.addChild(React.createElement(Toolbar, {
+        ZooGame.canvas.addChild(React.createElement(Toolbar, {
             key: "toolbar",
             toolManager: this,
-            game,
             ref: this.toolbarRef,
         }));
     }
 
     public update(): void {
-        if(this.game.input.isInputPressed(Inputs.RightMouse)) {
+        if(ZooGame.input.isInputPressed(Inputs.RightMouse)) {
             this.setTool(ToolType.None);
             this.toolbarRef.current?.setState({activeTool: ToolType.None});
             Mediator.fire(UIEvent.UNFOCUS);

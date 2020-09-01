@@ -1,7 +1,8 @@
-import { Game, Vector } from "engine";
+import { Vector } from "engine";
 import { Entity } from "engine/entities";
 import { PhysicsSystem, RenderSystem, InputSystem } from "engine/entities/systems";
 import { StateMachine, State } from "engine/state";
+import ZooGame from "ZooGame";
 
 export enum ActorStateInput {
     MOVE= "MOVE",
@@ -17,8 +18,8 @@ export default class Actor extends Entity {
 
     protected accelleration = 50; // Temp
 
-    public constructor(game: Game, pos: Vector, inputSystem: InputSystem, physicsSystem: PhysicsSystem, renderSystem: RenderSystem) {
-        super(game, pos);
+    public constructor(pos: Vector, inputSystem: InputSystem, physicsSystem: PhysicsSystem, renderSystem: RenderSystem) {
+        super(ZooGame, pos);
 
         this.input = this.addSystem(inputSystem);
         this.physics = this.addSystem(physicsSystem);

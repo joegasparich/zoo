@@ -1,7 +1,7 @@
-import { Camera, Game, Layers, Vector } from "engine";
+import { Camera, Layers, Vector } from "engine";
 import { Side } from "engine/consts";
-import { circleIntersectsRect, pointInCircle, randomInt } from "engine/helpers/math";
-import World from "./World";
+import { circleIntersectsRect, pointInCircle } from "engine/helpers/math";
+import ZooGame from "ZooGame";
 
 export enum Biome {
     Grass = 0xb6d53c,
@@ -26,13 +26,10 @@ class Square {
 
 export default class BiomeGrid {
 
-    private camera: Camera;
 
     private chunks: BiomeChunk[][];
 
-    public constructor(private world: World, public width: number, public height: number, private cellSize: number) {
-        this.camera = world.game.camera;
-    }
+    public constructor(public width: number, public height: number, private cellSize: number) {}
 
     public setup(): void  {
         const chunkCols = Math.ceil(this.width / CHUNK_SIZE);
@@ -42,7 +39,6 @@ export default class BiomeGrid {
             this.chunks[i] = [];
             for (let j = 0; j < chunkRows; j++) {
                 this.chunks[i][j] = new BiomeChunk(
-                    this.world,
                     new Vector(i * CHUNK_SIZE, j * CHUNK_SIZE),
                     i === chunkCols ? this.width % CHUNK_SIZE : CHUNK_SIZE,
                     j === chunkRows ? this.height % CHUNK_SIZE : CHUNK_SIZE,
@@ -61,9 +57,6 @@ export default class BiomeGrid {
                 this.chunks[i][j].draw();
             }
         }
-
-        console.log(this.chunks);
-        
     }
 
     public postUpdate(): void {
@@ -112,15 +105,13 @@ export default class BiomeGrid {
 class BiomeChunk {
     public static Biome = Biome;
 
-    private game: Game;
     private camera: Camera;
 
     private grid: Square[][];
     private graphics: PIXI.Graphics;
 
-    public constructor(world: World, public pos: Vector, public width: number, public height: number, private cellSize: number) {
-        this.game = world.game;
-        this.camera = this.game.camera;
+    public constructor(public pos: Vector, public width: number, public height: number, private cellSize: number) {
+        this.camera = ZooGame.camera;
     }
 
     public setup(): void  {
@@ -136,7 +127,7 @@ class BiomeChunk {
         this.graphics = new PIXI.Graphics();
         this.graphics.parentGroup = Layers.GROUND;
         this.graphics.position = this.camera.offset.toPoint();
-        this.game.stage.addChild(this.graphics);
+        ZooGame.stage.addChild(this.graphics);
     }
 
     public draw(): void {

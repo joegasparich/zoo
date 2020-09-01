@@ -1,4 +1,4 @@
-import { Game, Debug, Vector } from "engine";
+import { Game, Graphics, Vector } from "engine";
 import { PathfindingGrid } from ".";
 import { MapEvent, Side, TAG } from "engine/consts";
 import { Config } from "consts";
@@ -245,12 +245,12 @@ export default class MapGrid {
      * Draws a grid showing the map cells
      */
     public drawDebug(): void {
-        Debug.setLineStyle(1, 0xFFFFFF);
+        Graphics.setLineStyle(1, 0xFFFFFF);
         const xOffset =  this.position.x;
         const yOffset = this.position.y;
         // Horizontal
         for(let i = 0; i < this.rows + 1; i++) {
-            Debug.drawLine(
+            Graphics.drawLine(
                 xOffset,
                 i * this.cellSize + yOffset,
                 this.cols * this.cellSize + xOffset,
@@ -259,7 +259,7 @@ export default class MapGrid {
         }
         // Vertical
         for(let i = 0; i < this.cols + 1; i++) {
-            Debug.drawLine(
+            Graphics.drawLine(
                 i * this.cellSize + xOffset,
                 yOffset,
                 i * this.cellSize + xOffset,

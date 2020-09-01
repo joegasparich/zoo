@@ -1,20 +1,30 @@
+import uuid = require("uuid");
+
 class Mediator {
 
-    private listeners: Map<string, Function[]>;
+    private listeners: Map<string, {context: string; callback: Function}[]>;
 
     public constructor() {
         this.listeners = new Map();
     }
 
-    public on(event: string, callback: Function): void {
+    public on(event: string, callback: Function): string {
+        const context = uuid();
+
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
         }
-        this.listeners.get(event).push(callback);
+        this.listeners.get(event).push({context, callback});
+
+        return context;
     }
 
     public fire(event: string, data?: Object): void {
-        this.listeners.get(event)?.forEach(callback => callback(data));
+        this.listeners.get(event)?.forEach(listener => listener.callback(data));
+    }
+
+    public unsubscribe(event: string, context: string): void {
+        this.listeners.set(event, this.listeners.get(event).filter(listener => listener.context !== context));
     }
 }
 

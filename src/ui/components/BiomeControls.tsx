@@ -26,17 +26,25 @@ export default class BiomeControls extends UIComponent<BiomeControlsProps, Biome
 
     public focusID = "BIOME_TOOLS";
 
+    private focusListener: string;
+    private unfocusListener: string;
+
     public constructor(props: BiomeControlsProps) {
         super(props);
 
         this.state = defaultState;
 
-        Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
+        this.focusListener = Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
             if (id !== this.focusID) {
                 this.setState({panelOpen: false});
             }
         });
-        Mediator.on(UIEvent.UNFOCUS, () => this.setState({panelOpen: false}));
+        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.setState({panelOpen: false}));
+    }
+
+    public componentWillUnmount(): void {
+        Mediator.unsubscribe(UIEvent.FOCUS, this.focusListener);
+        Mediator.unsubscribe(UIEvent.UNFOCUS, this.unfocusListener);
     }
 
     protected getStyles(): SerializedStyles {

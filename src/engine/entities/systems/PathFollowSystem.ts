@@ -1,7 +1,7 @@
 import { PhysicsSystem, SYSTEM, System } from ".";
 import { Vector } from "engine";
 import { Entity } from "..";
-import Debug from "engine/Debug";
+import Graphics from "engine/Graphics";
 import Mediator from "engine/Mediator";
 import { MapEvent } from "engine/consts";
 
@@ -14,6 +14,8 @@ export default class PathFollowSystem extends System {
     private path: Vector[];
     private currentNode: Vector;
 
+    private placeSolidListener: string;
+
     public start(entity: Entity): void {
         super.start(entity);
 
@@ -22,7 +24,7 @@ export default class PathFollowSystem extends System {
             console.error("PathFollowSystem requires PhysicsSystem");
         }
 
-        Mediator.on(MapEvent.PLACE_SOLID, () => {
+        this.placeSolidListener = Mediator.on(MapEvent.PLACE_SOLID, () => {
             if (!this.path) return;
 
             if (!entity.game.map.checkPath([this.entity.position, this.currentNode, ...this.path])) {
@@ -31,8 +33,13 @@ export default class PathFollowSystem extends System {
         });
     }
 
+    public end(): void {
+        Mediator.unsubscribe(MapEvent.PLACE_SOLID, this.placeSolidListener);
+    }
+
     public async pathTo(location: Vector): Promise<boolean> {
-        this.path = undefined;
+        this.resetPath();
+
         const path = await this.entity.game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: true});
         if (!path) return false;
 
@@ -70,32 +77,38 @@ export default class PathFollowSystem extends System {
 
         this.moveTowardTarget(this.currentNode, speed);
 
+        // TODO: Add debug button for this
         this.drawDebugPath();
 
         return false;
     }
 
+    protected resetPath(): void {
+        this.path = undefined;
+        this.currentNode = undefined;
+    }
+
     private drawDebugPath(): void {
         const cellSize = this.game.map.cellSize;
 
-        Debug.setLineStyle(3, 0x0000FF);
+        Graphics.setLineStyle(3, 0x0000FF);
 
-        Debug.drawLine(
+        Graphics.drawLine(
             this.entity.position.x * cellSize,
             this.entity.position.y * cellSize,
             this.currentNode.x * cellSize,
             this.currentNode.y * cellSize);
 
         let lastNode = this.currentNode;
-        Debug.drawCircle(lastNode.multiply(cellSize), 2);
+        Graphics.drawCircle(lastNode.multiply(cellSize), 2);
         this.path.forEach(node => {
-            Debug.drawLine(
+            Graphics.drawLine(
                 lastNode.x * cellSize,
                 lastNode.y * cellSize,
                 node.x * cellSize,
                 node.y * cellSize,
             );
-            Debug.drawCircle(node.multiply(cellSize), 2);
+            Graphics.drawCircle(node.multiply(cellSize), 2);
             lastNode = node;
         });
     }
