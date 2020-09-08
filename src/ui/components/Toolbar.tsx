@@ -101,8 +101,15 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         }}
                     />
                     <Button
+                        key="deleteButton"
+                        image={Assets.UI.SAND}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Delete);
+                        }}
+                    />
+                    <Button
                         key="areasButton"
-                        image={Assets.UI.IRON_BAR_GATE}
+                        image={Assets.UI.GRASS}
                         onClick={(): void => {
                             UIManager.openWindow("areaList", "Areas", new Vector(0, 400), <AreaList />);
                         }}

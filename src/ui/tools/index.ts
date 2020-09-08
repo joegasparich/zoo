@@ -6,6 +6,7 @@ export enum ToolType {
     Tree,
     Wall,
     Door,
+    Delete,
     Biome,
 }
 
@@ -31,4 +32,5 @@ export class NoTool extends Tool {
 export { default as BiomeTool } from "./BiomeTool";
 export { default as WallTool } from "./WallTool";
 export { default as DoorTool } from "./DoorTool";
+export { default as DeleteTool } from "./DeleteTool";
 export { default as TreeTool } from "./TreeTool";

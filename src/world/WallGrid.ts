@@ -123,7 +123,10 @@ export default class WallGrid {
         this.wallGrid[x][y].remove();
         this.wallGrid[x][y] = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y));
 
-        ZooGame.world.joinAreas(this.wallGrid[x][y]);
+        const [tile1, tile2] = this.getAdjacentTiles(this.wallGrid[x][y]);
+        if (ZooGame.world.getAreaAtPosition(tile1) !== ZooGame.world.getAreaAtPosition(tile2)) {
+            ZooGame.world.joinAreas(this.wallGrid[x][y]);
+        }
 
         // Update pathfinding information
         if (side === Side.North && tilePos.y > 0) {

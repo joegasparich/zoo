@@ -159,7 +159,10 @@ export default class World {
         area1.setCells([...area1.getCells(), ...area2.getCells()]);
         area2.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), area1));
         area2.connectedAreas.forEach((doors, area) => {
-            doors.forEach(door => area1.addAreaConnection(area, door));
+            doors.forEach(door => {
+                area1.addAreaConnection(area, door);
+                area.addAreaConnection(area1, door);
+            });
         });
 
         this.areas.delete(area2.id);

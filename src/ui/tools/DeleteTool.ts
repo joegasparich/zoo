@@ -9,7 +9,7 @@ import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
 import ZooGame from "ZooGame";
 
-export default class DoorTool extends Tool {
+export default class DeleteTool extends Tool {
     public type = ToolType.Wall;
 
     private currentWall: WallData;
@@ -36,7 +36,7 @@ export default class DoorTool extends Tool {
 
         if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos) {
-                ZooGame.world.placeDoor(wallatMousePos);
+                ZooGame.world.wallGrid.deleteWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
             }
         }
     }
