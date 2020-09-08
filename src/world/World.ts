@@ -1,5 +1,6 @@
-import { Assets, Config } from "consts";
-import { WorldEvents } from "consts/events";
+import Graph = require("node-dijkstra");
+import uuid = require("uuid");
+
 import { Vector } from "engine";
 import { Side } from "engine/consts";
 import { randomInt } from "engine/helpers/math";
@@ -7,11 +8,11 @@ import { AssetManager } from "engine/managers";
 import { MapCell, MapGrid } from "engine/map";
 import Mediator from "engine/Mediator";
 
+import { Assets, Config } from "consts";
+import { WorldEvents } from "consts/events";
 import TileObject from "entities/TileObject";
-import Graph = require("node-dijkstra");
 import EmptyScene from "scenes/EmptyScene";
 import { WallData } from "types/AssetTypes";
-import uuid = require("uuid");
 import ZooGame from "ZooGame";
 import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";

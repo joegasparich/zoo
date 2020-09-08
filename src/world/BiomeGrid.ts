@@ -2,6 +2,7 @@ import { Camera, Layers, Vector } from "engine";
 import { Side } from "engine/consts";
 import { circleIntersectsRect, pointInCircle } from "engine/helpers/math";
 import ZooGame from "ZooGame";
+import Area from "./Area";
 
 export enum Biome {
     Grass = 0xb6d53c,
@@ -12,7 +13,8 @@ export enum Biome {
 const CHUNK_SIZE = 5;
 
 class Square {
-    public quadrants: Biome[];
+    private quadrants: Biome[];
+    public isHomogeneous: boolean;
 
     public constructor(biome?: Biome, biomes?: {north: number; south: number; east: number; west: number}) {
         this.quadrants = [];
@@ -21,11 +23,22 @@ class Square {
         this.quadrants[Side.East] = biomes?.east ?? biome ?? Biome.Grass;
         this.quadrants[Side.South] = biomes?.south ?? biome ?? Biome.Grass;
         this.quadrants[Side.West] = biomes?.west ?? biome ?? Biome.Grass;
+
+        this.isHomogeneous = this.quadrants.every(quadrant => quadrant === this.quadrants[0]);
+    }
+
+    public setQuadrant(side: Side, biome: Biome): void {
+        this.quadrants[side] = biome;
+
+        this.isHomogeneous = this.quadrants.every(quadrant => quadrant === this.quadrants[0]);
+    }
+
+    public getQuadrants(): Biome[] {
+        return this.quadrants;
     }
 }
 
 export default class BiomeGrid {
-
 
     private chunks: BiomeChunk[][];
 
@@ -67,18 +80,19 @@ export default class BiomeGrid {
         }
     }
 
-    public setBiome(pos: Vector, radius: number, biome: Biome): void {
-        this.getChunksInArea(pos, radius).forEach(chunk => {
-            chunk.setBiome(new Vector(pos.x - chunk.pos.x, pos.y - chunk.pos.y), radius, biome);
+    public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
+        this.getChunksInRadius(pos, radius).forEach(chunk => {
+            chunk.setBiome(new Vector(pos.x - chunk.pos.x, pos.y - chunk.pos.y), radius, biome, area);
             chunk.draw();
         });
     }
 
-    private getChunksInArea(pos: Vector, radius: number): BiomeChunk[] {
+    private getChunksInRadius(pos: Vector, radius: number): BiomeChunk[] {
         const { x: flrX, y: flrY } = pos.divide(CHUNK_SIZE).floor();
 
         const chunks: BiomeChunk[] = [];
 
+        // TODO: Only handles 3x3 around position. May potentially need to handle more chunks?
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
                 const chunk = this.getChunkAtPos(new Vector(flrX + i, flrY + j));
@@ -135,11 +149,29 @@ class BiomeChunk {
 
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
-                for (let q = 0; q < 4; q++) {
-                    this.graphics.beginFill(this.grid[i][j].quadrants[q]).drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
-                        const vec = vertex.add(new Vector(this.pos.x, this.pos.y)).multiply(this.cellSize);
-                        return new PIXI.Point(vec.x, vec.y);
-                    })).endFill();
+                if (this.grid[i][j].isHomogeneous) {
+                    // Draw square if whole tile is the same
+                    this.graphics
+                        .beginFill(this.grid[i][j].getQuadrants()[0])
+                        .drawRect(
+                            (i + this.pos.x) * this.cellSize,
+                            (j + this.pos.y) * this.cellSize,
+                            this.cellSize,
+                            this.cellSize,
+                        )
+                        .endFill();
+                } else {
+                    // Draw 4 triangles if not
+                    for (let q = 0; q < 4; q++) {
+                        this.graphics
+                            .beginFill(this.grid[i][j].getQuadrants()[q])
+                            .drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
+                                const vec = vertex.add(new Vector(this.pos.x, this.pos.y)).multiply(this.cellSize);
+                                return new PIXI.Point(vec.x, vec.y);
+                            }))
+                            .endFill();
+
+                    }
                 }
             }
         }
@@ -179,18 +211,20 @@ class BiomeChunk {
         }
     }
 
-    public setBiome(pos: Vector, radius: number, biome: Biome): void {
+    public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
         for(let i = pos.x - (radius); i <= pos.x + (radius); i++) {
             for(let j = pos.y - (radius); j <= pos.y + (radius); j++) {
                 const cellPos = new Vector(i, j).floor();
                 if (!this.isPositionInGrid(cellPos)) continue;
+                if (area && area !== ZooGame.world.getAreaAtPosition(cellPos.add(this.pos).multiply(0.5))) continue;
+
                 // Get Triangles in circle
                 for (let q = 0; q < 4; q++) {
                     this.getQuadrantVertices(cellPos.x, cellPos.y, q).forEach((point: Vector) => {
                         if (pointInCircle(pos, radius, point)) {
                             const xflr = Math.floor(cellPos.x);
                             const yflr = Math.floor(cellPos.y);
-                            this.grid[xflr][yflr].quadrants[q] = biome;
+                            this.grid[xflr][yflr].setQuadrant(q, biome);
                             return;
                         }
                     });

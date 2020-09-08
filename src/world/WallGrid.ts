@@ -1,9 +1,9 @@
-import { Camera, Graphics, Game, Layers, Vector } from "engine";
+import { Camera, Graphics, Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { MapGrid } from "engine/map";
 import { MapEvent, Side } from "engine/consts";
 
-import Wall, { WallSpriteIndex } from "./Wall";
+import Wall from "./Wall";
 import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
 import Mediator from "engine/Mediator";
@@ -47,6 +47,7 @@ export default class WallGrid {
             const orientation = col % 2;
             for (let row = 0; row < this.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
+                if (!wall?.exists) { continue; }
                 if (!wall?.data) { continue; }
 
                 // Texture
@@ -286,6 +287,7 @@ export default class WallGrid {
                 tilePos = tilePos.floor().add(new Vector(1, 0));
                 side = Side.East;
             } else {
+                // Position is outside map
                 return undefined;
             }
         }
@@ -338,20 +340,20 @@ export default class WallGrid {
 
         if (wall.orientation) {
             // Horizontal
-            if (this.getWallByGridPos(x - 2, y)?.data) adjacentWalls.push(this.wallGrid[x - 2][y]);
-            if (this.getWallByGridPos(x + 2, y)?.data) adjacentWalls.push(this.wallGrid[x + 2][y]);
-            if (this.getWallByGridPos(x - 1, y)?.data) adjacentWalls.push(this.wallGrid[x - 1][y]);
-            if (this.getWallByGridPos(x + 1, y)?.data) adjacentWalls.push(this.wallGrid[x + 1][y]);
-            if (this.getWallByGridPos(x - 1, y - 1)?.data) adjacentWalls.push(this.wallGrid[x - 1][y - 1]);
-            if (this.getWallByGridPos(x + 1, y - 1)?.data) adjacentWalls.push(this.wallGrid[x + 1][y - 1]);
+            if (this.getWallByGridPos(x - 2, y)?.exists) adjacentWalls.push(this.wallGrid[x - 2][y]);
+            if (this.getWallByGridPos(x + 2, y)?.exists) adjacentWalls.push(this.wallGrid[x + 2][y]);
+            if (this.getWallByGridPos(x - 1, y)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y]);
+            if (this.getWallByGridPos(x + 1, y)?.exists) adjacentWalls.push(this.wallGrid[x + 1][y]);
+            if (this.getWallByGridPos(x - 1, y - 1)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y - 1]);
+            if (this.getWallByGridPos(x + 1, y - 1)?.exists) adjacentWalls.push(this.wallGrid[x + 1][y - 1]);
         } else {
             // Vertical
-            if (this.getWallByGridPos(x - 1, y)?.data) adjacentWalls.push(this.wallGrid[x - 1][y]);
-            if (this.getWallByGridPos(x + 1, y)?.data) adjacentWalls.push(this.wallGrid[x + 1][y]);
-            if (this.getWallByGridPos(x - 1, y + 1)?.data) adjacentWalls.push(this.wallGrid[x - 1][y + 1]);
-            if (this.getWallByGridPos(x + 1, y + 1)?.data) adjacentWalls.push(this.wallGrid[x + 1][y + 1]);
-            if (this.getWallByGridPos(x, y + 1)?.data) adjacentWalls.push(this.wallGrid[x][y + 1]);
-            if (this.getWallByGridPos(x, y - 1)?.data) adjacentWalls.push(this.wallGrid[x][y - 1]);
+            if (this.getWallByGridPos(x - 1, y)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y]);
+            if (this.getWallByGridPos(x + 1, y)?.exists) adjacentWalls.push(this.wallGrid[x + 1][y]);
+            if (this.getWallByGridPos(x - 1, y + 1)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y + 1]);
+            if (this.getWallByGridPos(x + 1, y + 1)?.exists) adjacentWalls.push(this.wallGrid[x + 1][y + 1]);
+            if (this.getWallByGridPos(x, y + 1)?.exists) adjacentWalls.push(this.wallGrid[x][y + 1]);
+            if (this.getWallByGridPos(x, y - 1)?.exists) adjacentWalls.push(this.wallGrid[x][y - 1]);
         }
 
         return adjacentWalls;
@@ -389,7 +391,7 @@ export default class WallGrid {
             const orientation = col % 2;
             for (let row = 0; row < this.map.rows + orientation; row++) {
                 Graphics.setLineStyle(1, 0x00FF00);
-                if (!this.wallGrid[col][row].data) {
+                if (!this.wallGrid[col][row].exists) {
                     Graphics.setLineStyle(1, 0xFF0000);
                 }
                 if (orientation === 0) {

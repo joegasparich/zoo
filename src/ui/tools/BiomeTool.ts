@@ -13,7 +13,6 @@ export default class BiomeTool extends Tool {
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
         this.currentBiome = data.biome;
         ghost.setDrawFunction(pos => {
-            // TODO: Stop using Debug here
             Graphics.setLineStyle(1, 0xFFFFFF);
             Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.BIOME_SCALE, this.currentBiome, 0.5);
         });
@@ -24,7 +23,7 @@ export default class BiomeTool extends Tool {
         const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
         if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
-            ZooGame.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius, this.currentBiome);
+            ZooGame.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius, this.currentBiome, ZooGame.world.getAreaAtPosition(mouseWorldPos));
         }
         if (ZooGame.input.isInputPressed(Inputs.IncreaseBrushSize)) {
             this.toolManager.setRadius(Math.min(this.toolManager.radius + 0.25, 5));
