@@ -15,7 +15,7 @@ type DebugSettings = {
     showPathfinding: boolean;
     showWallGrid: boolean;
     showPhysics: boolean;
-    showAreas: boolean;
+    showElevation: boolean;
 };
 
 const defaultSettings: DebugSettings = {
@@ -23,7 +23,7 @@ const defaultSettings: DebugSettings = {
     showPathfinding: false,
     showWallGrid: false,
     showPhysics: false,
-    showAreas: false,
+    showElevation: false,
 };
 
 class ZooGame extends Game {
@@ -104,7 +104,7 @@ class ZooGame extends Game {
         if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();
         if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
         if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
-        // if (this.debugSettings.showAreas) this.world.drawDebugAreas();
+        if (this.debugSettings.showElevation) this.world.elevationGrid.drawDebug();
     }
 }
 

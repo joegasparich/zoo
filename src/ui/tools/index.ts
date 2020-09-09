@@ -8,6 +8,7 @@ export enum ToolType {
     Door,
     Delete,
     Biome,
+    Hill,
 }
 
 export abstract class Tool {
@@ -30,6 +31,7 @@ export class NoTool extends Tool {
 }
 
 export { default as BiomeTool } from "./BiomeTool";
+export { default as HillTool } from "./HillTool";
 export { default as WallTool } from "./WallTool";
 export { default as DoorTool } from "./DoorTool";
 export { default as DeleteTool } from "./DeleteTool";

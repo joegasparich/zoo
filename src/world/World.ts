@@ -18,11 +18,13 @@ import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
 import Wall from "./Wall";
 import WallGrid from "./WallGrid";
+import ElevationGrid from "./ElevationGrid";
 
 export default class World {
     public map: MapGrid;
     public biomeGrid: BiomeGrid;
     public wallGrid: WallGrid;
+    public elevationGrid: ElevationGrid;
     private tileObjects: Map<string, TileObject>;
     private areas: Map<string, Area>;
     private tileAreaMap: Map<string, Area>;
@@ -38,9 +40,11 @@ export default class World {
         // TODO: Figure out how to load map info like biomes after biomeGrid.setup
         await this.loadMap();
 
-        this.wallGrid = new WallGrid();
+        this.elevationGrid = new ElevationGrid();
         this.biomeGrid = new BiomeGrid(this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
+        this.wallGrid = new WallGrid();
 
+        this.elevationGrid.setup();
         this.biomeGrid.setup();
         this.wallGrid.setup();
 
@@ -49,6 +53,7 @@ export default class World {
         this.generateFence();
     }
 
+    // TODO: Move to scene
     private generateFence(): void {
         const ironFence = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         for (let i = 0; i < this.map.cols; i++) {

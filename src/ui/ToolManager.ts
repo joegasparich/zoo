@@ -7,7 +7,7 @@ import { UIEvent } from "engine/consts/events";
 import ZooGame from "ZooGame";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TreeTool, WallTool, DeleteTool } from "./tools";
+import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TreeTool, WallTool, DeleteTool, HillTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
 
 export default class ToolManager {
@@ -39,6 +39,15 @@ export default class ToolManager {
         }
 
         this.activeTool.update();
+
+        if (this.showRadius()) {
+            if (ZooGame.input.isInputPressed(Inputs.IncreaseBrushSize)) {
+                this.setRadius(Math.min(this.radius + 0.125, 2.5));
+            }
+            if (ZooGame.input.isInputPressed(Inputs.DecreaseBrushSize)) {
+                this.setRadius(Math.max(this.radius - 0.125, 0.25));
+            }
+        }
     }
 
     public postUpdate(): void {
@@ -57,6 +66,7 @@ export default class ToolManager {
             case ToolType.Door: this.activeTool = new DoorTool(this); break;
             case ToolType.Delete: this.activeTool = new DeleteTool(this); break;
             case ToolType.Biome: this.activeTool = new BiomeTool(this); break;
+            case ToolType.Hill: this.activeTool = new HillTool(this); break;
 
             case ToolType.None:
             default:
@@ -70,6 +80,16 @@ export default class ToolManager {
     public setRadius(radius: number): void {
         this.radius = radius;
         this.toolbarRef.current?.setState({radius});
+    }
+
+    public showRadius(): boolean {
+        switch(this.activeTool.type) {
+            case ToolType.Biome:
+            case ToolType.Hill:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public hasFocus(): boolean {

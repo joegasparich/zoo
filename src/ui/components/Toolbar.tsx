@@ -22,7 +22,7 @@ interface ToolbarState {
 }
 const defaultState: ToolbarState = {
     activeTool: 0,
-    radius: 2.5,
+    radius: 1,
 };
 
 export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
@@ -117,19 +117,26 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     <BiomeControls
                         setTool={this.setTool.bind(this)}
                     />
+                    <Button
+                        key="hillButton"
+                        image={Assets.UI.SNOW}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Hill, { elevation: 1 });
+                        }}
+                    />
                     <DebugControls />
                 </div>
                 <FloatingPanel
                     key="brushSize"
                     className="resize-panel"
-                    hidden={this.state?.activeTool !== ToolType.Biome}
+                    hidden={!this.props.toolManager.showRadius()}
                     layout="horizontal"
                     showTriangle={false}
                 >
                     <Button
                         key="decreaseButton"
                         onClick={(): void => {
-                            const radius = Math.max(this.state.radius - 0.25, 0.5);
+                            const radius = Math.max(this.state.radius - 0.125, 0.5);
                             this.setState({radius: radius});
                             this.props.toolManager.radius = radius;
                         }}
@@ -138,7 +145,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     <Button
                         key="increaseButton"
                         onClick={(): void => {
-                            const radius = Math.min(this.state.radius + 0.25, 5);
+                            const radius = Math.min(this.state.radius + 0.125, 2.5);
                             this.setState({radius: radius});
                             this.props.toolManager.radius = radius;
                         }}
@@ -147,6 +154,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
             </React.Fragment>
         );
     }
+
 
     private setTool(tool: ToolType, data?: Record<string, any>): void {
         this.setState({activeTool: tool});

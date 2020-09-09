@@ -87,7 +87,7 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                         <Button
                             key="areaButton"
                             image={Assets.UI.SNOW}
-                            onClick={(): void => { ZooGame.debugSettings.showAreas = !ZooGame.debugSettings.showAreas; }}
+                            onClick={(): void => { ZooGame.debugSettings.showElevation = !ZooGame.debugSettings.showElevation; }}
                         />
                     </FloatingPanel>
                 </div>
