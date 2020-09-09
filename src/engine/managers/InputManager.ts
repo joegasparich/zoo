@@ -98,7 +98,7 @@ export default class InputManager {
         this.mouseButtonsDown = [];
         this.mouseButtonsUp = [];
 
-        this.mousePos = Vector.Zero;
+        this.mousePos = Vector.Zero();
         document.addEventListener("mousemove", (event: MouseEvent) => {
             this.mousePos = new Vector(event.clientX, event.clientY).subtract(this.canvasPos);
         });

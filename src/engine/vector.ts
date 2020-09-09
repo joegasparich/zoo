@@ -93,5 +93,7 @@ export default class Vector {
         return new Vector(vec2.x, vec2.y);
     }
 
-    public static Zero = new Vector(0, 0);
+    public static Zero(): Vector {
+        return new Vector(0, 0);
+    }
 }

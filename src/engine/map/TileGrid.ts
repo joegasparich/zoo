@@ -83,7 +83,7 @@ export default class TileGrid {
      * Update the position and scale of the tile grid
      */
     private drawTiles(): void {
-        this.tiles.position = this.game.camera.worldToScreenPosition(Vector.Zero).toPoint();
+        this.tiles.position = this.game.camera.worldToScreenPosition(Vector.Zero()).toPoint();
         this.tiles.scale.set(this.game.camera.scale, this.game.camera.scale);
     }
 }

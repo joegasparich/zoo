@@ -23,7 +23,8 @@ export default class BiomeTool extends Tool {
     public update(): void {
         const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
-        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
+        // TODO: Update every quarter of a second or something
+        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
             ZooGame.world.elevationGrid.setElevation(mouseWorldPos, this.toolManager.radius, this.targetElevation);
         }
     }

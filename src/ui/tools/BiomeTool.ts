@@ -22,6 +22,7 @@ export default class BiomeTool extends Tool {
     public update(): void {
         const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
+        // TODO: Update every quarter of a second or something
         if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
             ZooGame.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, ZooGame.world.getAreaAtPosition(mouseWorldPos));
         }

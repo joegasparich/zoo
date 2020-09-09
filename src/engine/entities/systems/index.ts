@@ -9,7 +9,6 @@ export { default as WallAvoidanceSystem } from "./WallAvoidanceSystem";
 
 export const SYSTEM = {
     RENDER_SYSTEM: "RENDER_SYSTEM",
-    ANIMATED_RENDER_SYSTEM: "ANIMATED_RENDER_SYSTEM",
     PHYSICS_SYSTEM: "PHYSICS_SYSTEM",
     INPUT_SYSTEM: "INPUT_SYSTEM",
     CAMERA_FOLLOW_SYSTEM: "CAMERA_FOLLOW_SYSTEM",

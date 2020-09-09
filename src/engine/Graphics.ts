@@ -39,7 +39,7 @@ class Graphics {
         if (!this.graphics) return;
 
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
-        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
+        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
     }
 
     public setLineStyle(thickness: number, colour = Colour.Black): void {

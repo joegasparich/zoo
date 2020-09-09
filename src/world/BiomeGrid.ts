@@ -127,7 +127,6 @@ class BiomeChunk {
         for (let i = 0; i < this.width; i++) {
             this.grid[i] = [];
             for (let j = 0; j < this.height; j++) {
-                // this.grid[i][j] = new Square(randomBool() ? Biome.Grass : Biome.Sand);
                 this.grid[i][j] = new Square(Biome.Grass);
             }
         }
@@ -170,13 +169,14 @@ class BiomeChunk {
 
     public postUpdate(): void {
         if (this.shouldRedraw) {
+            // TODO: Investigate drawing one chunk per frame or something
             this.draw();
             this.shouldRedraw = false;
         }
 
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
         // TODO: set position and draw triangles locally?
-        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
+        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
     }
 
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {
