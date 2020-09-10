@@ -3,7 +3,7 @@ import { Graphics, Vector } from "engine";
 import { pointInCircle } from "engine/helpers/math";
 import ZooGame from "ZooGame";
 
-const ELEVATION_HEIGHT = 0.6;
+const ELEVATION_HEIGHT = 0.5;
 
 export enum Elevation {
     // Water = -1,
@@ -53,6 +53,7 @@ export default class ElevationGrid {
         }
 
         ZooGame.world.biomeGrid.redrawChunksInRadius(pos.multiply(2), radius + 3);
+        ZooGame.world.wallGrid.getWallsInRadius(pos, radius + 1).forEach(wall => wall.updateSprite());
     }
 
     public getElevationAtPoint(pos: Vector): number {

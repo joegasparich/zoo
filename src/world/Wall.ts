@@ -12,6 +12,10 @@ export enum WallSpriteIndex {
     Vertical = 1,
     DoorHorizontal = 2,
     DoorVertical = 3,
+    HillEast = 4,
+    HillWest = 5,
+    HillNorth = 6,
+    HillSouth = 7,
 }
 
 export default class Wall {
@@ -52,6 +56,7 @@ export default class Wall {
 
     public exists: boolean;
     public isDoor: boolean;
+    public elevation: number;
 
     public constructor(public orientation: number, public position: Vector, public gridPos: Vector, data?: WallData) {
         this.exists = false;
@@ -70,17 +75,11 @@ export default class Wall {
                     position: position,
                     tag: TAG.Solid,
                     pivot: new Vector(0.5, 0.5),
-                    // pivot: orientation ? new Vector(0.5, 0.5) : new Vector(0.5, 1),
                     isDynamic: false,
                 });
             }
 
-            // Add new sprite
-            const texture = this.spriteSheet.getTextureById(orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
-            this.sprite = new PIXI.Sprite(texture);
-            ZooGame.app.stage.addChild(this.sprite);
-            this.sprite.parentGroup = Layers.ENTITIES;
-            this.sprite.anchor.set(0.5, 1);
+            this.updateSprite();
         }
     }
 
@@ -90,6 +89,22 @@ export default class Wall {
         this.exists = false;
         ZooGame.app.stage.removeChild(this.sprite);
         ZooGame.physicsManager.removeBody(this.body);
+    }
+
+    public updateSprite(): void {
+        if (!this.exists) return;
+
+        if (this.sprite) {
+            // Remove old sprite
+            ZooGame.app.stage.removeChild(this.sprite);
+        }
+
+        // Add new sprite
+        const texture = this.spriteSheet.getTextureById(this.getSpriteIndex());
+        this.sprite = new PIXI.Sprite(texture);
+        ZooGame.app.stage.addChild(this.sprite);
+        this.sprite.parentGroup = Layers.ENTITIES;
+        this.sprite.anchor.set(0.5, 1 + this.elevation * 0.25);
     }
 
     /**
@@ -107,6 +122,35 @@ export default class Wall {
         } else {
             this.sprite.texture = this.spriteSheet.getTextureById(this.orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
             this.body.setActive(true);
+        }
+    }
+
+    public getSpriteIndex(): WallSpriteIndex {
+        if (this.orientation) {
+            const left = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
+            const right = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
+            this.elevation = 0;
+            if (!left && !right) return WallSpriteIndex.Horizontal;
+            if (left && !right) return WallSpriteIndex.HillWest;
+            if (!left && right) return WallSpriteIndex.HillEast;
+            if (left && right) {
+                this.elevation = 1;
+                return WallSpriteIndex.Horizontal;
+            }
+        } else {
+            const up = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
+            const down = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
+            this.elevation = 0;
+            if (!up && !down) return WallSpriteIndex.Vertical;
+            if (up && !down) return WallSpriteIndex.HillNorth;
+            if (!up && down) {
+                this.elevation = 1;
+                return WallSpriteIndex.HillSouth;
+            }
+            if (up && down) {
+                this.elevation = 1;
+                return WallSpriteIndex.Vertical;
+            }
         }
     }
 }
