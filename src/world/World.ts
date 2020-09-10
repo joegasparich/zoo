@@ -122,14 +122,19 @@ export default class World {
         // Current solution is to ensure that the map is already surrounded by walls
         if (tiles.length < 2) return;
 
+        tiles.forEach(tilePos =>{
+            areasCells.push(this.floodFill(this.map.getCell(tilePos)));
+        });
+
         const oldArea = this.tileAreaMap.get(tiles[0].toString());
+
+        // Return if areas weren't formed properly (false positive in loop check)
+        if (areasCells[0].length + areasCells[1].length > oldArea.getCells().length) return;
+
         const newArea = new Area(uuid(), "New Area");
         // TODO: Autogenerate a good name
         this.areas.set(newArea.id, newArea);
 
-        tiles.forEach(tilePos =>{
-            areasCells.push(this.floodFill(this.map.getCell(tilePos)));
-        });
 
         const larger = areasCells[0].length >= areasCells[1].length ? areasCells[0] : areasCells[1];
         const smaller = areasCells[0].length < areasCells[1].length ? areasCells[0] : areasCells[1];
