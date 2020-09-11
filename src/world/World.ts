@@ -28,12 +28,14 @@ export default class World {
     private tileObjects: Map<string, TileObject>;
     private areas: Map<string, Area>;
     private tileAreaMap: Map<string, Area>;
+    private tileObjectMap: Map<string, TileObject>;
 
     public constructor() {
         this.map = ZooGame.map;
         this.tileObjects = new Map();
         this.areas = new Map();
         this.tileAreaMap = new Map();
+        this.tileObjectMap = new Map();
     }
 
     public async setup(): Promise<void> {
@@ -94,10 +96,17 @@ export default class World {
     public registerTileObject(tileObject: TileObject): void {
         ZooGame.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
+        this.tileObjectMap.set(tileObject.position.floor().toString(), tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {
             this.map.setTileSolid(tileObject.position.floor(), true);
         }
+    }
+
+    public getTileObjectAtPos(pos: Vector): TileObject {
+        if (!this.map.isPositionInMap(pos)) return undefined;
+
+        return this.tileObjectMap.get(pos.floor().toString());
     }
 
     public getRandomCell(): Vector {

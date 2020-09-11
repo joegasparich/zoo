@@ -12,11 +12,11 @@ export default class BiomeTool extends Tool {
 
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
         this.currentBiome = data.biome;
+        ghost.reset();
         ghost.setDrawFunction(pos => {
             Graphics.setLineStyle(1, 0xFFFFFF);
             Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, this.currentBiome, 0.5);
         });
-        ghost.setSnap(false);
     }
 
     public update(): void {

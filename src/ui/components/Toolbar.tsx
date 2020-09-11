@@ -11,6 +11,8 @@ import { ToolType } from "ui/tools";
 import UIManager from "ui/UIManager";
 import { Vector } from "engine";
 import AreaList from "./AreaList";
+import { TileObjectData } from "types/AssetTypes";
+import { AssetManager } from "engine/managers";
 
 interface ToolbarProps extends UIComponentProps {
     toolManager: ToolManager;
@@ -83,7 +85,10 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         key="treeButton"
                         image={Assets.SPRITES.TREE}
                         onClick={(): void => {
-                            this.setTool(ToolType.Tree);
+                            this.setTool(
+                                ToolType.TileObject,
+                                {object: AssetManager.getJSON(Assets.OBJECTS.TREE) as TileObjectData},
+                            );
                         }}
                     />
                     <Button

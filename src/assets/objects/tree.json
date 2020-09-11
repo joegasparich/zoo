@@ -12,5 +12,6 @@
         "x": 0.5,
         "y": 0.7
     },
-    "sprite": "/assets/img/tree.png"
+    "sprite": "/assets/img/tree.png",
+    "canPlaceOnSlopes": true
 }

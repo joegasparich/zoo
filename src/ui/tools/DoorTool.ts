@@ -18,6 +18,7 @@ export default class DoorTool extends Tool {
 
     public set(ghost: PlacementGhost): void {
         this.ghost = ghost;
+        this.ghost.reset();
 
         this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
@@ -26,7 +27,7 @@ export default class DoorTool extends Tool {
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
             const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
-            return wall?.exists && !wall.isDoor;
+            return wall?.exists && !wall.isDoor && !wall.isSloped();
         };
     }
 
@@ -35,7 +36,7 @@ export default class DoorTool extends Tool {
         const wallatMousePos = ZooGame.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
 
         if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
-            if (wallatMousePos) {
+            if (wallatMousePos && !wallatMousePos.isSloped()) {
                 ZooGame.world.placeDoor(wallatMousePos);
             }
         }
@@ -45,23 +46,27 @@ export default class DoorTool extends Tool {
         const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
         const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
+        this.setSprite(this.ghost, Vector.Zero(), quadrant);
+    }
+
+    private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        switch (quadrant) {
+        const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
+        const [spriteIndex, elevation] = wall?.getSpriteIndex(true) || [0, 0];
+        ghost.setSprite(spriteSheet.getTextureById(spriteIndex));
+
+        switch (side) {
             case Side.North:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
-                this.ghost.setOffset(new Vector(0, -0.5));
+                ghost.setOffset(new Vector(0, -0.5 - elevation * 0.5).subtract(offset));
                 break;
             case Side.South:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
-                this.ghost.setOffset(new Vector(0, 0.5));
+                ghost.setOffset(new Vector(0, 0.5 - elevation * 0.5).subtract(offset));
                 break;
             case Side.West:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorVertical));
-                this.ghost.setOffset(new Vector(-0.5, 0.5));
+                ghost.setOffset(new Vector(-0.5, 0.5 - elevation * 0.5).subtract(offset));
                 break;
             case Side.East:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorVertical));
-                this.ghost.setOffset(new Vector(0.5, 0.5));
+                ghost.setOffset(new Vector(0.5, 0.5 - elevation * 0.5).subtract(offset));
                 break;
             default:
                 break;

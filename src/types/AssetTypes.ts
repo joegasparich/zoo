@@ -9,6 +9,7 @@ export interface TileObjectData {
     height: number;
     pivot: Vector;
     sprite: string;
+    canPlaceOnSlopes: boolean;
 }
 
 export interface GroundTileData {

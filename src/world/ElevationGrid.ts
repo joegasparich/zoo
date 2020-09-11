@@ -1,7 +1,10 @@
 import { Config } from "consts";
 import { Graphics, Vector } from "engine";
+import { Side } from "engine/consts";
 import { pointInCircle } from "engine/helpers/math";
+
 import ZooGame from "ZooGame";
+import Wall from "./Wall";
 
 const ELEVATION_HEIGHT = 0.5;
 
@@ -38,22 +41,40 @@ export default class ElevationGrid {
         }
     }
 
-    public setElevation(pos: Vector, radius: number, elevation: Elevation): void {
-        if (!ZooGame.map.isPositionInMap(pos)) return;
+    public setElevation(centre: Vector, radius: number, elevation: Elevation): void {
+        if (!ZooGame.map.isPositionInMap(centre)) return;
 
-        for(let i = pos.x - radius; i <= pos.x + radius; i++) {
-            for(let j = pos.y - radius; j <= pos.y + radius; j++) {
+        for(let i = centre.x - radius; i <= centre.x + radius; i++) {
+            for(let j = centre.y - radius; j <= centre.y + radius; j++) {
                 const gridPos = new Vector(i, j).floor();
                 if (!this.isPositionInGrid(gridPos)) continue;
 
-                if (pointInCircle(pos, radius, gridPos)) {
-                    this.grid[gridPos.x][gridPos.y] = elevation;
+                if (pointInCircle(centre, radius, gridPos)) {
+                    // TODO: Allow elevation if all required points are being elevated
+                    if (this.canElevate(gridPos)) {
+                        this.grid[gridPos.x][gridPos.y] = elevation;
+                    }
                 }
             }
         }
 
-        ZooGame.world.biomeGrid.redrawChunksInRadius(pos.multiply(2), radius + 3);
-        ZooGame.world.wallGrid.getWallsInRadius(pos, radius + 1).forEach(wall => wall.updateSprite());
+        ZooGame.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 3);
+        ZooGame.world.wallGrid.getWallsInRadius(centre, radius + 1).forEach(wall => wall.updateSprite());
+    }
+
+    public canElevate(gridPos: Vector): boolean {
+        // Check 4 surrounding tiles for tileObjects that can't be on slopes
+        for (const tile of this.getSurroundingTiles(gridPos)) {
+            const object = ZooGame.world.getTileObjectAtPos(tile);
+            if (object && !object.data.canPlaceOnSlopes) return false;
+        }
+
+        // Check 4 surrounding wall slots for gates
+        for (const wall of this.getSurroundingWalls(gridPos)) {
+            if (wall?.exists && wall?.isDoor) return false;
+        }
+
+        return true;
     }
 
     public getElevationAtPoint(pos: Vector): number {
@@ -88,16 +109,12 @@ export default class ElevationGrid {
         }
     }
 
-    public getSlopeVariant(cell: Vector): SlopeVariant {
-        if (!ZooGame.map.isPositionInMap(cell)) {
-            return SlopeVariant.Flat;
-        }
-
-        const {x, y} = cell;
-        const nw = this.grid[x][y];         // Top Left
-        const ne = this.grid[x + 1][y];     // Top Right
-        const sw = this.grid[x][y + 1];     // Bottom Left
-        const se = this.grid[x + 1][y + 1]; // Bottom Right
+    public getSlopeVariant(tile: Vector): SlopeVariant {
+        const {x, y} = tile;
+        const nw = this.getElevationAtGridPoint(new Vector(x, y));         // Top Left
+        const ne = this.getElevationAtGridPoint(new Vector(x + 1, y));     // Top Right
+        const sw = this.getElevationAtGridPoint(new Vector(x, y + 1));     // Bottom Left
+        const se = this.getElevationAtGridPoint(new Vector(x + 1, y + 1)); // Bottom Right
 
         if (nw && ne && sw && se) return SlopeVariant.Cliff;
         if (!nw && !ne && !sw && !se) return SlopeVariant.Flat;
@@ -120,8 +137,38 @@ export default class ElevationGrid {
         return undefined;
     }
 
+    public isPositionSloped(position: Vector): boolean {
+        const slopeVariant = this.getSlopeVariant(position.floor());
+
+        return slopeVariant === SlopeVariant.Cliff || slopeVariant === SlopeVariant.Flat;
+    }
+
     private isPositionInGrid(pos: Vector): boolean {
         return pos.x >= 0 && pos.x < this.width && pos.y >= 0 && pos.y < this.height;
+    }
+
+    private getElevationAtGridPoint(gridPos: Vector): number {
+        return this.grid[gridPos.x] && this.grid[gridPos.x][gridPos.y] ? this.grid[gridPos.x][gridPos.y] : 0;
+    }
+
+    private getSurroundingTiles(gridPos: Vector): Vector[] {
+        const tiles: Vector[] = [];
+        for (let i = -1; i < 1; i++) {
+            for (let j = -1; j < 1; j++) {
+                tiles.push(gridPos.add(new Vector(i, j)));
+            }
+        }
+
+        return tiles;
+    }
+
+    private getSurroundingWalls(gridPos: Vector): Wall[] {
+        return [
+            ZooGame.world.wallGrid.getWallAtTile(gridPos, Side.North),
+            ZooGame.world.wallGrid.getWallAtTile(gridPos, Side.West),
+            ZooGame.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.South),
+            ZooGame.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.East),
+        ];
     }
 
     /**

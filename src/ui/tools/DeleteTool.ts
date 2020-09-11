@@ -18,13 +18,14 @@ export default class DeleteTool extends Tool {
 
     public set(ghost: PlacementGhost): void {
         this.ghost = ghost;
+        this.ghost.reset();
 
         this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
-        ghost.setPivot(new Vector(0.5, 1));
-        ghost.setSnap(true);
-        ghost.canPlaceFunction = (pos: Vector): boolean => {
+        this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
+        this.ghost.setPivot(new Vector(0.5, 1));
+        this.ghost.setSnap(true);
+        this.ghost.canPlaceFunction = (pos: Vector): boolean => {
             const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
             return wall?.exists && !wall.isDoor;
         };

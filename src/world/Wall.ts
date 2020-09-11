@@ -56,7 +56,6 @@ export default class Wall {
 
     public exists: boolean;
     public isDoor: boolean;
-    public elevation: number;
 
     public constructor(public orientation: number, public position: Vector, public gridPos: Vector, data?: WallData) {
         this.exists = false;
@@ -100,11 +99,12 @@ export default class Wall {
         }
 
         // Add new sprite
-        const texture = this.spriteSheet.getTextureById(this.getSpriteIndex());
+        const [spriteIndex, elevation] = this.getSpriteIndex();
+        const texture = this.spriteSheet.getTextureById(spriteIndex);
         this.sprite = new PIXI.Sprite(texture);
         ZooGame.app.stage.addChild(this.sprite);
         this.sprite.parentGroup = Layers.ENTITIES;
-        this.sprite.anchor.set(0.5, 1 + this.elevation * 0.25);
+        this.sprite.anchor.set(0.5, 1 + elevation * 0.25);
     }
 
     /**
@@ -125,32 +125,37 @@ export default class Wall {
         }
     }
 
-    public getSpriteIndex(): WallSpriteIndex {
+    public isSloped(): boolean {
         if (this.orientation) {
             const left = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
             const right = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
-            this.elevation = 0;
-            if (!left && !right) return WallSpriteIndex.Horizontal;
-            if (left && !right) return WallSpriteIndex.HillWest;
-            if (!left && right) return WallSpriteIndex.HillEast;
-            if (left && right) {
-                this.elevation = 1;
-                return WallSpriteIndex.Horizontal;
-            }
+
+            return left !== right
         } else {
             const up = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
             const down = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
-            this.elevation = 0;
-            if (!up && !down) return WallSpriteIndex.Vertical;
-            if (up && !down) return WallSpriteIndex.HillNorth;
-            if (!up && down) {
-                this.elevation = 1;
-                return WallSpriteIndex.HillSouth;
-            }
-            if (up && down) {
-                this.elevation = 1;
-                return WallSpriteIndex.Vertical;
-            }
+
+            return up !== down
+        }
+    }
+
+    public getSpriteIndex(isDoor = this.isDoor): [WallSpriteIndex, number] {
+        if (this.orientation) {
+            const left = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
+            const right = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
+
+            if (!left && !right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, 0];
+            if (left && !right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillWest, 0];
+            if (!left && right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillEast, 0];
+            if (left && right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, 1];
+        } else {
+            const up = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
+            const down = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
+
+            if (!up && !down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, 0];
+            if (up && !down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillNorth, 0];
+            if (!up && down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillSouth, 1];
+            if (up && down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, 1];
         }
     }
 }

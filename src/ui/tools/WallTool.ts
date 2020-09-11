@@ -20,13 +20,14 @@ export default class WallTool extends Tool {
 
     public set(ghost: PlacementGhost): void {
         this.ghost = ghost;
+        this.ghost.reset();
 
         this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
-        ghost.setPivot(new Vector(0.5, 1));
-        ghost.setSnap(true);
-        ghost.canPlaceFunction = (pos: Vector): boolean => {
+        this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
+        this.ghost.setPivot(new Vector(0.5, 1));
+        this.ghost.setSnap(true);
+        this.ghost.canPlaceFunction = (pos: Vector): boolean => {
             // TODO: placement is incorrect on vertical walls just outside map
             const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
             return wall && !wall.exists;
@@ -61,24 +62,17 @@ export default class WallTool extends Tool {
 
             this.ghost.setVisible(false);
 
-            const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-
             let i = Math.floor(this.startWallPos?.pos.x);
             let j = Math.floor(this.startWallPos?.pos.y);
             for (let w = 0; w < this.wallGhosts.length; w++) {
                 const ghost = this.wallGhosts[w];
                 ghost.setPosition(new Vector(i, j));
+                this.setSprite(ghost, new Vector(-0.5, 0.5), dragQuadrant);
 
                 if (horizontal) {
-                    ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
                     i += Math.sign(mouseWorldPos.floor().x - i);
-                    if (dragQuadrant === Side.North) ghost.setOffset(new Vector(0.5, -1));
-                    else ghost.setOffset(new Vector(0.5, 0));
                 } else {
-                    ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Vertical));
                     j += Math.sign(mouseWorldPos.floor().y - j);
-                    if (dragQuadrant === Side.West) ghost.setOffset(new Vector(0, 0));
-                    else ghost.setOffset(new Vector(1, 0));
                 }
             };
 
@@ -117,23 +111,27 @@ export default class WallTool extends Tool {
         this.wallGhosts?.forEach(ghost => ghost.postUpdate());
 
         const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
+        this.setSprite(this.ghost, Vector.Zero(), quadrant);
+    }
+
+    private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        switch (quadrant) {
+        const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
+        const [spriteIndex, elevation] = wall?.getSpriteIndex() || [0, 0];
+        ghost.setSprite(spriteSheet.getTextureById(spriteIndex));
+
+        switch (side) {
             case Side.North:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
-                this.ghost.setOffset(new Vector(0, -0.5));
+                ghost.setOffset(new Vector(0, -0.5 - elevation * 0.5).subtract(offset));
                 break;
             case Side.South:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
-                this.ghost.setOffset(new Vector(0, 0.5));
+                ghost.setOffset(new Vector(0, 0.5 - elevation * 0.5).subtract(offset));
                 break;
             case Side.West:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Vertical));
-                this.ghost.setOffset(new Vector(-0.5, 0.5));
+                ghost.setOffset(new Vector(-0.5, 0.5 - elevation * 0.5).subtract(offset));
                 break;
             case Side.East:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Vertical));
-                this.ghost.setOffset(new Vector(0.5, 0.5));
+                ghost.setOffset(new Vector(0.5, 0.5 - elevation * 0.5).subtract(offset));
                 break;
             default:
                 break;

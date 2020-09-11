@@ -6,6 +6,7 @@ import { FollowMouseSystem, SnapToGridSystem, ZOO_SYSTEM } from "entities/system
 import { Assets } from "consts";
 import World from "world/World";
 import ZooGame from "ZooGame";
+import ElevationSystem from "entities/systems/ElevationSystem";
 
 // Should never be seen
 const DEFAULT_SPRITE = Assets.SPRITES.TREE;
@@ -26,6 +27,7 @@ export default class PlacementGhost {
     private mode: Mode;
     private snap: boolean;
     private follow: boolean;
+    private elevation: boolean;
 
     public canPlaceFunction = this.canPlace;
 
@@ -111,6 +113,19 @@ export default class PlacementGhost {
         this.ghost.position = position;
     }
 
+    public applyElevation(): void {
+        if (this.elevation) return;
+        this.elevation = true;
+
+        this.ghost.addSystem(new ElevationSystem());
+    }
+    public disableElevation(): void {
+        if (!this.elevation) return;
+        this.elevation = false;
+
+        this.ghost.removeSystem("ELEVATION_SYSTEM");
+    }
+
     // Based on sprite size
     public setPivot(pivot: Vector): void {
         this.ghostRenderer.pivot = pivot;
@@ -119,6 +134,18 @@ export default class PlacementGhost {
     // Based on world scale
     public setOffset(offset: Vector): void {
         this.ghostRenderer.offset = offset;
+    }
+
+    public reset(): void {
+        this.setSprite(DEFAULT_SPRITE);
+        this.setVisible(true);
+        this.setDrawFunction(() => {});
+        this.setPivot(new Vector(0.5));
+        this.setOffset(Vector.Zero());
+        this.setSnap(false);
+        this.setFollow(true);
+        this.disableElevation();
+        this.canPlaceFunction = this.canPlace;
     }
 
     public destroy(): void {
