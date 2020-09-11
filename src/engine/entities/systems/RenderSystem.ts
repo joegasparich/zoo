@@ -28,8 +28,8 @@ export default class RenderSystem extends System {
         super();
         this.spriteUrl = spriteUrl ?? "";
         this.layer = layer ?? DEFAULT_LAYER;
-        this.pivot = pivot ?? new Vector(0.5, 0.5);
-        this.offset = new Vector(0, 0);
+        this.pivot = pivot ?? new Vector(0.5);
+        this.offset = Vector.Zero();
     }
 
     public start(entity: Entity): void {

@@ -3,11 +3,12 @@ import ToolManager from "ui/ToolManager";
 
 export enum ToolType {
     None,
-    Tree,
+    TileObject,
     Wall,
     Door,
     Delete,
     Biome,
+    Hill,
 }
 
 export abstract class Tool {
@@ -23,6 +24,7 @@ export class NoTool extends Tool {
     public type = ToolType.None;
 
     public set(ghost: PlacementGhost): void {
+        ghost.reset();
         ghost.setVisible(false);
     }
     public update(): void {}
@@ -30,7 +32,8 @@ export class NoTool extends Tool {
 }
 
 export { default as BiomeTool } from "./BiomeTool";
+export { default as HillTool } from "./HillTool";
 export { default as WallTool } from "./WallTool";
 export { default as DoorTool } from "./DoorTool";
 export { default as DeleteTool } from "./DeleteTool";
-export { default as TreeTool } from "./TreeTool";
+export { default as TileObjectTool } from "./TileObjectTool";

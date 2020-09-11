@@ -5,20 +5,20 @@ import { AssetManager } from "engine/managers";
 import { TileObjectData } from "types/AssetTypes";
 import { TAG } from "engine/consts";
 import ZooGame from "ZooGame";
+import ElevationSystem from "./systems/ElevationSystem";
 
 export default class TileObject extends Entity {
     private render: RenderSystem;
     private physics: PhysicsSystem;
-    public blocksPath: boolean;
 
-    public constructor(pos: Vector, data: TileObjectData, blocksPath = false) {
+    public constructor(pos: Vector, public data: TileObjectData, public blocksPath = false) {
         super(ZooGame, pos);
 
-        const sprite = data.sprite;
+        const sprite = this.data.sprite;
 
-        this.render = this.addSystem(new RenderSystem(sprite, undefined, data.pivot));
-        this.physics = this.addSystem(new PhysicsSystem(data.collider, false, 1, TAG.Solid, data.pivot));
-        this.blocksPath = blocksPath;
+        this.render = this.addSystem(new RenderSystem(sprite, undefined, this.data.pivot));
+        this.physics = this.addSystem(new PhysicsSystem(this.data.collider, false, 1, TAG.Solid, this.data.pivot));
+        this.addSystem(new ElevationSystem());
     }
 
     public start(): void {

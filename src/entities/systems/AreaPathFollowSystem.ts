@@ -1,10 +1,12 @@
 import { Vector } from "engine";
-import { PathFollowSystem } from "engine/entities/systems";
+import { PathFollowSystem, SYSTEM } from "engine/entities/systems";
 import Area from "world/Area";
 import Wall from "world/Wall";
 import ZooGame from "ZooGame";
 
 export default class AreaPathFollowSystem extends PathFollowSystem {
+    public id = SYSTEM.PATH_FOLLOW_SYSTEM;
+
     private areaPath: Area[];
     private currentArea: Area;
     private currentDoor: Wall;

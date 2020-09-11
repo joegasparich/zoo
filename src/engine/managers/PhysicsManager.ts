@@ -22,7 +22,7 @@ export enum ColliderType {
 };
 
 const defaultPhysicsObjOpts: PhysicsObjOpts = {
-    position: Vector.Zero,
+    position: Vector.Zero(),
     collider: {
         type: ColliderType.Circle,
     },

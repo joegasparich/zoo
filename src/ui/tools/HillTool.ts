@@ -1,21 +1,23 @@
-import { Config, Inputs } from "consts";
 import { Graphics } from "engine";
-import PlacementGhost from "ui/PlacementGhost";
-import { Biome } from "world/BiomeGrid";
+
 import ZooGame from "ZooGame";
+import { Config, Inputs } from "consts";
+import PlacementGhost from "ui/PlacementGhost";
+import { Elevation } from "world/ElevationGrid";
 import { Tool, ToolType } from ".";
 
 export default class BiomeTool extends Tool {
     public type = ToolType.Biome;
 
-    private currentBiome: Biome;
+    private targetElevation: Elevation;
 
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
-        this.currentBiome = data.biome;
+        this.targetElevation = data.elevation;
+
         ghost.reset();
         ghost.setDrawFunction(pos => {
-            Graphics.setLineStyle(1, 0xFFFFFF);
-            Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, this.currentBiome, 0.5);
+            Graphics.setLineStyle(1, 0xFF0000);
+            Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, 0xFF0000, 0.5);
         });
     }
 
@@ -24,7 +26,7 @@ export default class BiomeTool extends Tool {
 
         // TODO: Update every quarter of a second or something
         if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
-            ZooGame.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, ZooGame.world.getAreaAtPosition(mouseWorldPos));
+            ZooGame.world.elevationGrid.setElevation(mouseWorldPos, this.toolManager.radius, this.targetElevation);
         }
     }
 

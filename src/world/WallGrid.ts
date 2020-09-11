@@ -2,11 +2,11 @@ import { Camera, Graphics, Vector } from "engine";
 import { AssetManager } from "engine/managers";
 import { MapGrid } from "engine/map";
 import { MapEvent, Side } from "engine/consts";
+import Mediator from "engine/Mediator";
 
 import Wall from "./Wall";
 import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
-import Mediator from "engine/Mediator";
 import ZooGame from "ZooGame";
 
 export default class WallGrid {
@@ -378,6 +378,24 @@ export default class WallGrid {
         }
 
         return adjacentTiles;
+    }
+
+    public getWallsInRadius(pos: Vector, radius: number): Wall[] {
+        const walls: Wall[] = [];
+
+        for (let col = 0; col < (this.map.cols * 2) + 1; col++) {
+            const orientation = col % 2;
+            for (let row = 0; row < this.map.rows + orientation; row++) {
+                const wall = this.wallGrid[col][row];
+                if (!wall?.exists) { continue; }
+
+                if (Vector.Distance(pos, wall.position) < radius) {
+                    walls.push(wall);
+                }
+            }
+        }
+
+        return walls;
     }
 
     /**

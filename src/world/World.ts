@@ -18,29 +18,35 @@ import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
 import Wall from "./Wall";
 import WallGrid from "./WallGrid";
+import ElevationGrid from "./ElevationGrid";
 
 export default class World {
     public map: MapGrid;
     public biomeGrid: BiomeGrid;
     public wallGrid: WallGrid;
+    public elevationGrid: ElevationGrid;
     private tileObjects: Map<string, TileObject>;
     private areas: Map<string, Area>;
     private tileAreaMap: Map<string, Area>;
+    private tileObjectMap: Map<string, TileObject>;
 
     public constructor() {
         this.map = ZooGame.map;
         this.tileObjects = new Map();
         this.areas = new Map();
         this.tileAreaMap = new Map();
+        this.tileObjectMap = new Map();
     }
 
     public async setup(): Promise<void> {
         // TODO: Figure out how to load map info like biomes after biomeGrid.setup
         await this.loadMap();
 
-        this.wallGrid = new WallGrid();
+        this.elevationGrid = new ElevationGrid();
         this.biomeGrid = new BiomeGrid(this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
+        this.wallGrid = new WallGrid();
 
+        this.elevationGrid.setup();
         this.biomeGrid.setup();
         this.wallGrid.setup();
 
@@ -49,6 +55,7 @@ export default class World {
         this.generateFence();
     }
 
+    // TODO: Move to scene
     private generateFence(): void {
         const ironFence = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         for (let i = 0; i < this.map.cols; i++) {
@@ -89,10 +96,17 @@ export default class World {
     public registerTileObject(tileObject: TileObject): void {
         ZooGame.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
+        this.tileObjectMap.set(tileObject.position.floor().toString(), tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {
             this.map.setTileSolid(tileObject.position.floor(), true);
         }
+    }
+
+    public getTileObjectAtPos(pos: Vector): TileObject {
+        if (!this.map.isPositionInMap(pos)) return undefined;
+
+        return this.tileObjectMap.get(pos.floor().toString());
     }
 
     public getRandomCell(): Vector {

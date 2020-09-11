@@ -8,6 +8,7 @@ import { MapEvent } from "engine/consts";
 const DISTANCE_TO_NODE = 0.3;
 
 export default class PathFollowSystem extends System {
+    public id = SYSTEM.PATH_FOLLOW_SYSTEM;
 
     private physics: PhysicsSystem;
 

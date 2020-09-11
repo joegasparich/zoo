@@ -17,6 +17,7 @@ class Graphics {
         this.camera = game.camera;
 
         this.graphics = new PIXI.Graphics();
+        // TODO: Seperate this class from DEBUG layer
         this.graphics.parentGroup = Layers.DEBUG;
         game.stage.addChild(this.graphics);
         this.graphics.position = this.camera.offset.toPoint();
@@ -24,6 +25,7 @@ class Graphics {
 
     public preUpdate(): void {
         if (!this.graphics) return;
+
         this.graphics.clear();
 
         if (this.game.opts.enableDebug) {
@@ -35,17 +37,20 @@ class Graphics {
 
     public postUpdate(): void {
         if (!this.graphics) return;
+
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
-        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
+        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
     }
 
     public setLineStyle(thickness: number, colour = Colour.Black): void {
         if (!this.graphics) return;
+
         this.graphics.lineStyle(thickness, colour);
     }
 
     public drawLine(startX: number, startY: number, endX: number, endy: number): void {
         if (!this.graphics) return;
+
         this.graphics.moveTo(startX, startY);
         this.graphics.lineTo(endX, endy);
     }
@@ -76,6 +81,7 @@ class Graphics {
 
     public drawCircle(pos: Vector, radius: number, fill?: number, fillAlpha = 1): void {
         if (!this.graphics) return;
+
         if (fill) this.graphics.beginFill(fill, fillAlpha);
         this.graphics.drawCircle(pos.x, pos.y, radius);
         if (fill) this.graphics.endFill();
@@ -83,13 +89,13 @@ class Graphics {
 
     public drawPolygon(vertices: Vector[], fill?: number, fillAlpha = 1): void {
         if (!this.graphics) return;
+
         if (fill) this.graphics.beginFill(fill, fillAlpha);
         this.graphics.drawPolygon(vertices.map(vertex => vertex.toPoint()));
         if (fill) this.graphics.endFill();
     }
 
     public drawX(pos: Vector, size: number): void {
-        if (!this.graphics) return;
         this.drawLine(pos.x - size, pos.y - size, pos.x + size, pos.y + size);
         this.drawLine(pos.x - size, pos.y + size, pos.x + size, pos.y - size);
     }

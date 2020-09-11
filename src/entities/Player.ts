@@ -35,7 +35,7 @@ export default class Player extends Actor {
         this.addSystem(new CameraFollowSystem());
         this.pather = this.addSystem(new AreaPathFollowSystem());
         this.wallAvoid = this.addSystem(new WallAvoidanceSystem());
-        this.animator = this.getSystem(SYSTEM.ANIMATED_RENDER_SYSTEM) as AnimatedRenderSystem;
+        this.animator = this.getSystem(SYSTEM.RENDER_SYSTEM) as AnimatedRenderSystem;
     }
 
     public start(): void {

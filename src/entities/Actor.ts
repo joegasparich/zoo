@@ -3,6 +3,7 @@ import { Entity } from "engine/entities";
 import { PhysicsSystem, RenderSystem, InputSystem } from "engine/entities/systems";
 import { StateMachine, State } from "engine/state";
 import ZooGame from "ZooGame";
+import ElevationSystem from "./systems/ElevationSystem";
 
 export enum ActorStateInput {
     MOVE= "MOVE",
@@ -24,6 +25,7 @@ export default class Actor extends Entity {
         this.input = this.addSystem(inputSystem);
         this.physics = this.addSystem(physicsSystem);
         this.render = this.addSystem(renderSystem);
+        this.addSystem(new ElevationSystem());
 
         this.state = new StateMachine(Actor.idle);
     }

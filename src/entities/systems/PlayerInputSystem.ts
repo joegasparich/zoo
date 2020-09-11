@@ -1,12 +1,12 @@
 import { Vector } from "engine";
-import { InputSystem } from "engine/entities/systems";
+import { InputSystem, SYSTEM } from "engine/entities/systems";
 
 import Actor, { ActorStateInput } from "entities/Actor";
 import { Inputs } from "consts";
 import ZooGame from "ZooGame";
 
 export default class PlayerInputSystem extends InputSystem {
-    public id = "PLAYER_INPUT_SYSTEM";
+    public id = SYSTEM.INPUT_SYSTEM;
 
     public update(delta: number): void {
         super.update(delta);

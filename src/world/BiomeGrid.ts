@@ -1,8 +1,9 @@
 import { Camera, Layers, Vector } from "engine";
 import { Side } from "engine/consts";
-import { circleIntersectsRect, pointInCircle } from "engine/helpers/math";
+import { circleIntersectsRect, clamp, hexToHsl, hslToHex, pointInCircle } from "engine/helpers/math";
 import ZooGame from "ZooGame";
 import Area from "./Area";
+import { SlopeVariant } from "./ElevationGrid";
 
 export enum Biome {
     Grass = 0xb6d53c,
@@ -14,7 +15,6 @@ const CHUNK_SIZE = 5;
 
 class Square {
     private quadrants: Biome[];
-    public isHomogeneous: boolean;
 
     public constructor(biome?: Biome, biomes?: {north: number; south: number; east: number; west: number}) {
         this.quadrants = [];
@@ -23,14 +23,10 @@ class Square {
         this.quadrants[Side.East] = biomes?.east ?? biome ?? Biome.Grass;
         this.quadrants[Side.South] = biomes?.south ?? biome ?? Biome.Grass;
         this.quadrants[Side.West] = biomes?.west ?? biome ?? Biome.Grass;
-
-        this.isHomogeneous = this.quadrants.every(quadrant => quadrant === this.quadrants[0]);
     }
 
     public setQuadrant(side: Side, biome: Biome): void {
         this.quadrants[side] = biome;
-
-        this.isHomogeneous = this.quadrants.every(quadrant => quadrant === this.quadrants[0]);
     }
 
     public getQuadrants(): Biome[] {
@@ -53,21 +49,11 @@ export default class BiomeGrid {
             for (let j = 0; j < chunkRows; j++) {
                 this.chunks[i][j] = new BiomeChunk(
                     new Vector(i * CHUNK_SIZE, j * CHUNK_SIZE),
-                    i === chunkCols ? this.width % CHUNK_SIZE : CHUNK_SIZE,
-                    j === chunkRows ? this.height % CHUNK_SIZE : CHUNK_SIZE,
+                    i === chunkCols - 1 && this.width % CHUNK_SIZE !== 0 ? this.width % CHUNK_SIZE : CHUNK_SIZE,
+                    j === chunkRows - 1 && this.width % CHUNK_SIZE !== 0 ? this.height % CHUNK_SIZE : CHUNK_SIZE,
                     this.cellSize,
                 );
                 this.chunks[i][j].setup();
-            }
-        }
-
-        this.draw();
-    }
-
-    public draw(): void {
-        for (let i = 0; i < this.chunks.length; i++) {
-            for (let j = 0; j < this.chunks[i].length; j++) {
-                this.chunks[i][j].draw();
             }
         }
     }
@@ -83,7 +69,12 @@ export default class BiomeGrid {
     public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
         this.getChunksInRadius(pos, radius).forEach(chunk => {
             chunk.setBiome(new Vector(pos.x - chunk.pos.x, pos.y - chunk.pos.y), radius, biome, area);
-            chunk.draw();
+        });
+    }
+
+    public redrawChunksInRadius(pos: Vector, radius: number): void {
+        this.getChunksInRadius(pos, radius).forEach(chunk => {
+            chunk.shouldRedraw = true;
         });
     }
 
@@ -124,6 +115,8 @@ class BiomeChunk {
     private grid: Square[][];
     private graphics: PIXI.Graphics;
 
+    public shouldRedraw: boolean;
+
     public constructor(public pos: Vector, public width: number, public height: number, private cellSize: number) {
         this.camera = ZooGame.camera;
     }
@@ -142,6 +135,8 @@ class BiomeChunk {
         this.graphics.parentGroup = Layers.GROUND;
         this.graphics.position = this.camera.offset.toPoint();
         ZooGame.stage.addChild(this.graphics);
+
+        this.shouldRedraw = true;
     }
 
     public draw(): void {
@@ -149,37 +144,39 @@ class BiomeChunk {
 
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
-                if (this.grid[i][j].isHomogeneous) {
-                    // Draw square if whole tile is the same
+                for (let q = 0; q < 4; q++) {
+                    // this.graphics.lineStyle(0.2, 0xFFFFFF); // White borders on biome grid
+                    let colour = this.grid[i][j].getQuadrants()[q];
+                    const {h,s,l} = hexToHsl(colour);
+                    const slopeColour = this.getQuadrantSlopeColour(i + this.pos.x, j + this.pos.y, q) * 0.1;
+                    colour = hslToHex(h, s, clamp(l + slopeColour, 0, 1));
                     this.graphics
-                        .beginFill(this.grid[i][j].getQuadrants()[0])
-                        .drawRect(
-                            (i + this.pos.x) * this.cellSize,
-                            (j + this.pos.y) * this.cellSize,
-                            this.cellSize,
-                            this.cellSize,
-                        )
-                        .endFill();
-                } else {
-                    // Draw 4 triangles if not
-                    for (let q = 0; q < 4; q++) {
-                        this.graphics
-                            .beginFill(this.grid[i][j].getQuadrants()[q])
-                            .drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
-                                const vec = vertex.add(new Vector(this.pos.x, this.pos.y)).multiply(this.cellSize);
-                                return new PIXI.Point(vec.x, vec.y);
-                            }))
-                            .endFill();
+                        .beginFill(colour)
+                        .drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
+                            let vec = vertex.add(new Vector(this.pos.x, this.pos.y));
+                            // Add elevation
+                            const elevation = ZooGame.world.elevationGrid.getElevationAtPoint(vec.divide(2));
+                            vec = vec.add(new Vector(0, -(elevation * 2)));
 
-                    }
+                            // Convert to screen space
+                            return vec.multiply(this.cellSize).toPoint();
+                        }))
+                        .endFill();
                 }
             }
         }
     }
 
     public postUpdate(): void {
+        if (this.shouldRedraw) {
+            // TODO: Investigate drawing one chunk per frame or something
+            this.draw();
+            this.shouldRedraw = false;
+        }
+
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
-        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero).toPoint();
+        // TODO: set position and draw triangles locally?
+        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
     }
 
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {
@@ -190,7 +187,7 @@ class BiomeChunk {
                     new Vector((x+1), y),
                     new Vector(x + 0.5, y + 0.5),
                 ];
-            case Side.East:
+            case Side.West:
                 return [
                     new Vector(x, y),
                     new Vector(x, (y+1)),
@@ -202,7 +199,7 @@ class BiomeChunk {
                     new Vector((x+1), (y+1)),
                     new Vector(x + 0.5, y + 0.5),
                 ];
-            case Side.West:
+            case Side.East:
                 return [
                     new Vector((x+1), y),
                     new Vector((x+1), (y+1)),
@@ -211,7 +208,38 @@ class BiomeChunk {
         }
     }
 
+    private getQuadrantSlopeColour(x: number, y: number, quadrant: Side): number {
+        const slopeVariant = ZooGame.world.elevationGrid.getSlopeVariant(new Vector(x, y).divide(2).floor());
+
+        const NW = 1, N = 0.75, W = 0.5, NE = 0.25, F = 0, SW = -0.25, E = -0.5, S = -0.75, SE = -1;
+        const xRel = x/2 % 1;
+        const yRel = y/2 % 1;
+
+        switch(slopeVariant) {
+            case SlopeVariant.N: return N;
+            case SlopeVariant.S: return S;
+            case SlopeVariant.W: return W;
+            case SlopeVariant.E: return E;
+            case SlopeVariant.NW: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? NW : F;
+            case SlopeVariant.NE: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? NE : F;
+            case SlopeVariant.SW: return (yRel - xRel) < 0 || ((yRel - xRel) === 0 && (quadrant === Side.North || quadrant === Side.East)) ? SW : F;
+            case SlopeVariant.SE: return (xRel + yRel) < 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.North || quadrant === Side.West)) ? SE : F;
+            case SlopeVariant.INW: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? N : W;
+            case SlopeVariant.INE: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? N : E;
+            case SlopeVariant.ISW: return (xRel + yRel) < 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.North || quadrant === Side.West)) ? S : W;
+            case SlopeVariant.ISE: return (yRel - xRel) < 0 || ((yRel - xRel) === 0 && (quadrant === Side.North || quadrant === Side.East)) ? S : E;
+            case SlopeVariant.I1: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? NW : SE;
+            case SlopeVariant.I2: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? NE : SW;
+            case SlopeVariant.Cliff:
+            case SlopeVariant.Flat:
+            default:
+                return F;
+        }
+    }
+
     public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
+        let changed = false;
+
         for(let i = pos.x - (radius); i <= pos.x + (radius); i++) {
             for(let j = pos.y - (radius); j <= pos.y + (radius); j++) {
                 const cellPos = new Vector(i, j).floor();
@@ -225,11 +253,15 @@ class BiomeChunk {
                             const xflr = Math.floor(cellPos.x);
                             const yflr = Math.floor(cellPos.y);
                             this.grid[xflr][yflr].setQuadrant(q, biome);
-                            return;
+                            changed = true;
                         }
                     });
                 }
             }
+        }
+
+        if (changed) {
+            this.draw();
         }
     }
 

@@ -16,7 +16,7 @@ export class Animation {
 }
 
 export default class AnimatedRenderSystem extends RenderSystem {
-    public id = SYSTEM.ANIMATED_RENDER_SYSTEM;
+    public id = SYSTEM.RENDER_SYSTEM;
 
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;
