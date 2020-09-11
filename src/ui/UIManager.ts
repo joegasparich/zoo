@@ -22,15 +22,6 @@ class UIManager {
             key: "windows",
             ref: this.windowsRef,
         }));
-
-        this.openWindow(
-            "areaList",
-            "Areas",
-            new Vector(0, 500),
-            React.createElement(AreaList, {
-                ref: this.areasRef,
-            }),
-        );
     }
 
     public update(delta: number): void {

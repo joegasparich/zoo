@@ -10,6 +10,15 @@ export const UI = {
     SAND: "/assets/img/sand.png",
     IRON_BAR_FENCE: "/assets/img/iron_bar_fence_icon.png",
     IRON_BAR_GATE: "/assets/img/iron_bar_gate_icon.png",
+    DEBUG_ICON: "/assets/img/debug_icon.png",
+    AREAS_ICON: "/assets/img/areas_icon.png",
+    BIN_ICON: "/assets/img/bin_icon.png",
+    ELEVATE_ICON: "/assets/img/elevate_icon.png",
+    FLATTEN_ICON: "/assets/img/flatten_icon.png",
+    ELEVATION_ICON: "/assets/img/elevation_icon.png",
+    GRID_ICON: "/assets/img/grid_icon.png",
+    PATHFINDING_ICON: "/assets/img/pathfinding_icon.png",
+    PHYSICS_ICON: "/assets/img/physics_icon.png",
 };
 
 export const SPRITESHEETS = {

@@ -54,7 +54,7 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                     <Button
                         id="debugButton"
                         key="debugButton"
-                        image={Assets.UI.BIOME}
+                        image={Assets.UI.DEBUG_ICON}
                         onClick={this.handlePanelButtonClick.bind(this)}
                     />
                     <FloatingPanel
@@ -66,27 +66,27 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                     >
                         <Button
                             key="mapGridButton"
-                            image={Assets.UI.GRASS}
+                            image={Assets.UI.GRID_ICON}
                             onClick={(): void => { ZooGame.debugSettings.showMapGrid = !ZooGame.debugSettings.showMapGrid; }}
                         />
                         <Button
                             key="pathfindingButton"
-                            image={Assets.UI.SNOW}
+                            image={Assets.UI.PATHFINDING_ICON}
                             onClick={(): void => { ZooGame.debugSettings.showPathfinding = !ZooGame.debugSettings.showPathfinding; }}
                         />
                         <Button
                             key="physicsButton"
-                            image={Assets.UI.SAND}
+                            image={Assets.UI.PHYSICS_ICON}
                             onClick={(): void => { ZooGame.debugSettings.showPhysics = !ZooGame.debugSettings.showPhysics; }}
                         />
                         <Button
                             key="wallButton"
-                            image={Assets.UI.SAND}
+                            image={Assets.UI.IRON_BAR_FENCE}
                             onClick={(): void => { ZooGame.debugSettings.showWallGrid = !ZooGame.debugSettings.showWallGrid; }}
                         />
                         <Button
                             key="elevationButton"
-                            image={Assets.UI.SNOW}
+                            image={Assets.UI.ELEVATION_ICON}
                             onClick={(): void => { ZooGame.debugSettings.showElevation = !ZooGame.debugSettings.showElevation; }}
                         />
                     </FloatingPanel>

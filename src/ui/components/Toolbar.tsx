@@ -107,14 +107,14 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     />
                     <Button
                         key="deleteButton"
-                        image={Assets.UI.SAND}
+                        image={Assets.UI.BIN_ICON}
                         onClick={(): void => {
                             this.setTool(ToolType.Delete);
                         }}
                     />
                     <Button
                         key="areasButton"
-                        image={Assets.UI.GRASS}
+                        image={Assets.UI.AREAS_ICON}
                         onClick={(): void => {
                             UIManager.openWindow("areaList", "Areas", new Vector(0, 400), <AreaList />);
                         }}
@@ -124,7 +124,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     />
                     <Button
                         key="hillButton"
-                        image={Assets.UI.SNOW}
+                        image={Assets.UI.ELEVATE_ICON}
                         onClick={(): void => {
                             this.setTool(ToolType.Hill, { elevation: 1 });
                         }}
