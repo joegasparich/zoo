@@ -6,16 +6,16 @@ import { pointInCircle } from "engine/helpers/math";
 import ZooGame from "ZooGame";
 import Wall from "./Wall";
 
-const ELEVATION_HEIGHT = 0.5;
+export const ELEVATION_HEIGHT = 0.5;
 
 export enum Elevation {
-    // Water = -1,
+    Water = -1,
     Flat = 0,
     Hill = 1,
 }
 
 export enum SlopeVariant {
-    Flat, Cliff,
+    Flat,
     S, E, W, N,
     NW, NE, SW, SE,
     INW, INE, ISW, ISE,
@@ -41,7 +41,7 @@ export default class ElevationGrid {
         }
     }
 
-    public setElevation(centre: Vector, radius: number, elevation: Elevation): void {
+    public setElevationInCircle(centre: Vector, radius: number, elevation: Elevation): void {
         if (!ZooGame.map.isPositionInMap(centre)) return;
 
         for(let i = centre.x - radius; i <= centre.x + radius; i++) {
@@ -50,10 +50,7 @@ export default class ElevationGrid {
                 if (!this.isPositionInGrid(gridPos)) continue;
 
                 if (pointInCircle(centre, radius, gridPos)) {
-                    // TODO: Allow elevation if all required points are being elevated
-                    if (this.canElevate(gridPos)) {
-                        this.grid[gridPos.x][gridPos.y] = elevation;
-                    }
+                    this.setElevation(gridPos, elevation);
                 }
             }
         }
@@ -62,7 +59,32 @@ export default class ElevationGrid {
         ZooGame.world.wallGrid.getWallsInRadius(centre, radius + 1).forEach(wall => wall.updateSprite());
     }
 
-    public canElevate(gridPos: Vector): boolean {
+    public setElevation(gridPos: Vector, elevation: Elevation): void {
+        // TODO: Allow elevation if all required points are being elevated
+        if (this.canElevate(gridPos, elevation)) {
+            // Flatten surrounding terrain
+            if (elevation !== Elevation.Flat) {
+                this.getAdjacentGridPositions(gridPos, true)
+                    .filter(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation)
+                    .forEach(gridPos => {
+                        this.setElevation(gridPos, Elevation.Flat);
+                        ZooGame.world.biomeGrid.redrawChunksInRadius(gridPos.multiply(2), 2);
+                    });
+            }
+
+            this.grid[gridPos.x][gridPos.y] = elevation;
+
+            this.getAdjacentGridPositions(gridPos, true).forEach(gridPos => {
+                if (this.getBaseElevation(gridPos) < 0) {
+                    ZooGame.world.waterGrid.setTileWater(gridPos);
+                } else {
+                    ZooGame.world.waterGrid.setTileLand(gridPos);
+                }
+            });
+        }
+    }
+
+    public canElevate(gridPos: Vector, elevation: Elevation): boolean {
         // Check 4 surrounding tiles for tileObjects that can't be on slopes
         for (const tile of this.getSurroundingTiles(gridPos)) {
             const object = ZooGame.world.getTileObjectAtPos(tile);
@@ -72,6 +94,19 @@ export default class ElevationGrid {
         // Check 4 surrounding wall slots for gates
         for (const wall of this.getSurroundingWalls(gridPos)) {
             if (wall?.exists && wall?.isDoor) return false;
+        }
+
+        if (elevation === Elevation.Water) {
+            // Check 4 surrounding tiles for tileObjects that can't be on slopes
+            for (const tile of this.getSurroundingTiles(gridPos)) {
+                const object = ZooGame.world.getTileObjectAtPos(tile);
+                if (object && !object.data.canPlaceInWater) return false;
+            }
+
+            // Check 4 surrounding wall slots for walls
+            for (const wall of this.getSurroundingWalls(gridPos)) {
+                if (wall?.exists) return false;
+            }
         }
 
         return true;
@@ -84,25 +119,26 @@ export default class ElevationGrid {
 
         const relX = pos.x % 1;
         const relY = pos.y % 1;
+        const baseElevation = this.getBaseElevation(pos.floor());
+        const slopeVariant = this.getSlopeVariant(pos.floor());
 
         // Tried to come up with a formula instead of using enums but I'm too dumb
-        switch (this.getSlopeVariant(pos.floor())) {
-            case SlopeVariant.Flat: return 0;
-            case SlopeVariant.Cliff: return ELEVATION_HEIGHT;
-            case SlopeVariant.N: return ELEVATION_HEIGHT * relY;
-            case SlopeVariant.S: return ELEVATION_HEIGHT * (1 - relY);
-            case SlopeVariant.W: return ELEVATION_HEIGHT * relX;
-            case SlopeVariant.E: return ELEVATION_HEIGHT * (1 - relX);
-            case SlopeVariant.SE: return ELEVATION_HEIGHT * Math.max((1 - relX - relY), 0);
-            case SlopeVariant.SW: return ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - relY), 0);
-            case SlopeVariant.NE: return ELEVATION_HEIGHT * Math.max((1 - relX - (1 - relY)), 0);
-            case SlopeVariant.NW: return ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - (1 - relY)), 0);
-            case SlopeVariant.ISE: return ELEVATION_HEIGHT * Math.max((1 - relX), (1 - relY));
-            case SlopeVariant.ISW: return ELEVATION_HEIGHT * Math.max(relX, (1 - relY));
-            case SlopeVariant.INE: return ELEVATION_HEIGHT * Math.max((1 - relX), relY);
-            case SlopeVariant.INW: return ELEVATION_HEIGHT * Math.max(relX, relY);
-            case SlopeVariant.I1: return ELEVATION_HEIGHT * Math.max((1 - relX - relY), (1 - (1 - relX) - (1 - relY)));
-            case SlopeVariant.I2: return ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - relY), (1 - relX - (1 - relY)));
+        switch (slopeVariant) {
+            case SlopeVariant.Flat: return baseElevation;
+            case SlopeVariant.N: return baseElevation + ELEVATION_HEIGHT * relY;
+            case SlopeVariant.S: return baseElevation + ELEVATION_HEIGHT * (1 - relY);
+            case SlopeVariant.W: return baseElevation + ELEVATION_HEIGHT * relX;
+            case SlopeVariant.E: return baseElevation + ELEVATION_HEIGHT * (1 - relX);
+            case SlopeVariant.SE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX - relY), 0);
+            case SlopeVariant.SW: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - relY), 0);
+            case SlopeVariant.NE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX - (1 - relY)), 0);
+            case SlopeVariant.NW: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - (1 - relY)), 0);
+            case SlopeVariant.ISE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX), (1 - relY));
+            case SlopeVariant.ISW: return baseElevation + ELEVATION_HEIGHT * Math.max(relX, (1 - relY));
+            case SlopeVariant.INE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX), relY);
+            case SlopeVariant.INW: return baseElevation + ELEVATION_HEIGHT * Math.max(relX, relY);
+            case SlopeVariant.I1: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX - relY), (1 - (1 - relX) - (1 - relY)));
+            case SlopeVariant.I2: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - relY), (1 - relX - (1 - relY)));
             default:
                 console.error("You shouldn't be here");
                 return 0;
@@ -116,35 +152,41 @@ export default class ElevationGrid {
         const sw = this.getElevationAtGridPoint(new Vector(x, y + 1));     // Bottom Left
         const se = this.getElevationAtGridPoint(new Vector(x + 1, y + 1)); // Bottom Right
 
-        if (nw && ne && sw && se) return SlopeVariant.Cliff;
-        if (!nw && !ne && !sw && !se) return SlopeVariant.Flat;
-        if (!nw && !ne && sw && se) return SlopeVariant.N;
-        if (nw && !ne && sw && !se) return SlopeVariant.E;
-        if (nw && ne && !sw && !se) return SlopeVariant.S;
-        if (!nw && ne && !sw && se) return SlopeVariant.W;
-        if (nw && !ne && !sw && !se) return SlopeVariant.SE;
-        if (!nw && ne && !sw && !se) return SlopeVariant.SW;
-        if (!nw && !ne && sw && !se) return SlopeVariant.NE;
-        if (!nw && !ne && !sw && se) return SlopeVariant.NW;
-        if (!nw && ne && sw && se) return SlopeVariant.INW;
-        if (nw && !ne && sw && se) return SlopeVariant.INE;
-        if (nw && ne && !sw && se) return SlopeVariant.ISW;
-        if (nw && ne && sw && !se) return SlopeVariant.ISE;
-        if (nw && !ne && !sw && se) return SlopeVariant.I1;
-        if (!nw && ne && sw && !se) return SlopeVariant.I2;
+        if (nw === ne && nw === sw && nw === se) return SlopeVariant.Flat;
+        if (nw === ne && sw === se && nw < sw) return SlopeVariant.N;
+        if (nw === sw && ne === se && nw > ne) return SlopeVariant.E;
+        if (nw === ne && sw === se && nw > sw) return SlopeVariant.S;
+        if (nw === sw && ne === se && nw < ne) return SlopeVariant.W;
+        if (se === sw && se === ne && nw > se) return SlopeVariant.SE;
+        if (sw === nw && sw === se && ne > sw) return SlopeVariant.SW;
+        if (ne === nw && ne === se && sw > ne) return SlopeVariant.NE;
+        if (nw === sw && nw === ne && se > nw) return SlopeVariant.NW;
+        if (se === sw && se === ne && nw < se) return SlopeVariant.INW;
+        if (sw === nw && sw === se && ne < sw) return SlopeVariant.INE;
+        if (ne === nw && ne === se && sw < ne) return SlopeVariant.ISW;
+        if (nw === sw && nw === ne && se < nw) return SlopeVariant.ISE;
+        if (nw === se && sw === ne && nw > ne) return SlopeVariant.I1;
+        if (nw === se && sw === ne && nw < ne) return SlopeVariant.I2;
 
         console.error("How did you get here?");
-        return undefined;
+        return SlopeVariant.Flat;
     }
 
     public isPositionSloped(position: Vector): boolean {
-        const slopeVariant = this.getSlopeVariant(position.floor());
-
-        return slopeVariant === SlopeVariant.Cliff || slopeVariant === SlopeVariant.Flat;
+        return this.getSlopeVariant(position.floor()) === SlopeVariant.Flat;
     }
 
     private isPositionInGrid(pos: Vector): boolean {
         return pos.x >= 0 && pos.x < this.width && pos.y >= 0 && pos.y < this.height;
+    }
+
+    public getBaseElevation(tile: Vector): number {
+        return Math.min(
+            this.getElevationAtGridPoint(tile),
+            this.getElevationAtGridPoint(tile.add(new Vector(0, 1))),
+            this.getElevationAtGridPoint(tile.add(new Vector(1, 0))),
+            this.getElevationAtGridPoint(tile.add(new Vector(1, 1))),
+        ) * ELEVATION_HEIGHT;
     }
 
     private getElevationAtGridPoint(gridPos: Vector): number {
@@ -169,6 +211,25 @@ export default class ElevationGrid {
             ZooGame.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.South),
             ZooGame.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.East),
         ];
+    }
+
+    private getAdjacentGridPositions(gridPos: Vector, diagonals?: boolean): Vector[] {
+        let elevations = [
+            gridPos.add(new Vector(1, 0)),
+            gridPos.add(new Vector(-1, 0)),
+            gridPos.add(new Vector(0, 1)),
+            gridPos.add(new Vector(0, -1)),
+        ];
+        if (diagonals) {
+            elevations = elevations.concat([
+                gridPos.add(new Vector(1, -1)),
+                gridPos.add(new Vector(1, 1)),
+                gridPos.add(new Vector(-1, 1)),
+                gridPos.add(new Vector(-1, -1)),
+            ]);
+        }
+
+        return elevations;
     }
 
     /**

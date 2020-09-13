@@ -19,22 +19,29 @@ export default class TileObjectTool extends Tool {
         ghost.setPivot(this.currentObject.pivot);
         ghost.setSnap(true);
         ghost.applyElevation();
-        ghost.canPlaceFunction = (position: Vector): boolean => {
-            if (!ZooGame.map.isPositionInMap(position)) return false;
-
-            return this.currentObject.canPlaceOnSlopes || ZooGame.world.elevationGrid.isPositionSloped(position);
-        };
+        ghost.canPlaceFunction = this.canPlace.bind(this);
     }
 
     public update(): void {
         const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
 
         if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
-            const placePos: Vector = mouseWorldPos.floor();
+            if (this.canPlace(mouseWorldPos)) {
+                const placePos: Vector = mouseWorldPos.floor();
 
-            ZooGame.placeTileObject(this.currentObject, placePos);
+                ZooGame.placeTileObject(this.currentObject, placePos);
+            }
         }
     }
 
     public postUpdate(): void {}
+
+    private canPlace(position: Vector): boolean {
+        if (!ZooGame.map.isPositionInMap(position)) return false;
+
+        if (!this.currentObject.canPlaceOnSlopes && ZooGame.world.elevationGrid.isPositionSloped(position)) return false;
+        if (!this.currentObject.canPlaceInWater && ZooGame.world.waterGrid.isPositionWater(position)) return false;
+
+        return true;
+    }
 }

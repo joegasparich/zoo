@@ -10,6 +10,7 @@ export const UI = {
     SAND: "/assets/img/sand.png",
     IRON_BAR_FENCE: "/assets/img/iron_bar_fence_icon.png",
     IRON_BAR_GATE: "/assets/img/iron_bar_gate_icon.png",
+    WATER_ICON: "/assets/img/water_icon.png",
 };
 
 export const SPRITESHEETS = {

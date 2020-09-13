@@ -7,7 +7,7 @@ import { UIEvent } from "engine/consts/events";
 import ZooGame from "ZooGame";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TileObjectTool, WallTool, DeleteTool, HillTool } from "./tools";
+import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TileObjectTool, WallTool, DeleteTool, ElevationTool, WaterTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
 
 export default class ToolManager {
@@ -66,7 +66,8 @@ export default class ToolManager {
             case ToolType.Door: this.activeTool = new DoorTool(this); break;
             case ToolType.Delete: this.activeTool = new DeleteTool(this); break;
             case ToolType.Biome: this.activeTool = new BiomeTool(this); break;
-            case ToolType.Hill: this.activeTool = new HillTool(this); break;
+            case ToolType.Water: this.activeTool = new WaterTool(this); break;
+            case ToolType.Elevation: this.activeTool = new ElevationTool(this); break;
 
             case ToolType.None:
             default:
@@ -85,7 +86,7 @@ export default class ToolManager {
     public showRadius(): boolean {
         switch(this.activeTool.type) {
             case ToolType.Biome:
-            case ToolType.Hill:
+            case ToolType.Elevation:
                 return true;
             default:
                 return false;

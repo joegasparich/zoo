@@ -27,11 +27,7 @@ export default class WallTool extends Tool {
         this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
         this.ghost.setPivot(new Vector(0.5, 1));
         this.ghost.setSnap(true);
-        this.ghost.canPlaceFunction = (pos: Vector): boolean => {
-            // TODO: placement is incorrect on vertical walls just outside map
-            const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
-            return wall && !wall.exists;
-        };
+        this.ghost.canPlaceFunction = this.canPlace.bind(this);
     }
 
     public update(): void {
@@ -97,7 +93,10 @@ export default class WallTool extends Tool {
             this.wallGhosts.forEach(ghost => {
                 const tilePos = ghost.getPosition().floor();
 
-                ZooGame.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant);
+                if (this.canPlace(tilePos)) {
+                    ZooGame.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant);
+                }
+
                 ghost.destroy();
             });
 
@@ -122,19 +121,58 @@ export default class WallTool extends Tool {
 
         switch (side) {
             case Side.North:
-                ghost.setOffset(new Vector(0, -0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(0, -0.5 - elevation).subtract(offset));
                 break;
             case Side.South:
-                ghost.setOffset(new Vector(0, 0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(0, 0.5 - elevation).subtract(offset));
                 break;
             case Side.West:
-                ghost.setOffset(new Vector(-0.5, 0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(-0.5, 0.5 - elevation).subtract(offset));
                 break;
             case Side.East:
-                ghost.setOffset(new Vector(0.5, 0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(0.5, 0.5 - elevation).subtract(offset));
                 break;
             default:
                 break;
         }
+    }
+
+    private canPlace(pos: Vector): boolean {
+        // TODO: placement is incorrect on vertical walls just outside map
+        const quadrant = ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos()));
+
+        // Check inside map
+        if (!ZooGame.map.isPositionInMap(pos)) return false;
+
+        // Check for existing wall
+        const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), quadrant);
+        if (wall && wall.exists) return false;
+
+        // Check for water
+        let vertexA: Vector, vertexB: Vector;
+        const flPos = pos.floor();
+        switch(quadrant) {
+            case Side.North:
+                vertexA = new Vector(flPos.x, flPos.y);
+                vertexB = new Vector(flPos.x + 1, flPos.y);
+                break;
+            case Side.South:
+                vertexA = new Vector(flPos.x, flPos.y + 1);
+                vertexB = new Vector(flPos.x + 1, flPos.y + 1);
+                break;
+            case Side.East:
+                vertexA = new Vector(flPos.x + 1, flPos.y);
+                vertexB = new Vector(flPos.x + 1, flPos.y + 1);
+                break;
+            case Side.West:
+                vertexA = new Vector(flPos.x, flPos.y);
+                vertexB = new Vector(flPos.x, flPos.y + 1);
+                break;
+        }
+
+        const elevA = ZooGame.world.elevationGrid.getElevationAtPoint(vertexA);
+        const elevB = ZooGame.world.elevationGrid.getElevationAtPoint(vertexB);
+
+        return elevA >= 0 && elevB >= 0;
     }
 }

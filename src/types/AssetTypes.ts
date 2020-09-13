@@ -10,6 +10,7 @@ export interface TileObjectData {
     pivot: Vector;
     sprite: string;
     canPlaceOnSlopes: boolean;
+    canPlaceInWater: boolean;
 }
 
 export interface GroundTileData {

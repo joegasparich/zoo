@@ -89,6 +89,11 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                             image={Assets.UI.SNOW}
                             onClick={(): void => { ZooGame.debugSettings.showElevation = !ZooGame.debugSettings.showElevation; }}
                         />
+                        <Button
+                            key="waterButton"
+                            image={Assets.UI.WATER_ICON}
+                            onClick={(): void => { ZooGame.debugSettings.showWater = !ZooGame.debugSettings.showWater; }}
+                        />
                     </FloatingPanel>
                 </div>
             </React.Fragment>
