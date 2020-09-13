@@ -16,6 +16,7 @@ type DebugSettings = {
     showWallGrid: boolean;
     showPhysics: boolean;
     showElevation: boolean;
+    showWater: boolean;
 };
 
 const defaultSettings: DebugSettings = {
@@ -24,6 +25,7 @@ const defaultSettings: DebugSettings = {
     showWallGrid: false,
     showPhysics: false,
     showElevation: false,
+    showWater: false,
 };
 
 class ZooGame extends Game {
@@ -105,6 +107,7 @@ class ZooGame extends Game {
         if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
         if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
         if (this.debugSettings.showElevation) this.world.elevationGrid.drawDebug();
+        if (this.debugSettings.showWater) this.world.waterGrid.drawDebug();
     }
 }
 

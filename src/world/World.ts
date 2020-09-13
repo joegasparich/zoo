@@ -19,12 +19,15 @@ import BiomeGrid from "./BiomeGrid";
 import Wall from "./Wall";
 import WallGrid from "./WallGrid";
 import ElevationGrid from "./ElevationGrid";
+import WaterGrid from "./WaterGrid";
 
 export default class World {
     public map: MapGrid;
     public biomeGrid: BiomeGrid;
     public wallGrid: WallGrid;
     public elevationGrid: ElevationGrid;
+    public waterGrid: WaterGrid;
+
     private tileObjects: Map<string, TileObject>;
     private areas: Map<string, Area>;
     private tileAreaMap: Map<string, Area>;
@@ -45,10 +48,12 @@ export default class World {
         this.elevationGrid = new ElevationGrid();
         this.biomeGrid = new BiomeGrid(this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
         this.wallGrid = new WallGrid();
+        this.waterGrid = new WaterGrid();
 
         this.elevationGrid.setup();
         this.biomeGrid.setup();
         this.wallGrid.setup();
+        this.waterGrid.setup();
 
         // TODO: Store outer fence information in scene & then generate area based on that
         // TODO: Add unremovable fences
@@ -77,6 +82,7 @@ export default class World {
     public postUpdate(delta: number): void {
         this.biomeGrid.postUpdate();
         this.wallGrid.postUpdate();
+        this.waterGrid.postUpdate();
 
         this.areas.forEach(area => {
             area.postUpdate();

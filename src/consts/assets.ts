@@ -19,6 +19,7 @@ export const UI = {
     GRID_ICON: "/assets/img/grid_icon.png",
     PATHFINDING_ICON: "/assets/img/pathfinding_icon.png",
     PHYSICS_ICON: "/assets/img/physics_icon.png",
+    WATER_ICON: "/assets/img/water_icon.png",
 };
 
 export const SPRITESHEETS = {

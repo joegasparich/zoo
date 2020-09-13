@@ -6,8 +6,8 @@ import PlacementGhost from "ui/PlacementGhost";
 import { Elevation } from "world/ElevationGrid";
 import { Tool, ToolType } from ".";
 
-export default class BiomeTool extends Tool {
-    public type = ToolType.Biome;
+export default class ElevationTool extends Tool {
+    public type = ToolType.Elevation;
 
     private targetElevation: Elevation;
 
@@ -26,7 +26,7 @@ export default class BiomeTool extends Tool {
 
         // TODO: Update every quarter of a second or something
         if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
-            ZooGame.world.elevationGrid.setElevation(mouseWorldPos, this.toolManager.radius, this.targetElevation);
+            ZooGame.world.elevationGrid.setElevationInCircle(mouseWorldPos, this.toolManager.radius, this.targetElevation);
         }
     }
 

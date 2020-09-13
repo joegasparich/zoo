@@ -230,7 +230,6 @@ class BiomeChunk {
             case SlopeVariant.ISE: return (yRel - xRel) < 0 || ((yRel - xRel) === 0 && (quadrant === Side.North || quadrant === Side.East)) ? S : E;
             case SlopeVariant.I1: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? NW : SE;
             case SlopeVariant.I2: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? NE : SW;
-            case SlopeVariant.Cliff:
             case SlopeVariant.Flat:
             default:
                 return F;
