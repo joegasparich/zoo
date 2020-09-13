@@ -19,9 +19,12 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
         const currentArea = ZooGame.world.getAreaAtPosition(this.entity.position);
         const targetArea = ZooGame.world.getAreaAtPosition(location);
         if (currentArea !== targetArea) {
-            this.areaPath = ZooGame.world.findAreaPath(currentArea, targetArea);
-            this.currentArea = this.areaPath.shift();
-            this.targetPosition = location;
+            const path = ZooGame.world.findAreaPath(currentArea, targetArea);
+            if (path) {
+                this.areaPath = path;
+                this.currentArea = this.areaPath.shift();
+                this.targetPosition = location;
+            }
         } else {
             return super.pathTo(location);
         }

@@ -4,7 +4,7 @@ import { MapGrid } from "engine/map";
 import { MapEvent, Side } from "engine/consts";
 import Mediator from "engine/Mediator";
 
-import Wall from "./Wall";
+import Wall, { Orientation } from "./Wall";
 import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
 import ZooGame from "ZooGame";
@@ -52,8 +52,7 @@ export default class WallGrid {
 
                 // Texture
                 let wallPos;
-                if (orientation === 0) {
-                    // Vertical
+                if (orientation === Orientation.Vertical) {
                     wallPos = new Vector((col/2), row+1);
                 } else {
                     wallPos = new Vector((col/2), row);
@@ -113,6 +112,10 @@ export default class WallGrid {
         return wall;
     }
 
+    public deleteWall(wall: Wall): void {
+        this.deleteWallAtTile(wall.position.floor(), wall.orientation === Orientation.Horizontal ? Side.North : Side.West);
+    }
+
     public deleteWallAtTile(tilePos: Vector, side: Side): void {
         if (!this.isWallPosInMap(tilePos, side)) return; // Return if out of map
         if (this.getWallAtTile(tilePos, side) && !this.getWallAtTile(tilePos, side).exists) return; // Return if wall doesn't exist here
@@ -156,13 +159,11 @@ export default class WallGrid {
         const adjacent = this.getAdjacentWalls(wall);
         if (adjacent.length < 2) return false;
 
-        if (wall.orientation) {
-            // Horizontal
+        if (wall.orientation === Orientation.Horizontal) {
             if (adjacent.find(adj => adj.position.x > wall.position.x) &&
                 adjacent.find(adj => adj.position.x < wall.position.x) )
                 return true;
         } else {
-            // Vertical
             if (adjacent.find(adj => adj.position.y > wall.position.y) &&
                 adjacent.find(adj => adj.position.y < wall.position.y) )
                 return true;
@@ -201,28 +202,28 @@ export default class WallGrid {
         return found;
     }
 
-    private getGridPosition(side: Side, tilePos: Vector): { orientation: number; x: number; y: number } {
-        let x: number, y: number, orientation: number;
+    private getGridPosition(side: Side, tilePos: Vector): { orientation: Orientation; x: number; y: number } {
+        let x: number, y: number, orientation: Orientation;
         switch (side) {
             case Side.North:
                 x = (tilePos.x * 2) + 1;
                 y = tilePos.y;
-                orientation = 1;
+                orientation = Orientation.Horizontal;
                 break;
             case Side.East:
                 x = (tilePos.x * 2) + 2;
                 y = tilePos.y;
-                orientation = 0;
+                orientation = Orientation.Vertical;
                 break;
             case Side.South:
                 x = (tilePos.x * 2) + 1;
                 y = tilePos.y + 1;
-                orientation = 1;
+                orientation = Orientation.Horizontal;
                 break;
             case Side.West:
                 x = tilePos.x * 2;
                 y = tilePos.y;
-                orientation = 0;
+                orientation = Orientation.Vertical;
                 break;
         }
         return { orientation, x, y };
@@ -338,8 +339,7 @@ export default class WallGrid {
         const adjacentWalls: Wall[] = [];
         const {x, y} = wall.gridPos;
 
-        if (wall.orientation) {
-            // Horizontal
+        if (wall.orientation === Orientation.Horizontal) {
             if (this.getWallByGridPos(x - 2, y)?.exists) adjacentWalls.push(this.wallGrid[x - 2][y]);
             if (this.getWallByGridPos(x + 2, y)?.exists) adjacentWalls.push(this.wallGrid[x + 2][y]);
             if (this.getWallByGridPos(x - 1, y)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y]);
@@ -347,7 +347,6 @@ export default class WallGrid {
             if (this.getWallByGridPos(x - 1, y - 1)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y - 1]);
             if (this.getWallByGridPos(x + 1, y - 1)?.exists) adjacentWalls.push(this.wallGrid[x + 1][y - 1]);
         } else {
-            // Vertical
             if (this.getWallByGridPos(x - 1, y)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y]);
             if (this.getWallByGridPos(x + 1, y)?.exists) adjacentWalls.push(this.wallGrid[x + 1][y]);
             if (this.getWallByGridPos(x - 1, y + 1)?.exists) adjacentWalls.push(this.wallGrid[x - 1][y + 1]);
@@ -367,12 +366,10 @@ export default class WallGrid {
         const adjacentTiles: Vector[] = [];
         const {x, y} = wall.position;
 
-        if (wall.orientation) {
-            // Horizontal
+        if (wall.orientation === Orientation.Horizontal) {
             if (this.map.isPositionInMap(new Vector(x - 0.5, y - 1))) adjacentTiles.push(new Vector(x - 0.5, y - 1));
             if (this.map.isPositionInMap(new Vector(x - 0.5, y))) adjacentTiles.push(new Vector(x - 0.5, y));
         } else {
-            // Vertical
             if (this.map.isPositionInMap(new Vector(x - 1, y - 0.5))) adjacentTiles.push(new Vector(x - 1, y - 0.5));
             if (this.map.isPositionInMap(new Vector(x, y - 0.5))) adjacentTiles.push(new Vector(x, y - 0.5));
         }
@@ -412,8 +409,7 @@ export default class WallGrid {
                 if (!this.wallGrid[col][row].exists) {
                     Graphics.setLineStyle(1, 0xFF0000);
                 }
-                if (orientation === 0) {
-                    // Vertical
+                if (orientation === Orientation.Vertical) {
                     Graphics.drawLine(
                         (col / 2) * Config.WORLD_SCALE + xOffset,
                         row * Config.WORLD_SCALE + yOffset,
@@ -421,7 +417,6 @@ export default class WallGrid {
                         (row + 1) * Config.WORLD_SCALE + yOffset,
                     );
                 } else {
-                    // Horizontal
                     Graphics.drawLine(
                         ((col - 1) / 2) * Config.WORLD_SCALE + xOffset,
                         row  * Config.WORLD_SCALE + yOffset,

@@ -16,13 +16,18 @@ const CHUNK_SIZE = 5;
 class Square {
     private quadrants: Biome[];
 
-    public constructor(biome?: Biome, biomes?: {north: number; south: number; east: number; west: number}) {
+    public constructor(biome?: Biome, biomes?: number[]) {
         this.quadrants = [];
 
-        this.quadrants[Side.North] = biomes?.north ?? biome ?? Biome.Grass;
-        this.quadrants[Side.East] = biomes?.east ?? biome ?? Biome.Grass;
-        this.quadrants[Side.South] = biomes?.south ?? biome ?? Biome.Grass;
-        this.quadrants[Side.West] = biomes?.west ?? biome ?? Biome.Grass;
+        if (biomes) {
+            this.quadrants = biomes;
+            return;
+        }
+
+        this.quadrants[Side.North] = biome ?? Biome.Grass;
+        this.quadrants[Side.East] = biome ?? Biome.Grass;
+        this.quadrants[Side.South] = biome ?? Biome.Grass;
+        this.quadrants[Side.West] = biome ?? Biome.Grass;
     }
 
     public setQuadrant(side: Side, biome: Biome): void {
@@ -78,7 +83,15 @@ export default class BiomeGrid {
         });
     }
 
-    private getChunksInRadius(pos: Vector, radius: number): BiomeChunk[] {
+    public redrawAllChunks(): void {
+        for (let i = 0; i < this.chunks.length; i++) {
+            for (let j = 0; j < this.chunks[i].length; j++) {
+                this.chunks[i][j].shouldRedraw = true;
+            }
+        }
+    }
+
+    public getChunksInRadius(pos: Vector, radius: number): BiomeChunk[] {
         const { x: flrX, y: flrY } = pos.divide(CHUNK_SIZE).floor();
 
         const chunks: BiomeChunk[] = [];
@@ -107,7 +120,7 @@ export default class BiomeGrid {
     }
 }
 
-class BiomeChunk {
+export class BiomeChunk {
     public static Biome = Biome;
 
     private camera: Camera;
@@ -261,6 +274,21 @@ class BiomeChunk {
 
         if (changed) {
             this.draw();
+        }
+    }
+
+    public getCopy(): Biome[][][] {
+        return this.grid.map(r => r.map(sq => [...sq.getQuadrants()]));
+    }
+
+    public setData(data: Biome[][][]): void {
+        this.grid = [];
+
+        for (let i = 0; i < data.length; i++) {
+            this.grid[i] = [];
+            for (let j = 0; j < data[i].length; j++) {
+                this.grid[i][j] = new Square(undefined, data[i][j]);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import { TileObjectData } from "types/AssetTypes";
 import { TAG } from "engine/consts";
 import ZooGame from "ZooGame";
 import ElevationSystem from "./systems/ElevationSystem";
+import { basename } from "path";
 
 export default class TileObject extends Entity {
     private render: RenderSystem;

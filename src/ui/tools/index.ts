@@ -9,7 +9,12 @@ export enum ToolType {
     Delete,
     Biome,
     Elevation,
-    Water,
+}
+
+export interface Action {
+    name: string;
+    data: Object;
+    undo: (data: Object) => void;
 }
 
 export abstract class Tool {
@@ -19,6 +24,10 @@ export abstract class Tool {
     public abstract set(ghost: PlacementGhost, data?: Record<string, any>): void;
     public abstract update(): void;
     public abstract postUpdate(): void;
+
+    protected registerAction(action: Action): void {
+        this.toolManager.pushAction(action);
+    }
 }
 
 export class NoTool extends Tool {
@@ -38,4 +47,3 @@ export { default as WallTool } from "./WallTool";
 export { default as DoorTool } from "./DoorTool";
 export { default as DeleteTool } from "./DeleteTool";
 export { default as TileObjectTool } from "./TileObjectTool";
-export { default as WaterTool } from "./WaterTool";
