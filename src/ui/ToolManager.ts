@@ -3,17 +3,21 @@ import * as React from "react";
 import { Vector } from "engine";
 import Mediator from "engine/Mediator";
 import { UIEvent } from "engine/consts/events";
+import { KEY } from "engine/managers/InputManager";
 
 import ZooGame from "ZooGame";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { BiomeTool, DoorTool, NoTool, Tool, ToolType, TileObjectTool, WallTool, DeleteTool, ElevationTool, WaterTool } from "./tools";
+import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
+
+const MAX_UNDOS = 10;
 
 export default class ToolManager {
     private activeTool: Tool;
     public radius: number;
 
+    private actionStack: Action[];
     private ghost: PlacementGhost;
 
     private toolbarRef: React.RefObject<Toolbar>;
@@ -22,6 +26,7 @@ export default class ToolManager {
         this.ghost = new PlacementGhost();
 
         this.setTool(ToolType.None);
+        this.actionStack = [];
 
         this.toolbarRef = React.createRef();
         ZooGame.canvas.addChild(React.createElement(Toolbar, {
@@ -48,6 +53,11 @@ export default class ToolManager {
                 this.setRadius(Math.max(this.radius - 0.125, 0.25));
             }
         }
+
+        // Undo
+        if (ZooGame.input.isKeyReleased(KEY.Z)) {
+            this.undo();
+        }
     }
 
     public postUpdate(): void {
@@ -66,7 +76,6 @@ export default class ToolManager {
             case ToolType.Door: this.activeTool = new DoorTool(this); break;
             case ToolType.Delete: this.activeTool = new DeleteTool(this); break;
             case ToolType.Biome: this.activeTool = new BiomeTool(this); break;
-            case ToolType.Water: this.activeTool = new WaterTool(this); break;
             case ToolType.Elevation: this.activeTool = new ElevationTool(this); break;
 
             case ToolType.None:
@@ -76,6 +85,23 @@ export default class ToolManager {
         }
 
         this.activeTool.set(this.ghost, data);
+    }
+
+    public pushAction(action: Action): void {
+        console.log(`Registered new action: ${action.name}`);
+        this.actionStack.push(action);
+        if (this.actionStack.length > MAX_UNDOS) {
+            this.actionStack.shift();
+        }
+    }
+
+    public undo(): void {
+        if (this.actionStack.length < 1) return;
+
+        const action = this.actionStack.pop();
+        console.log(`Undoing action: ${action.name}`);
+
+        action.undo(action.data);
     }
 
     public setRadius(radius: number): void {

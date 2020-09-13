@@ -30,7 +30,6 @@ class UIManager {
 
     public postUpdate(delta: number): void {
         const mouseScreenPos = ZooGame.input.getMousePos();
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(mouseScreenPos);
 
         this.tools.postUpdate();
     }

@@ -29,7 +29,15 @@ export default class TileObjectTool extends Tool {
             if (this.canPlace(mouseWorldPos)) {
                 const placePos: Vector = mouseWorldPos.floor();
 
-                ZooGame.placeTileObject(this.currentObject, placePos);
+                const tileObject = ZooGame.world.placeTileObject(this.currentObject, placePos);
+
+                this.toolManager.pushAction({
+                    name: `Place ${this.currentObject.name}`,
+                    data: { tileObject },
+                    undo: (data: any): void => {
+                        ZooGame.world.deleteTileObject(data.tileObject);
+                    },
+                });
             }
         }
     }

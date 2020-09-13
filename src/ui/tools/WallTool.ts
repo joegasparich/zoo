@@ -91,14 +91,27 @@ export default class WallTool extends Tool {
 
             if (!this.wallGhosts) return;
 
+            const walls: Wall[] = [];
             this.wallGhosts.forEach(ghost => {
                 const tilePos = ghost.getPosition().floor();
 
                 if (this.canPlace(tilePos)) {
-                    ZooGame.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant);
+                    walls.push(ZooGame.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant));
                 }
 
                 ghost.destroy();
+            });
+
+            this.toolManager.pushAction({
+                name: "Place walls",
+                data: { walls },
+                undo: (data: any): void => {
+                    const walls = data.walls as Wall[];
+
+                    walls.forEach(wall => {
+                        ZooGame.world.wallGrid.deleteWall(wall);
+                    });
+                },
             });
 
             this.wallGhosts = [];

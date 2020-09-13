@@ -87,20 +87,6 @@ class ZooGame extends Game {
         }
     }
 
-    public placeTileObject(object: (TileObjectData | string), position: Vector): void {
-        if (!this.world.isTileFree(position)) return;
-
-        if (typeof object === "string") {
-            object = AssetManager.getJSON(object) as TileObjectData;
-        }
-
-        this.world.registerTileObject(new TileObject(
-            position,
-            object,
-            true,
-        ));
-    }
-
     private drawDebug(): void {
         if (this.debugSettings.showMapGrid) this.map.drawDebug();
         if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();

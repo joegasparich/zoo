@@ -1,7 +1,7 @@
 import { Game, Vector } from "engine";
 import * as util from "engine/helpers/util";
 
-enum KEY {
+export enum KEY {
     UP = "ArrowUp",
     DOWN = "ArrowDown",
     LEFT = "ArrowLeft",
@@ -13,10 +13,12 @@ enum KEY {
     W = "w",
     X = "x",
     Z = "z",
+    DOT = ".",
+    COMMA = ",",
     LEFT_SQUARE_BRACKET = "[",
     RIGHT_SQUARE_BRACKET = "]",
 }
-enum MOUSE_BUTTON {
+export enum MOUSE_BUTTON {
     LEFT = 0,
     MIDDLE = 1,
     RIGHT = 2,
@@ -123,6 +125,11 @@ export default class InputManager {
         });
 
         document.addEventListener("mouseup", (event: MouseEvent) => {
+            if (!(event.target instanceof HTMLCanvasElement)) {
+                // Target was UI
+                return;
+            }
+
             const index = this.mouseButtons.indexOf(event.button);
             if (index !== -1) this.mouseButtons.splice(index, 1);
             this.mouseButtonsUp.push(event.button);

@@ -81,6 +81,14 @@ export default class WaterGrid {
         return polygon.map(point => point.add(new Vector(0, WATER_LEVEL * ELEVATION_HEIGHT)).multiply(Config.WORLD_SCALE).toPoint());
     }
 
+    public getGridCopy(): boolean[][] {
+        return this.grid.map(o => [...o]);
+    }
+
+    public setGrid(grid: boolean[][]): void {
+        this.grid = grid;
+    }
+
     public isPositionWater(position: Vector): boolean {
         if (!ZooGame.map.isPositionInMap(position)) return false;
 

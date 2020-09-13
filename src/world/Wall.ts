@@ -19,6 +19,11 @@ export enum WallSpriteIndex {
     HillSouth = 7,
 }
 
+export enum Orientation {
+    Vertical = 0,
+    Horizontal = 1,
+}
+
 export default class Wall {
 
     public static wallSprites = new Map<string, SpriteSheet>();
@@ -38,12 +43,10 @@ export default class Wall {
         return data;
     }
 
-    public static wallToWorldPos(wallPos: Vector, orientation: number): Vector {
-        if (orientation) {
-            // Horizontal
+    public static wallToWorldPos(wallPos: Vector, orientation: Orientation): Vector {
+        if (orientation === Orientation.Horizontal) {
             return new Vector(wallPos.x / 2, wallPos.y);
         } else {
-            // Vertical
             return new Vector(wallPos.x / 2, wallPos.y + 0.5);
         }
     }
@@ -58,7 +61,7 @@ export default class Wall {
     public exists: boolean;
     public isDoor: boolean;
 
-    public constructor(public orientation: number, public position: Vector, public gridPos: Vector, data?: WallData) {
+    public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, data?: WallData) {
         this.exists = false;
         if (data) {
             this.data = data;
@@ -69,8 +72,8 @@ export default class Wall {
                 this.body = ZooGame.physicsManager.createPhysicsObject({
                     collider: {
                         type: ColliderType.Rect,
-                        height: orientation ? 0.2 : 1,
-                        width: orientation ? 1 : 0.2,
+                        height: orientation === Orientation.Horizontal ? 0.2 : 1,
+                        width: orientation === Orientation.Horizontal ? 1 : 0.2,
                     },
                     position: position,
                     tag: TAG.Solid,
@@ -118,16 +121,16 @@ export default class Wall {
         this.isDoor = isDoor;
 
         if (isDoor) {
-            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.DoorVertical);
+            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation === Orientation.Horizontal ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.DoorVertical);
             this.body.setActive(false);
         } else {
-            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
+            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation === Orientation.Horizontal ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
             this.body.setActive(true);
         }
     }
 
     public isSloped(): boolean {
-        if (this.orientation) {
+        if (this.orientation === Orientation.Horizontal) {
             const left = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
             const right = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
 
@@ -141,7 +144,7 @@ export default class Wall {
     }
 
     public getSpriteIndex(isDoor = this.isDoor): [index: WallSpriteIndex, elevation: number] {
-        if (this.orientation) {
+        if (this.orientation === Orientation.Horizontal) {
             const left = ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
             const right = ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
             const elevation = Math.min(left, right);

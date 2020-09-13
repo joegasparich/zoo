@@ -38,11 +38,11 @@ const Right: Input = {
 };
 const ZoomIn: Input = {
     name: "Zoom In",
-    buttons: [InputManager.KEY.Z],
+    buttons: [InputManager.KEY.COMMA],
 };
 const ZoomOut: Input = {
     name: "Zoom Out",
-    buttons: [InputManager.KEY.X],
+    buttons: [InputManager.KEY.DOT],
 };
 const IncreaseBrushSize: Input = {
     name: "Increase Brush Size",

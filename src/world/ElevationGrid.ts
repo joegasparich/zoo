@@ -112,6 +112,14 @@ export default class ElevationGrid {
         return true;
     }
 
+    public getGridCopy(): Elevation[][] {
+        return this.grid.map(o => [...o]);
+    }
+
+    public setGrid(grid: Elevation[][]): void {
+        this.grid = grid;
+    }
+
     public getElevationAtPoint(pos: Vector): number {
         if (!this.isPositionInGrid(pos)) {
             return 0;

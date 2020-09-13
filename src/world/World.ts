@@ -12,7 +12,7 @@ import { Assets, Config } from "consts";
 import { WorldEvents } from "consts/events";
 import TileObject from "entities/TileObject";
 import EmptyScene from "scenes/EmptyScene";
-import { WallData } from "types/AssetTypes";
+import { TileObjectData, WallData } from "types/AssetTypes";
 import ZooGame from "ZooGame";
 import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
@@ -99,8 +99,19 @@ export default class World {
         );
     }
 
-    public registerTileObject(tileObject: TileObject): void {
-        if (!tileObject) return;
+    public placeTileObject(object: (TileObjectData | string), position: Vector): TileObject {
+        if (!this.isTileFree(position)) return;
+        if (!object) return;
+
+        if (typeof object === "string") {
+            object = AssetManager.getJSON(object) as TileObjectData;
+        }
+
+        const tileObject = new TileObject(
+            position,
+            object,
+            true,
+        );
 
         ZooGame.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
@@ -109,6 +120,8 @@ export default class World {
         if (tileObject.blocksPath) {
             this.map.setTileSolid(tileObject.position.floor(), true);
         }
+
+        return tileObject;
     }
 
     public deleteTileObject(tileObject: TileObject): void {
@@ -229,6 +242,16 @@ export default class World {
         }
     }
 
+    public removeDoor(wall: Wall): void {
+        wall.setDoor(false);
+
+        const [areaA, areaB] = this.wallGrid.getAdjacentTiles(wall).map(tile => this.tileAreaMap.get(tile.toString()));
+        if (areaA && areaB) {
+            areaA.removeAreaConnection(areaB, wall);
+            areaB.removeAreaConnection(areaA, wall);
+        }
+    }
+
     public findAreaPath(startArea: Area, endArea: Area): Area[] {
         const areaGraph: any = {};
         this.areas.forEach(area => {
@@ -242,7 +265,7 @@ export default class World {
         const graph = new Graph(areaGraph);
         const route = graph.path(startArea.id, endArea.id) as string[];
 
-        return route.map(areaName => this.areas.get(areaName));
+        return route?.map(areaName => this.areas.get(areaName));
     }
 
     /**

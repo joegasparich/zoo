@@ -38,6 +38,14 @@ export default class DoorTool extends Tool {
         if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos && !wallatMousePos.isSloped()) {
                 ZooGame.world.placeDoor(wallatMousePos);
+
+                this.toolManager.pushAction({
+                    name: "Create door",
+                    data: { wall: wallatMousePos },
+                    undo: (data: any): void => {
+                        ZooGame.world.removeDoor(data.wall);
+                    },
+                });
             }
         }
     }

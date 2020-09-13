@@ -126,14 +126,14 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         key="hillButton"
                         image={Assets.UI.ELEVATE_ICON}
                         onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: 1 });
+                            this.setTool(ToolType.Elevation, { elevation: 1, colour: 0xFFFF00 });
                         }}
                     />
                     <Button
                         key="waterButton"
                         image={Assets.UI.WATER_ICON}
                         onClick={(): void => {
-                            this.setTool(ToolType.Water, { elevation: -1 });
+                            this.setTool(ToolType.Elevation, { elevation: -1, colour: 0x0000FF });
                         }}
                     />
                     <DebugControls />

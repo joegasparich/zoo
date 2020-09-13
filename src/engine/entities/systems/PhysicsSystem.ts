@@ -48,4 +48,8 @@ export default class PhysicsSystem extends System {
     public addForce(force: Vector): void {
         this.body.applyForceToCenter(force.toVec2(), true);
     }
+
+    public end(): void {
+        this.game.physicsManager.removeBody(this.body);
+    }
 }
