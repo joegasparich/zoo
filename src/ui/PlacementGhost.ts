@@ -11,51 +11,42 @@ import ElevationSystem from "entities/systems/ElevationSystem";
 // Should never be seen
 const DEFAULT_SPRITE = Assets.SPRITES.TREE;
 
-enum Mode {
-    Sprite,
-    Draw
-}
-
 export default class PlacementGhost {
     private world: World;
 
     private ghost: Entity;
     private ghostRenderer: RenderSystem;
-    private drawFunction: Function;
 
-    private visible: boolean;
-    private mode: Mode;
+    public drawFunction: Function;
+    private spriteVisible: boolean;
     private snap: boolean;
     private follow: boolean;
     private elevation: boolean;
 
+    public changeColour: boolean;
     public canPlaceFunction = this.canPlace;
 
-    public constructor(shouldFollowMouse = true) {
+    public constructor() {
         this.world = ZooGame.world;
 
         this.ghost = ZooGame.registerEntity(new Entity(ZooGame, ZooGame.input.getMousePos()));
-        if (shouldFollowMouse) this.ghost.addSystem(new FollowMouseSystem());
+        this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
-        this.ghostRenderer.alpha = 0.6;
 
-        this.visible = true;
+        this.reset();
     }
 
     public postUpdate(): void {
-        if (!this.visible) return;
-
-        if (this.mode === Mode.Sprite) {
+        if (this.spriteVisible && this.changeColour) {
             if (this.canPlaceFunction(this.ghost.position)) {
                 this.ghostRenderer.colour = 0x0088DD;
             } else {
                 this.ghostRenderer.colour = 0xFF0000;
             }
         }
-        if (this.mode === Mode.Draw) {
-            this.drawFunction(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos()));
-        }
+
+        this.drawFunction(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos()));
     }
 
     private canPlace(position: Vector): boolean {
@@ -63,26 +54,27 @@ export default class PlacementGhost {
     }
 
     public setSprite(sprite: string | PIXI.Sprite | PIXI.Texture): void {
-        this.mode = Mode.Sprite;
         this.ghostRenderer.setSprite(sprite);
-        this.ghostRenderer.visible = this.visible;
+        this.ghostRenderer.visible = this.spriteVisible;
     }
 
-    public setDrawFunction(fn: (pos: Vector) => void): void {
-        this.mode = Mode.Draw;
-        this.ghostRenderer.visible = false;
-        this.drawFunction = fn;
+    public setAlpha(alpha: number): void {
+        this.ghostRenderer.alpha = alpha;
     }
 
-    public setVisible(visible: boolean): void {
-        if (this.visible === visible) return;
-        this.visible = visible;
+    public setScale(scale: number): void {
+        this.ghostRenderer.scale = scale;
+    }
 
-        this.ghostRenderer.visible = this.visible;
+    public setSpriteVisible(visible: boolean): void {
+        if (this.spriteVisible === visible) return;
+        this.spriteVisible = visible;
+
+        this.ghostRenderer.visible = this.spriteVisible;
     }
 
     public isVisible(): boolean {
-        return this.visible;
+        return this.spriteVisible;
     }
 
     public setSnap(snap: boolean, gridSize?: number): void {
@@ -137,15 +129,20 @@ export default class PlacementGhost {
     }
 
     public reset(): void {
+        this.ghostRenderer.colour = 0xFFFFFF;
+
         this.setSprite(DEFAULT_SPRITE);
-        this.setVisible(true);
-        this.setDrawFunction(() => {});
+        this.setAlpha(0.6);
+        this.setScale(1);
+        this.setSpriteVisible(true);
+        this.drawFunction = () => {};
         this.setPivot(new Vector(0.5));
         this.setOffset(Vector.Zero());
         this.setSnap(false);
         this.setFollow(true);
         this.disableElevation();
         this.canPlaceFunction = this.canPlace;
+        this.changeColour = true;
     }
 
     public destroy(): void {

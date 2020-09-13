@@ -1,4 +1,4 @@
-import { Graphics } from "engine";
+import { Graphics, Vector } from "engine";
 
 import ZooGame from "ZooGame";
 import { Config, Inputs } from "consts";
@@ -15,10 +15,11 @@ export default class ElevationTool extends Tool {
         this.targetElevation = data.elevation;
 
         ghost.reset();
-        ghost.setDrawFunction(pos => {
+        ghost.drawFunction = (pos: Vector): void => {
             Graphics.setLineStyle(1, 0xFF0000);
             Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, 0xFF0000, 0.5);
-        });
+        };
+        ghost.setSpriteVisible(false);
     }
 
     public update(): void {

@@ -1,71 +1,72 @@
-import { Vector } from "engine";
-import { Side } from "engine/consts";
-import { AssetManager } from "engine/managers";
+import { Graphics, Vector } from "engine";
 
-import { Assets, Inputs } from "consts";
-import { WallData } from "types/AssetTypes";
-import Wall, { WallSpriteIndex } from "world/Wall";
+import { Assets, Config, Inputs } from "consts";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
 import ZooGame from "ZooGame";
 
 export default class DeleteTool extends Tool {
-    public type = ToolType.Wall;
+    public type = ToolType.Delete;
 
-    private currentWall: WallData;
-
-    private ghost: PlacementGhost;
+    private startPos: Vector;
 
     public set(ghost: PlacementGhost): void {
-        this.ghost = ghost;
-        this.ghost.reset();
+        ghost.reset();
 
-        this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
-        const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
-        this.ghost.setPivot(new Vector(0.5, 1));
-        this.ghost.setSnap(true);
-        this.ghost.canPlaceFunction = (pos: Vector): boolean => {
-            const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
-            return wall?.exists && !wall.isDoor;
+        ghost.setSprite(Assets.UI.BIN_ICON);
+        ghost.setPivot(new Vector(0.5, 0.5));
+        ghost.changeColour = false;
+        ghost.setAlpha(1);
+        ghost.setScale(0.5);
+        ghost.drawFunction = (pos: Vector): void => {
+            if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) return;
+
+            const worldCellPos = pos.floor().multiply(Config.WORLD_SCALE);
+            Graphics.setLineStyle(1, 0xFF0000);
+            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, 0xFF0000, 0.5);
         };
     }
 
     public update(): void {
         const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
-        const wallatMousePos = ZooGame.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
 
+        if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
+            this.startPos = mouseWorldPos;
+        }
+        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
+            if (this.startPos) {
+                const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
+                const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
+                for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
+                    for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {
+                        Graphics.setLineStyle(1, 0xFF0000);
+                        Graphics.drawRect(i * Config.WORLD_SCALE, j * Config.WORLD_SCALE, Config.WORLD_SCALE, Config.WORLD_SCALE, 0xFF0000, 0.5);
+                    }
+                }
+            }
+        }
         if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
-            if (wallatMousePos) {
-                ZooGame.world.wallGrid.deleteWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
+            if (this.startPos) {
+                const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
+                const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
+                let pos;
+
+                for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
+                    for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {
+                        pos = new Vector(i, j);
+                        // Delete walls
+                        for (let side = 0; side < 4; side++) {
+                            ZooGame.world.wallGrid.deleteWallAtTile(pos, side);
+                        }
+                        // Delete tile objects
+                        ZooGame.world.deleteTileObject(ZooGame.world.getTileObjectAtPos(pos));
+                    }
+                }
+
+                this.startPos = undefined;
             }
         }
     }
 
-    public postUpdate(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
-
-        const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
-        const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        switch (quadrant) {
-            case Side.North:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
-                this.ghost.setOffset(new Vector(0, -0.5));
-                break;
-            case Side.South:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
-                this.ghost.setOffset(new Vector(0, 0.5));
-                break;
-            case Side.West:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorVertical));
-                this.ghost.setOffset(new Vector(-0.5, 0.5));
-                break;
-            case Side.East:
-                this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorVertical));
-                this.ghost.setOffset(new Vector(0.5, 0.5));
-                break;
-            default:
-                break;
-        }
-    }
+    public postUpdate(): void {}
 }

@@ -95,6 +95,14 @@ class Graphics {
         if (fill) this.graphics.endFill();
     }
 
+    public drawRect(x: number, y: number, width: number, height: number, fill?: number, fillAlpha = 1): void {
+        if (!this.graphics) return;
+
+        if (fill) this.graphics.beginFill(fill, fillAlpha);
+        this.graphics.drawRect(x, y, width, height);
+        if (fill) this.graphics.endFill();
+    }
+
     public drawX(pos: Vector, size: number): void {
         this.drawLine(pos.x - size, pos.y - size, pos.x + size, pos.y + size);
         this.drawLine(pos.x - size, pos.y + size, pos.x + size, pos.y - size);

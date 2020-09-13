@@ -56,7 +56,7 @@ export default class WallTool extends Tool {
         }
         if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
 
-            this.ghost.setVisible(false);
+            this.ghost.setSpriteVisible(false);
 
             let i = Math.floor(this.startWallPos?.pos.x);
             let j = Math.floor(this.startWallPos?.pos.y);
@@ -74,7 +74,8 @@ export default class WallTool extends Tool {
 
             // Generate the ghost entities after so that they have a chance to initialise
             while (this.wallGhosts.length < length) {
-                const ghost = new PlacementGhost(false);
+                const ghost = new PlacementGhost();
+                ghost.setFollow(false);
                 ghost.canPlaceFunction = (pos: Vector): boolean =>  {
                     const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
                     return wall && !wall.exists;
@@ -86,7 +87,7 @@ export default class WallTool extends Tool {
             }
         }
         if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
-            this.ghost.setVisible(true);
+            this.ghost.setSpriteVisible(true);
 
             if (!this.wallGhosts) return;
 

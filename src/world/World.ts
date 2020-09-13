@@ -100,6 +100,8 @@ export default class World {
     }
 
     public registerTileObject(tileObject: TileObject): void {
+        if (!tileObject) return;
+
         ZooGame.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
         this.tileObjectMap.set(tileObject.position.floor().toString(), tileObject);
@@ -107,6 +109,18 @@ export default class World {
         if (tileObject.blocksPath) {
             this.map.setTileSolid(tileObject.position.floor(), true);
         }
+    }
+
+    public deleteTileObject(tileObject: TileObject): void {
+        if (!tileObject) return;
+
+        this.tileObjects.delete(tileObject.id);
+        this.tileObjectMap.delete(tileObject.position.floor().toString());
+        if (tileObject.blocksPath) {
+            this.map.setTileSolid(tileObject.position.floor(), false);
+        }
+
+        tileObject.remove();
     }
 
     public getTileObjectAtPos(pos: Vector): TileObject {

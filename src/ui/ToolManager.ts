@@ -56,7 +56,7 @@ export default class ToolManager {
     }
 
     public setTool(tool: ToolType, data?: Record<string, any>): void {
-        this.ghost.setVisible(true);
+        this.ghost.setSpriteVisible(true);
         this.ghost.setPivot(new Vector(0.5, 0.5));
         this.ghost.setOffset(new Vector(0, 0));
 

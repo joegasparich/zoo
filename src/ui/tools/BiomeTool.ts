@@ -1,5 +1,5 @@
 import { Config, Inputs } from "consts";
-import { Graphics } from "engine";
+import { Graphics, Vector } from "engine";
 import PlacementGhost from "ui/PlacementGhost";
 import { Biome } from "world/BiomeGrid";
 import ZooGame from "ZooGame";
@@ -13,10 +13,11 @@ export default class BiomeTool extends Tool {
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
         this.currentBiome = data.biome;
         ghost.reset();
-        ghost.setDrawFunction(pos => {
+        ghost.drawFunction = (pos: Vector): void => {
             Graphics.setLineStyle(1, 0xFFFFFF);
             Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, this.currentBiome, 0.5);
-        });
+        };
+        ghost.setSpriteVisible(false);
     }
 
     public update(): void {

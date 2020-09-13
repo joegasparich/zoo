@@ -12,7 +12,7 @@ async function run(): Promise<void> {
     // Load Assets
     AssetManager.preLoadAssets(Object.values(Assets.SPRITES));
     AssetManager.preLoadAssets(Object.values(Assets.SPRITESHEETS));
-    AssetManager.preLoadAssets(Object.values(Assets.TILES));
+    AssetManager.preLoadAssets(Object.values(Assets.UI));
     await TileObject.loadTileObjectData(Assets.OBJECTS.TREE);
     await Wall.loadWallData(Assets.WALLS.IRON_BAR);
     await AssetManager.loadTileSetFile(Assets.TILESETS.TEST);

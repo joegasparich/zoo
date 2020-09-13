@@ -63,14 +63,9 @@ export default class Area {
 
     private highlight(): void {
         this.getCells().forEach(cell => {
-            const vertices = [
-                cell.position.multiply(Config.WORLD_SCALE),
-                cell.position.add(new Vector(0, 1)).multiply(Config.WORLD_SCALE),
-                cell.position.add(new Vector(1, 1)).multiply(Config.WORLD_SCALE),
-                cell.position.add(new Vector(1, 0)).multiply(Config.WORLD_SCALE),
-            ];
+            const worldCellPos = cell.position.multiply(Config.WORLD_SCALE);
             Graphics.setLineStyle(0);
-            Graphics.drawPolygon(vertices, this.colour, 0.5);
+            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, this.colour, 0.5);
         });
     }
 }

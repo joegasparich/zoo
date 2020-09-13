@@ -26,7 +26,7 @@ export class NoTool extends Tool {
 
     public set(ghost: PlacementGhost): void {
         ghost.reset();
-        ghost.setVisible(false);
+        ghost.setSpriteVisible(false);
     }
     public update(): void {}
     public postUpdate(): void {}
