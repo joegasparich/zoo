@@ -10,6 +10,7 @@ module.exports = {
     entry: "./src/index.ts",
     devtool: "inline-source-map",
     mode: "development",
+    target: "web",
     devServer: {
         contentBase: "./dist",
         hot: true,

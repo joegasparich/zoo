@@ -1,14 +1,12 @@
 
 
 import { Game, Vector } from "engine";
-import { AssetManager } from "engine/managers";
 
 import Player from "entities/Player";
-import TileObject from "entities/TileObject";
-import { TileObjectData } from "types/AssetTypes";
 import World from "world/World";
 import { Config, Inputs } from "consts";
 import UIManager from "ui/UIManager";
+import SaveManager from "SaveManager";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -57,6 +55,8 @@ class ZooGame extends Game {
         this.player.render.scale = 0.5;
 
         UIManager.setup();
+
+        SaveManager.saveGame();
     }
 
     protected update(delta: number): void {
