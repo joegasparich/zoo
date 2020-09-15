@@ -1,5 +1,3 @@
-
-
 import { Game, Vector } from "engine";
 
 import Player from "entities/Player";

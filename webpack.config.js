@@ -7,6 +7,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 
 module.exports = {
+    target: "electron-renderer",
     entry: "./src/index.ts",
     devtool: "inline-source-map",
     mode: "development",
@@ -22,11 +23,10 @@ module.exports = {
         }),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            title: "Development",
+            title: "Zoo",
             template: "src/index.html",
         }),
         new CopyWebpackPlugin([{ from: "./src/assets", to: "assets" }]),
-        new webpack.NamedModulesPlugin(),
         new webpack.HotModuleReplacementPlugin(),
     ],
     module: {

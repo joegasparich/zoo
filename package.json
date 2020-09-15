@@ -11,6 +11,10 @@
 	"scripts": {
 		"start": "webpack-dev-server",
 		"build": "webpack",
+		"build:watch": "npm run build -- --watch",
+		"electron:start": "npm run electron:build && electron ./dist/electron/index.js",
+		"electron:build": "webpack --config webpack.electron.config.js",
+		"electron:watch": "npm run electron:build -- --watch",
 		"lint": "eslint '**/*.ts' --no-ignore"
 	},
 	"dependencies": {
@@ -21,12 +25,13 @@
 		"pixi-layers": "^0.2.3",
 		"pixi-tilemap": "^2.0.3",
 		"pixi.js": "^5.1.5",
-		"planck-js": "https://github.com/shakiba/planck.js/tarball/master",
+		"planck-js": "^0.3.13",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
 		"uuid": "^3.3.3"
 	},
 	"devDependencies": {
+		"@types/electron": "^1.6.10",
 		"@types/node": "^12.12.29",
 		"@types/node-dijkstra": "^2.5.0",
 		"@types/pixi.js": "^5.0.0",
@@ -37,8 +42,10 @@
 		"@typescript-eslint/parser": "^2.23.0",
 		"awesome-typescript-loader": "^5.2.1",
 		"clean-webpack-plugin": "^3.0.0",
+		"concurrently": "^5.3.0",
 		"copy-webpack-plugin": "^5.0.4",
 		"css-loader": "^3.2.0",
+		"electron": "^10.1.2",
 		"eslint": "^6.8.0",
 		"eslint-plugin-import": "^2.20.1",
 		"file-loader": "^4.2.0",

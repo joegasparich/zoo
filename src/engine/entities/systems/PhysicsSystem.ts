@@ -34,7 +34,7 @@ export default class PhysicsSystem extends System {
 
     public update(delta: number): void {
         super.update(delta);
-        const offset = (this.body.getUserData() as BodyUserData).offset
+        const offset = (this.body.getUserData() as BodyUserData).offset;
 
         if (this.entity.position !== this.lastPosition) {
             // Position has been altered somewhere, compensate
