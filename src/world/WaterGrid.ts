@@ -15,8 +15,8 @@ export default class WaterGrid {
     private graphics: PIXI.Graphics;
 
     public setup(): void {
-        this.width = ZooGame.map.cols + 1;
-        this.height = ZooGame.map.rows + 1;
+        this.width = ZooGame.map.cols;
+        this.height = ZooGame.map.rows;
 
         // Initialise grid to empty
         this.grid = [];
@@ -28,7 +28,7 @@ export default class WaterGrid {
         }
 
         this.graphics = new PIXI.Graphics();
-        this.graphics.parentGroup = Layers.GROUND;
+        this.graphics.parentGroup = Layers.WATER;
         this.graphics.position = ZooGame.camera.offset.toPoint();
         ZooGame.stage.addChild(this.graphics);
     }
@@ -89,6 +89,22 @@ export default class WaterGrid {
         this.grid = grid;
     }
 
+    public regenerateGrid(): void {
+        const grid: boolean[][] = [];
+        for (let i = 0; i < ZooGame.map.cols; i++) {
+            grid[i] = [];
+            for (let j = 0; j < ZooGame.map.rows; j++) {
+                const tile = new Vector(i, j);
+                const baseElevation = ZooGame.world.elevationGrid.getBaseElevation(tile);
+
+                grid[i][j] = baseElevation < 0;
+            }
+        }
+
+        this.setGrid(grid);
+        this.draw();
+    }
+
     public isPositionWater(position: Vector): boolean {
         if (!ZooGame.map.isPositionInMap(position)) return false;
 
@@ -97,6 +113,8 @@ export default class WaterGrid {
     }
 
     public setTileWater(tile: Vector): void {
+        if (!ZooGame.map.isPositionInMap(tile)) return;
+
         // TODO: Optimise whether we need to draw here
         this.draw();
         if (this.grid[tile.x][tile.y]) return;
@@ -106,6 +124,8 @@ export default class WaterGrid {
     }
 
     public setTileLand(tile: Vector): void {
+        if (!ZooGame.map.isPositionInMap(tile)) return;
+
         this.draw();
         if (!this.grid[tile.x][tile.y]) return;
 

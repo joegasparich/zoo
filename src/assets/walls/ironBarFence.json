@@ -1,4 +1,5 @@
 {
+    "assetPath": "/assets/walls/ironBarFence.json",
     "name": "Iron Bar Fence",
     "type": "fence",
     "spriteSheet": "/assets/img/iron_bar_fence.png",

@@ -13,6 +13,7 @@ import { Vector } from "engine";
 import AreaList from "./AreaList";
 import { TileObjectData } from "types/AssetTypes";
 import { AssetManager } from "engine/managers";
+import SaveManager from "SaveManager";
 
 interface ToolbarProps extends UIComponentProps {
     toolManager: ToolManager;
@@ -137,6 +138,20 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         }}
                     />
                     <DebugControls />
+                    <Button
+                        key="saveButton"
+                        image={Assets.UI.SAVE_ICON}
+                        onClick={(): void => {
+                            SaveManager.saveGame();
+                        }}
+                    />
+                    <Button
+                        key="loadButton"
+                        image={Assets.UI.LOAD_ICON}
+                        onClick={(): void => {
+                            SaveManager.loadGame();
+                        }}
+                    />
                 </div>
                 <FloatingPanel
                     key="brushSize"

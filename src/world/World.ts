@@ -21,6 +21,19 @@ import WallGrid from "./WallGrid";
 import ElevationGrid from "./ElevationGrid";
 import WaterGrid from "./WaterGrid";
 
+export interface AreaSaveData {
+    areas: {
+        id: string;
+        name: string;
+        colour: number;
+        cells: number[][];
+        connectedAreas: {
+            areaId: string;
+            doorGridPositions: number[][];
+        }[];
+    }[];
+}
+
 export default class World {
     public map: MapGrid;
     public biomeGrid: BiomeGrid;
@@ -58,6 +71,11 @@ export default class World {
         // TODO: Store outer fence information in scene & then generate area based on that
         // TODO: Add unremovable fences
         this.generateFence();
+    }
+
+    private resetAreas(): void {
+        this.areas = new Map();
+        this.tileAreaMap = new Map();
     }
 
     // TODO: Move to scene
@@ -295,6 +313,53 @@ export default class World {
         }
 
         return cells;
+    }
+
+    public saveAreas(): AreaSaveData {
+        return {
+            areas: Array.from(this.areas.values()).map(area => {
+                return {
+                    id: area.id,
+                    name: area.name,
+                    colour: area.colour,
+                    cells: area.getCells().map(cell => Vector.Serialize(cell.position)),
+                    connectedAreas: Array.from(area.connectedAreas.entries()).map(([area, doors]) => {
+                        return {
+                            areaId: area.id,
+                            doorGridPositions: doors.map(door => Vector.Serialize(door.gridPos)),
+                        };
+                    }),
+                };
+            }),
+        };
+    }
+
+    public loadAreas(data: AreaSaveData): void {
+        this.resetAreas();
+
+        // Create areas
+        data.areas.forEach(area => {
+            const newArea = new Area(area.id, area.name);
+            newArea.colour = area.colour;
+            newArea.setCells(area.cells.map(pos => ZooGame.map.getCell(Vector.Deserialize(pos))));
+            newArea.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), newArea));
+
+            this.areas.set(newArea.id, newArea);
+        });
+
+        // Add connections once all areas have been created
+        data.areas.forEach(areaData => {
+            const area = this.getAreaById(areaData.id);
+            areaData.connectedAreas.forEach(connection => {
+                const connectedArea = this.getAreaById(connection.areaId);
+                connection.doorGridPositions.forEach(([x, y]) => {
+                    const door = this.wallGrid.getWallByGridPos(x, y);
+                    area.addAreaConnection(connectedArea, door);
+                });
+            });
+        });
+
+        Mediator.fire(WorldEvents.AREAS_UPDATED);
     }
 
     /**

@@ -22,6 +22,10 @@ export enum SlopeVariant {
     I1, I2
 }
 
+export interface ElevationSaveData {
+    elevationGrid: number[][];
+}
+
 export default class ElevationGrid {
     private grid: Elevation[][];
     private width: number;
@@ -39,6 +43,10 @@ export default class ElevationGrid {
                 this.grid[i][j] = Elevation.Flat;
             }
         }
+    }
+
+    private reset(): void {
+        this.grid = [];
     }
 
     public setElevationInCircle(centre: Vector, radius: number, elevation: Elevation): void {
@@ -238,6 +246,20 @@ export default class ElevationGrid {
         }
 
         return elevations;
+    }
+
+    public save(): ElevationSaveData {
+        return {
+            elevationGrid: this.grid,
+        };
+    }
+
+    public load(data: ElevationSaveData): void {
+        this.reset();
+
+        this.setGrid(data.elevationGrid);
+        ZooGame.world.biomeGrid.redrawAllChunks();
+        ZooGame.world.waterGrid.regenerateGrid();
     }
 
     /**

@@ -21,6 +21,7 @@ export interface GroundTileData {
 }
 
 export interface WallData {
+    assetPath: string;
     name: string;
     type: string;
     spriteSheet: string;

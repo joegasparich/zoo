@@ -96,4 +96,11 @@ export default class Vector {
     public static Zero(): Vector {
         return new Vector(0, 0);
     }
+
+    public static Serialize(vector: Vector): number[] {
+        return [vector.x, vector.y];
+    }
+    public static Deserialize([x, y]: number[]): Vector {
+        return new Vector(x, y);
+    }
 }

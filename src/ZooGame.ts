@@ -53,8 +53,6 @@ class ZooGame extends Game {
         this.player.render.scale = 0.5;
 
         UIManager.setup();
-
-        SaveManager.saveGame();
     }
 
     protected update(delta: number): void {

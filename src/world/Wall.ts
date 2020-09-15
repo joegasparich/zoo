@@ -87,11 +87,13 @@ export default class Wall {
     }
 
     public remove(): void {
+        if (this.exists) {
+            ZooGame.app.stage.removeChild(this.sprite);
+            ZooGame.physicsManager.removeBody(this.body);
+        }
         this.data = undefined;
         this.spriteSheet = undefined;
         this.exists = false;
-        ZooGame.app.stage.removeChild(this.sprite);
-        ZooGame.physicsManager.removeBody(this.body);
     }
 
     public updateSprite(): void {

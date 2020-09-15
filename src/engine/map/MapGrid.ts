@@ -149,10 +149,10 @@ export default class MapGrid {
         const xrel = ((pos.x + 10000) % 1) - 0.5;
         const yrel = ((pos.y + 10000) % 1) - 0.5;
 
-        if (yrel < 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.North;
-        if (xrel > 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.East;
-        if (yrel > 0 && Math.abs(yrel) > Math.abs(xrel)) return Side.South;
-        if (xrel < 0 && Math.abs(xrel) > Math.abs(yrel)) return Side.West;
+        if (yrel <= 0 && Math.abs(yrel) >= Math.abs(xrel)) return Side.North;
+        if (xrel >= 0 && Math.abs(xrel) >= Math.abs(yrel)) return Side.East;
+        if (yrel >= 0 && Math.abs(yrel) >= Math.abs(xrel)) return Side.South;
+        if (xrel <= 0 && Math.abs(xrel) >= Math.abs(yrel)) return Side.West;
     }
 
     /**

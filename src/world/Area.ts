@@ -1,5 +1,5 @@
 import { Config } from "consts";
-import { Graphics, Vector } from "engine";
+import { Graphics } from "engine";
 import { rgbToHex } from "engine/helpers/math";
 import { removeItem } from "engine/helpers/util";
 import { MapCell } from "engine/map";

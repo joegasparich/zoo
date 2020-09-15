@@ -9,34 +9,69 @@ import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
 import ZooGame from "ZooGame";
 
+export interface WallGridSaveData {
+    walls: ({
+        type: string;
+        isDoor: boolean;
+    } | undefined)[][];
+}
+
 export default class WallGrid {
     private map: MapGrid;
     private camera: Camera;
 
+    private isSetup: boolean;
     /* V H V H V
        V H V H V
          H   H  */
-    private wallGrid: (Wall | undefined)[][];
+    private wallGrid: Wall[][];
 
     public constructor() {
         this.map = ZooGame.world.map;
         this.camera = ZooGame.camera;
+
+        this.isSetup = false;
     }
 
-    public setup(): void {
+    public setup(data?: WallGridSaveData): void {
         this.wallGrid = [];
 
         for (let col = 0; col < (this.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
             this.wallGrid[col] = [];
             for (let row = 0; row < this.map.rows + orientation; row++) {
-                this.wallGrid[col][row] = new Wall(orientation, Wall.wallToWorldPos(new Vector(col, row), orientation), new Vector(col, row));
+                const worldPos = Wall.wallToWorldPos(new Vector(col, row), orientation);
+                const wallSaveData = data?.walls[col][row];
+                if (wallSaveData) {
+                    const wallData = AssetManager.getJSON(data?.walls[col][row]?.type) as WallData;
+                    this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row), wallData);
+                    this.wallGrid[col][row].setDoor(wallSaveData.isDoor);
+                } else {
+                    this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row));
+                }
             }
         }
+
+        this.isSetup = true;
+        this.regeneratePathfinding();
     }
 
     public postUpdate(): void {
-        this.drawWalls();
+        if (this.isSetup) {
+            this.drawWalls();
+        }
+    }
+
+    public reset(): void {
+        for (let col = 0; col < (this.map.cols * 2) + 1; col++) {
+            const orientation = col % 2;
+            for (let row = 0; row < this.map.rows + orientation; row++) {
+                this.wallGrid[col][row].remove();
+            }
+        }
+
+        this.wallGrid = [];
+        this.isSetup = false;
     }
 
     /**
@@ -70,6 +105,7 @@ export default class WallGrid {
      * @param side The side of the tile to place the wall on
      */
     public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
+        if (!this.isSetup) return;
         if (!this.isWallPosInMap(tilePos, side)) return;
         if (this.getWallAtTile(tilePos, side)?.exists) return;
 
@@ -85,7 +121,18 @@ export default class WallGrid {
         const wall = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), wallData);
         this.wallGrid[x][y] = wall;
 
-        // Update pathfinding information
+        this.updatePathfindingAtWall(tilePos, side);
+
+        Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
+
+        if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
+            ZooGame.world.formAreas(wall);
+        }
+
+        return wall;
+    }
+
+    private updatePathfindingAtWall(tilePos: Vector, side: Side): void {
         if (side === Side.North && tilePos.y > 0) {
             this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
             this.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
@@ -102,21 +149,24 @@ export default class WallGrid {
             this.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
             this.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
         }
+    }
 
-        Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
-
-        if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
-            ZooGame.world.formAreas(wall);
+    private regeneratePathfinding(): void {
+        for (let i = 0; i < ZooGame.map.cols; i++) {
+            for (let j = 0; j < ZooGame.map.rows; j++) {
+                const tile = new Vector(i, j);
+                this.map.setTileAccess(tile, this.getWalledSides(tile));
+            }
         }
-
-        return wall;
     }
 
     public deleteWall(wall: Wall): void {
+        if (!this.isSetup) return;
         this.deleteWallAtTile(wall.position.floor(), wall.orientation === Orientation.Horizontal ? Side.North : Side.West);
     }
 
     public deleteWallAtTile(tilePos: Vector, side: Side): void {
+        if (!this.isSetup) return;
         if (!this.isWallPosInMap(tilePos, side)) return; // Return if out of map
         if (this.getWallAtTile(tilePos, side) && !this.getWallAtTile(tilePos, side).exists) return; // Return if wall doesn't exist here
 
@@ -235,6 +285,8 @@ export default class WallGrid {
      * @param side The side of the tile
      */
     public isWallPosInMap(tilePos: Vector, side: Side): boolean {
+        if (!this.isSetup) return false;
+
         return this.map.isPositionInMap(tilePos.floor()) ||
                (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) ||
                (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) ||
@@ -248,6 +300,8 @@ export default class WallGrid {
      * @param y The grid y position of the wall
      */
     public isWallGridPosInMap(x: number, y: number): boolean {
+        if (!this.isSetup) return false;
+
         return x >= 0 &&
                x < this.wallGrid.length &&
                y >= 0 &&
@@ -260,7 +314,9 @@ export default class WallGrid {
      * @param y The grid y position of the wall
      */
     public getWallByGridPos(x: number, y: number): Wall {
+        if (!this.isSetup) return;
         if (!this.isWallGridPosInMap(x, y)) return;
+
         return this.wallGrid[x][y];
     }
 
@@ -270,6 +326,8 @@ export default class WallGrid {
      * @param side The side of the tile
      */
     public getWallAtTile(tilePos: Vector, side: Side): Wall {
+        if (!this.isSetup) return;
+
         if (!this.isWallPosInMap(tilePos, side)) {
             // Invert position and side if tile pos is correct but on the outside of the map
             if (this.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) {
@@ -306,6 +364,8 @@ export default class WallGrid {
      * @param tilePos The tile to check
      */
     public getWallsAtTile(tilePos: Vector): Wall[] {
+        if (!this.isSetup) return [];
+
         return [
             this.wallGrid[(tilePos.x * 2) + 1][tilePos.y],
             this.wallGrid[(tilePos.x * 2) + 2][tilePos.y],
@@ -319,6 +379,7 @@ export default class WallGrid {
      * @param tilePos The tile to check
      */
     public getWalledSides(tilePos: Vector): Side[] {
+        if (!this.isSetup) return [];
         if (!this.map.isPositionInMap(tilePos)) return [];
 
         const edges: Side[] = [];
@@ -336,6 +397,8 @@ export default class WallGrid {
      * @param wall The wall to check around
      */
     public getAdjacentWalls(wall: Wall): Wall[] {
+        if (!this.isSetup) return [];
+
         const adjacentWalls: Wall[] = [];
         const {x, y} = wall.gridPos;
 
@@ -363,6 +426,8 @@ export default class WallGrid {
      * @param wall The wall to check
      */
     public getAdjacentTiles(wall: Wall): Vector[] {
+        if (!this.isSetup) return [];
+
         const adjacentTiles: Vector[] = [];
         const {x, y} = wall.position;
 
@@ -378,6 +443,8 @@ export default class WallGrid {
     }
 
     public getWallsInRadius(pos: Vector, radius: number): Wall[] {
+        if (!this.isSetup) return [];
+
         const walls: Wall[] = [];
 
         for (let col = 0; col < (this.map.cols * 2) + 1; col++) {
@@ -395,10 +462,30 @@ export default class WallGrid {
         return walls;
     }
 
+    public save(): WallGridSaveData {
+        if (!this.isSetup) return;
+
+        return {
+            walls: this.wallGrid.map(row => row.map(wall => {
+                return wall.exists ? {
+                    type: wall.data.assetPath,
+                    isDoor: !!wall.isDoor, // For some reason need to put a !! here for it to save
+                } : undefined;
+            })),
+        };
+    }
+
+    public load(data: WallGridSaveData): void {
+        this.reset();
+        this.setup(data);
+    }
+
     /**
      * Draws a grid showing active and inactive walls
      */
     public drawDebug(): void {
+        if (!this.isSetup) return;
+
         const xOffset =  this.map.position.x;
         const yOffset = this.map.position.y;
 

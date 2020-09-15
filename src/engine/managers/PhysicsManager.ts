@@ -112,12 +112,12 @@ export default class PhysicsManager {
     }
 
     public update(delta: number): void {
-        this.world.step(delta / FRAME_RATE);
-
         while (this.bodiesToRemove.length) {
             const body = this.bodiesToRemove.pop();
             this.world.destroyBody(body);
         }
+
+        this.world.step(delta / FRAME_RATE);
     }
 
     public setGravity(direction: Vector): void {

@@ -13,6 +13,10 @@ export enum Biome {
 
 const CHUNK_SIZE = 5;
 
+export interface BiomeSaveData {
+    chunks: Biome[][][][][];
+}
+
 class Square {
     private quadrants: Biome[];
 
@@ -45,7 +49,7 @@ export default class BiomeGrid {
 
     public constructor(public width: number, public height: number, private cellSize: number) {}
 
-    public setup(): void  {
+    public setup(data?: BiomeSaveData): void  {
         const chunkCols = Math.ceil(this.width / CHUNK_SIZE);
         const chunkRows = Math.ceil(this.height / CHUNK_SIZE);
         this.chunks = [];
@@ -58,7 +62,7 @@ export default class BiomeGrid {
                     j === chunkRows - 1 && this.width % CHUNK_SIZE !== 0 ? this.height % CHUNK_SIZE : CHUNK_SIZE,
                     this.cellSize,
                 );
-                this.chunks[i][j].setup();
+                this.chunks[i][j].setup(data?.chunks[i][j]);
             }
         }
     }
@@ -69,6 +73,15 @@ export default class BiomeGrid {
                 this.chunks[i][j].postUpdate();
             }
         }
+    }
+
+    public reset(): void {
+        for (let i = 0; i < this.chunks.length; i++) {
+            for (let j = 0; j < this.chunks[i].length; j++) {
+                this.chunks[i][j].remove();
+            }
+        }
+        this.chunks = [];
     }
 
     public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
@@ -118,6 +131,17 @@ export default class BiomeGrid {
 
         return undefined;
     }
+
+    public save(): BiomeSaveData {
+        return {
+            chunks: this.chunks.map(row => row.map(chunk => chunk.getCopy())),
+        };
+    }
+
+    public load(data: BiomeSaveData): void {
+        this.reset();
+        this.setup(data);
+    }
 }
 
 export class BiomeChunk {
@@ -134,13 +158,17 @@ export class BiomeChunk {
         this.camera = ZooGame.camera;
     }
 
-    public setup(): void  {
+    public setup(data?: Biome[][][]): void  {
         // Generate grid
         this.grid = [];
         for (let i = 0; i < this.width; i++) {
             this.grid[i] = [];
             for (let j = 0; j < this.height; j++) {
-                this.grid[i][j] = new Square(Biome.Grass);
+                if (data) {
+                    this.grid[i][j] = new Square(undefined, data[i][j]);
+                } else {
+                    this.grid[i][j] = new Square(Biome.Grass);
+                }
             }
         }
 
@@ -190,6 +218,10 @@ export class BiomeChunk {
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
         // TODO: set position and draw triangles locally?
         this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
+    }
+
+    public remove(): void {
+        ZooGame.app.stage.removeChild(this.graphics);
     }
 
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {
