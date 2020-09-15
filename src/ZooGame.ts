@@ -1,11 +1,6 @@
-
-
 import { Game, Vector } from "engine";
-import { AssetManager } from "engine/managers";
 
 import Player from "entities/Player";
-import TileObject from "entities/TileObject";
-import { TileObjectData } from "types/AssetTypes";
 import World from "world/World";
 import { Config, Inputs } from "consts";
 import UIManager from "ui/UIManager";
