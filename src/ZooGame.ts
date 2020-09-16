@@ -5,6 +5,7 @@ import World from "world/World";
 import { Config, Inputs } from "consts";
 import UIManager from "ui/UIManager";
 import SaveManager from "SaveManager";
+import ZooScene from "scenes/ZooScene";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -35,10 +36,6 @@ class ZooGame extends Game {
 
         this.debugSettings = defaultSettings;
 
-        // Load Map
-        this.world = new World();
-        await this.world.setup();
-
         // Register inputs
         Object.values(Inputs).forEach(input => {
             this.input.registerInput(input);
@@ -46,11 +43,12 @@ class ZooGame extends Game {
 
         this.camera.scale = Config.CAMERA_SCALE;
 
-        // Create Player
-        this.player = this.registerEntity(new Player(
-            new Vector(4, 4),
-        )) as Player;
-        this.player.render.scale = 0.5;
+        this.sceneManager.loadScene(
+            new ZooScene(),
+            (progress: number) => {
+                console.log(`Map Load Progress: ${progress}%`);
+            },
+        );
 
         UIManager.setup();
     }

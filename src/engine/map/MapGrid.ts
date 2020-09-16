@@ -3,13 +3,11 @@ import { PathfindingGrid } from ".";
 import { MapEvent, Side, TAG } from "engine/consts";
 import { Config } from "consts";
 import Mediator from "engine/Mediator";
-import TileGrid from "./TileGrid";
 
 export class MapCell {
     public position: Vector;
 
     public isSolid: boolean;
-    public texture?: PIXI.Texture;
     public cellSize?: number;
 }
 
@@ -23,7 +21,6 @@ export default class MapGrid {
 
     private grid: MapCell[][];
     private pathfindingGrid: PathfindingGrid;
-    private tileGrid: TileGrid;
 
     private isGridSetup = false;
 
@@ -37,36 +34,28 @@ export default class MapGrid {
      * @param cells The map cells to populate the grid with
      * @param useTexture Whether a textured tile grid will be used
      */
-    public setupGrid(cells: MapCell[][], useTexture: boolean): void{
+    public setupGrid(cells: MapCell[][]): void{
         this.grid = cells;
         this.cols = cells.length;
         this.rows = cells[0].length;
 
-        if (useTexture) {
-            this.cellSize = cells[0][1].texture?.width ?? cells[0][1].cellSize;
-            this.tileGrid = new TileGrid(this.game, this, cells);
-        } else {
-            this.cellSize = Config.WORLD_SCALE;
-        }
+        this.cellSize = Config.WORLD_SCALE;
 
         this.pathfindingGrid = new PathfindingGrid(this.game, this.rows, this.cols);
 
         this.isGridSetup = true;
     }
 
-    public postUpdate(): void {
-        this.tileGrid?.postUpdate();
-    }
+    public postUpdate(): void {}
 
     /**
      * Resets the map grid back to an empty state
      */
-    private clearMap(): void {
+    public clearMap(): void {
         this.rows = 0;
         this.cols = 0;
         this.grid = [];
         this.pathfindingGrid?.reset();
-        this.tileGrid?.reset();
         this.isGridSetup = false;
     }
 

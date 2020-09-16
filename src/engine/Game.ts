@@ -187,6 +187,15 @@ export default class Game {
         this.entitiesToDelete.push(id);
     }
 
+    public clearEntities(): void {
+        this.entities.forEach(entity => {
+            entity.remove();
+        });
+        this.entities = new Map();
+        this.entitiesToAdd = [];
+        this.entitiesToDelete = [];
+    }
+
     private pushCachedEntities(): void {
         this.entitiesToAdd.forEach(entity => {
             this.entities.set(entity.id, entity);

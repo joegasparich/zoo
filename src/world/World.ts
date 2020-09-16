@@ -11,7 +11,6 @@ import Mediator from "engine/Mediator";
 import { Assets, Config } from "consts";
 import { WorldEvents } from "consts/events";
 import TileObject from "entities/TileObject";
-import EmptyScene from "scenes/EmptyScene";
 import { TileObjectData, WallData } from "types/AssetTypes";
 import ZooGame from "ZooGame";
 import Area from "./Area";
@@ -35,7 +34,6 @@ export interface AreaSaveData {
 }
 
 export default class World {
-    public map: MapGrid;
     public biomeGrid: BiomeGrid;
     public wallGrid: WallGrid;
     public elevationGrid: ElevationGrid;
@@ -47,7 +45,6 @@ export default class World {
     private tileObjectMap: Map<string, TileObject>;
 
     public constructor() {
-        this.map = ZooGame.map;
         this.tileObjects = new Map();
         this.areas = new Map();
         this.tileAreaMap = new Map();
@@ -55,11 +52,8 @@ export default class World {
     }
 
     public async setup(): Promise<void> {
-        // TODO: Figure out how to load map info like biomes after biomeGrid.setup
-        await this.loadMap();
-
         this.elevationGrid = new ElevationGrid();
-        this.biomeGrid = new BiomeGrid(this.map.cols * 2, this.map.rows * 2, Config.BIOME_SCALE);
+        this.biomeGrid = new BiomeGrid(ZooGame.map.cols * 2, ZooGame.map.rows * 2, Config.BIOME_SCALE);
         this.wallGrid = new WallGrid();
         this.waterGrid = new WaterGrid();
 
@@ -73,6 +67,17 @@ export default class World {
         this.generateFence();
     }
 
+    public reset(): void {
+        this.resetAreas();
+
+        this.biomeGrid.reset();
+        this.wallGrid.reset();
+        this.elevationGrid.reset();
+        this.waterGrid.reset();
+
+        this.tileObjectMap = new Map();
+    }
+
     private resetAreas(): void {
         this.areas = new Map();
         this.tileAreaMap = new Map();
@@ -81,18 +86,18 @@ export default class World {
     // TODO: Move to scene
     private generateFence(): void {
         const ironFence = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
-        for (let i = 0; i < this.map.cols; i++) {
+        for (let i = 0; i < ZooGame.map.cols; i++) {
             this.wallGrid.placeWallAtTile(ironFence, new Vector(i, 0), Side.North);
-            this.wallGrid.placeWallAtTile(ironFence, new Vector(i, this.map.rows - 1), Side.South);
+            this.wallGrid.placeWallAtTile(ironFence, new Vector(i, ZooGame.map.rows - 1), Side.South);
         }
-        for (let i = 0; i < this.map.rows; i++) {
+        for (let i = 0; i < ZooGame.map.rows; i++) {
             this.wallGrid.placeWallAtTile(ironFence, new Vector(0, i), Side.West);
-            this.wallGrid.placeWallAtTile(ironFence, new Vector(this.map.cols - 1, i), Side.East);
+            this.wallGrid.placeWallAtTile(ironFence, new Vector(ZooGame.map.cols - 1, i), Side.East);
         }
         const zooArea = new Area("0", "zoo");
         this.areas.set(zooArea.id, zooArea);
         Mediator.fire(WorldEvents.AREAS_UPDATED);
-        const zooCells = this.floodFill(this.map.getCell(new Vector(1)));
+        const zooCells = this.floodFill(ZooGame.map.getCell(new Vector(1)));
         zooArea.setCells(zooCells);
         zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
     }
@@ -105,16 +110,6 @@ export default class World {
         this.areas.forEach(area => {
             area.postUpdate();
         });
-    }
-
-    private async loadMap(): Promise<void> {
-        await ZooGame.sceneManager.loadScene(
-            new EmptyScene(this),
-            // new TestScene(),
-            (progress: number) => {
-                console.log(`Map Load Progress: ${progress}%`);
-            },
-        );
     }
 
     public placeTileObject(object: (TileObjectData | string), position: Vector): TileObject {
@@ -136,7 +131,7 @@ export default class World {
         this.tileObjectMap.set(tileObject.position.floor().toString(), tileObject);
         // This assumes that tile objects can't move, will need to be reconsidered if that changes
         if (tileObject.blocksPath) {
-            this.map.setTileSolid(tileObject.position.floor(), true);
+            ZooGame.map.setTileSolid(tileObject.position.floor(), true);
         }
 
         return tileObject;
@@ -148,28 +143,28 @@ export default class World {
         this.tileObjects.delete(tileObject.id);
         this.tileObjectMap.delete(tileObject.position.floor().toString());
         if (tileObject.blocksPath) {
-            this.map.setTileSolid(tileObject.position.floor(), false);
+            ZooGame.map.setTileSolid(tileObject.position.floor(), false);
         }
 
         tileObject.remove();
     }
 
     public getTileObjectAtPos(pos: Vector): TileObject {
-        if (!this.map.isPositionInMap(pos)) return undefined;
+        if (!ZooGame.map.isPositionInMap(pos)) return undefined;
 
         return this.tileObjectMap.get(pos.floor().toString());
     }
 
     public getRandomCell(): Vector {
-        return new Vector(randomInt(0, this.map.cols), randomInt(0, this.map.rows));
+        return new Vector(randomInt(0, ZooGame.map.cols), randomInt(0, ZooGame.map.rows));
     }
 
     public isTileFree(position: Vector): boolean {
-        return this.map.isTileFree(position);
+        return ZooGame.map.isTileFree(position);
     }
 
     public isSideAccessible(tilePos: Vector, side: Side): boolean {
-        const cell = this.map.getCellInDirection(tilePos, side);
+        const cell = ZooGame.map.getCellInDirection(tilePos, side);
         const wall = this.wallGrid.getWallAtTile(tilePos, side);
         if (!cell) return false;
         if (cell.isSolid) return false;
@@ -188,7 +183,7 @@ export default class World {
         if (tiles.length < 2) return;
 
         tiles.forEach(tilePos =>{
-            areasCells.push(this.floodFill(this.map.getCell(tilePos)));
+            areasCells.push(this.floodFill(ZooGame.map.getCell(tilePos)));
         });
 
         const oldArea = this.tileAreaMap.get(tiles[0].toString());
@@ -335,8 +330,6 @@ export default class World {
     }
 
     public loadAreas(data: AreaSaveData): void {
-        this.resetAreas();
-
         // Create areas
         data.areas.forEach(area => {
             const newArea = new Area(area.id, area.name);
@@ -367,18 +360,18 @@ export default class World {
      * @param cell The cell to search around
      */
     private getAccessibleAdjacentCells(cell: MapCell): MapCell[] {
-        if (!this.map.isPositionInMap(cell.position)) return;
+        if (!ZooGame.map.isPositionInMap(cell.position)) return;
 
         const allSides: Side[] = [ Side.East, Side.North, Side.South, Side.West ];
 
         return allSides
             .filter(side => !this.wallGrid.getWallAtTile(cell.position, side).exists)
-            .filter(side => this.map.isPositionInMap(this.map.getCellInDirection(cell.position, side)?.position))
-            .map(side => this.map.getCellInDirection(cell.position, side));
+            .filter(side => ZooGame.map.isPositionInMap(ZooGame.map.getCellInDirection(cell.position, side)?.position))
+            .map(side => ZooGame.map.getCellInDirection(cell.position, side));
     }
 
     public getAreaAtPosition(position: Vector): Area {
-        if (!this.map.isPositionInMap(position)) return undefined;
+        if (!ZooGame.map.isPositionInMap(position)) return undefined;
 
         return this.tileAreaMap.get(position.floor().toString());
     }

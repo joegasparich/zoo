@@ -38,6 +38,13 @@ export default class WaterGrid {
         this.graphics.position = ZooGame.camera.worldToScreenPosition(Vector.Zero()).toPoint();
     }
 
+    public reset(): void {
+        ZooGame.stage.removeChild(this.graphics);
+        this.graphics.destroy();
+        this.graphics = undefined;
+        this.grid = [];
+    }
+
     public draw(): void {
         this.graphics.clear();
 

@@ -1,9 +1,5 @@
-import * as path from "path";
-
 import { TileSet } from "engine";
 import { TileSetData } from "engine/TileSet";
-import { TiledSet } from "engine/map";
-import { parseTiledSet } from "engine/helpers/tiled";
 
 class AssetManager {
     private loader: PIXI.Loader;
@@ -96,18 +92,6 @@ class AssetManager {
         }
 
         return this.tilesets.get(key);
-    }
-
-    public async loadTileSetFile(location: string, onProgress?: Function): Promise<TileSet> {
-        // Load
-        const tilesetResource = await this.loadResource(location, (progress: number) => onProgress && onProgress(progress/2));
-        const tiledSet = tilesetResource.data as TiledSet;
-
-        // Load Tileset Image
-        const imagePath = path.join(location, "..", tiledSet.image);
-        const imageResource = await this.loadResource(imagePath, (progress: number) => onProgress && onProgress(progress/2 + 50));
-        const tileSetData = parseTiledSet(tiledSet, imageResource.texture, imagePath);
-        return this.createTileset(tileSetData);
     }
 }
 

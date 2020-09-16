@@ -45,7 +45,7 @@ export default class ElevationGrid {
         }
     }
 
-    private reset(): void {
+    public reset(): void {
         this.grid = [];
     }
 

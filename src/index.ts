@@ -15,7 +15,6 @@ async function run(): Promise<void> {
     AssetManager.preLoadAssets(Object.values(Assets.UI));
     await TileObject.loadTileObjectData(Assets.OBJECTS.TREE);
     await Wall.loadWallData(Assets.WALLS.IRON_BAR);
-    await AssetManager.loadTileSetFile(Assets.TILESETS.TEST);
 
     // Load game
     await ZooGame.load(progress => {
