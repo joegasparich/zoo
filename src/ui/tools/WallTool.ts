@@ -24,7 +24,7 @@ export default class WallTool extends Tool {
 
         this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        this.ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.Horizontal));
+        this.ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.Horizontal);
         this.ghost.setPivot(new Vector(0.5, 1));
         this.ghost.setSnap(true);
         this.ghost.canPlaceFunction = this.canPlace.bind(this);
@@ -131,7 +131,7 @@ export default class WallTool extends Tool {
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
         const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex() || [0, 0];
-        ghost.setSprite(spriteSheet.getTextureById(spriteIndex));
+        ghost.setSpriteSheet(spriteSheet, spriteIndex);
 
         switch (side) {
             case Side.North:

@@ -1,4 +1,4 @@
-import { Layers, Vector } from "engine";
+import { Layers, SpriteSheet, Vector } from "engine";
 import { Entity } from "engine/entities";
 import { RenderSystem } from "engine/entities/systems";
 import { FollowMouseSystem, SnapToGridSystem, ZOO_SYSTEM } from "entities/systems";
@@ -29,7 +29,7 @@ export default class PlacementGhost {
     public constructor() {
         this.world = ZooGame.world;
 
-        this.ghost = ZooGame.registerEntity(new Entity(ZooGame, ZooGame.input.getMousePos()));
+        this.ghost = ZooGame.registerEntity(new Entity(ZooGame, ZooGame.input.getMousePos(), false));
         this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
@@ -53,8 +53,12 @@ export default class PlacementGhost {
         return this.world.isTileFree(position);
     }
 
-    public setSprite(sprite: string | PIXI.Sprite | PIXI.Texture): void {
-        this.ghostRenderer.setSprite(sprite);
+    public setSprite(spriteUrl: string): void {
+        this.ghostRenderer.setSprite(spriteUrl);
+        this.ghostRenderer.visible = this.spriteVisible;
+    }
+    public setSpriteSheet(spriteSheet: SpriteSheet, index: number): void {
+        this.ghostRenderer.setSpriteSheet(spriteSheet, index);
         this.ghostRenderer.visible = this.spriteVisible;
     }
 

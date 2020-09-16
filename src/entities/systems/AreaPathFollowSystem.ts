@@ -1,11 +1,22 @@
 import { Vector } from "engine";
 import { PathFollowSystem, SYSTEM } from "engine/entities/systems";
+import { PathFollowSystemSaveData } from "engine/entities/systems/PathFollowSystem";
 import Area from "world/Area";
 import Wall from "world/Wall";
 import ZooGame from "ZooGame";
+import { ZOO_SYSTEM } from ".";
+
+interface AreaPathFollowSystemSaveData extends PathFollowSystemSaveData {
+    areaPath: string[];
+    currentArea: string;
+    currentDoor: number[];
+    enterDoorPosition: number[];
+    targetPosition: number[];
+}
 
 export default class AreaPathFollowSystem extends PathFollowSystem {
-    public id = SYSTEM.PATH_FOLLOW_SYSTEM;
+    public id = ZOO_SYSTEM.AREA_PATH_FOLLOW_SYSTEM;
+    public type = SYSTEM.PATH_FOLLOW_SYSTEM;
 
     private areaPath: Area[];
     private currentArea: Area;
@@ -59,7 +70,7 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
                 // We are going through the door
                 if (Vector.Distance(this.entity.position, this.enterDoorPosition) > 0.05) {
                     // Go through door
-                    this.moveTowardTarget(this.enterDoorPosition, speed);
+                    this.currentTarget = this.enterDoorPosition;
                 } else {
                     // Finished going through door
                     this.enterDoorPosition = undefined;
@@ -93,5 +104,28 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
     public hasPath(): boolean {
         if (this.areaPath?.length) return true;
         return super.hasPath();
+    }
+
+    public save(): AreaPathFollowSystemSaveData {
+        return Object.assign({
+            areaPath: this.areaPath?.map(area => area.id),
+            currentArea: this.currentArea?.id,
+            currentDoor: this.currentDoor && Vector.Serialize(this.currentDoor.gridPos),
+            enterDoorPosition: this.enterDoorPosition && Vector.Serialize(this.enterDoorPosition),
+            targetPosition: this.targetPosition && Vector.Serialize(this.targetPosition),
+        }, super.save());
+    }
+
+    public load(data: AreaPathFollowSystemSaveData): void {
+        super.load(data);
+
+        this.areaPath = data.areaPath?.map(areaId => ZooGame.world.getAreaById(areaId));
+        this.currentArea = data.currentArea && ZooGame.world.getAreaById(data.currentArea);
+        if (data.currentDoor) {
+            const {x, y} = Vector.Deserialize(data.currentDoor);
+            this.currentDoor = ZooGame.world.wallGrid.getWallByGridPos(x, y);
+        }
+        this.enterDoorPosition = data.enterDoorPosition && Vector.Deserialize(data.enterDoorPosition);
+        this.targetPosition = data.targetPosition && Vector.Deserialize(data.targetPosition);
     }
 }

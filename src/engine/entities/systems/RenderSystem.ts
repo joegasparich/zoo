@@ -1,14 +1,36 @@
 import { System, SYSTEM } from ".";
 import { AssetManager } from "engine/managers";
 import { Entity } from "engine/entities";
-import { Camera, Layers, Vector } from "engine";
+import { Camera, Layers, SpriteSheet, Vector } from "engine";
+import { SystemSaveData } from "./System";
 
 const DEFAULT_LAYER = Layers.ENTITIES;
 
+interface RenderSystemSaveData extends SystemSaveData {
+    spriteUrl: string;
+    spriteSheet?: {
+        cellWidth: number;
+        cellHeight: number;
+        pivot?: number[];
+        index: number;
+    };
+    flipX: boolean;
+    flipY: boolean;
+    scale: number;
+    pivot: number[];
+    offset: number[];
+    colour: number;
+    alpha: number;
+    visible: boolean;
+}
+
 export default class RenderSystem extends System {
     public id = SYSTEM.RENDER_SYSTEM;
+    public type = SYSTEM.RENDER_SYSTEM;
 
     private spriteUrl: string;
+    private spriteSheet: SpriteSheet;
+    private spriteIndex: number;
     protected sprite: PIXI.Sprite;
     private layer: PIXI.display.Group;
 
@@ -24,7 +46,7 @@ export default class RenderSystem extends System {
     public alpha = 1;
     public visible = true;
 
-    public constructor(spriteUrl: string, layer?: PIXI.display.Group, pivot?: Vector) {
+    public constructor(spriteUrl?: string, layer?: PIXI.display.Group, pivot?: Vector) {
         super();
         this.spriteUrl = spriteUrl ?? "";
         this.layer = layer ?? DEFAULT_LAYER;
@@ -37,7 +59,10 @@ export default class RenderSystem extends System {
 
         this.camera = this.game.camera;
 
-        if (this.spriteUrl) {
+        // Set cached sprites if they exist
+        if (this.spriteSheet) {
+            this.setSpriteSheet(this.spriteSheet, this.spriteIndex);
+        } else if (this.spriteUrl) {
             this.setSprite(this.spriteUrl);
         }
     }
@@ -55,21 +80,30 @@ export default class RenderSystem extends System {
         this.game.app.stage.removeChild(this.sprite);
     }
 
-    public setSprite(newSprite: string | PIXI.Texture | PIXI.Sprite): void {
-        if (!this.hasStarted) {
-            console.error("System hasn't been started yet");
-            return;
-        }
+    public setSprite(spriteUrl: string): void {
+        this.spriteUrl = spriteUrl;
+        this.spriteSheet = undefined;
 
-        if (typeof newSprite === "string") {
-            newSprite = AssetManager.getTexture(newSprite);
+        if (this.hasStarted) {
+            const sprite = new PIXI.Sprite(AssetManager.getTexture(spriteUrl));
+            this.updateSprite(sprite);
         }
-        if (newSprite instanceof PIXI.Texture) {
-            newSprite = new PIXI.Sprite(newSprite);
-        }
+    }
 
-        if (!newSprite) {
-            console.error("Failed to set sprite");
+    public setSpriteSheet(spriteSheet: SpriteSheet, index: number): void {
+        this.spriteUrl = spriteSheet.data.imageUrl;
+        this.spriteSheet = spriteSheet;
+        this.spriteIndex = index;
+
+        if (this.hasStarted) {
+            const sprite = new PIXI.Sprite(spriteSheet.getTextureByIndex(index));
+            this.updateSprite(sprite);
+        }
+    }
+
+    protected updateSprite(sprite: PIXI.Sprite): void {
+        if (!sprite) {
+            console.error("Failed to update sprite");
             return;
         }
 
@@ -78,8 +112,8 @@ export default class RenderSystem extends System {
         app.stage.removeChild(this.sprite);
 
         // Add new sprite
-        app.stage.addChild(newSprite);
-        this.sprite = newSprite;
+        this.sprite = sprite;
+        app.stage.addChild(this.sprite);
         this.sprite.parentGroup = this.layer;
         this.sprite.anchor.set(0.5);
         this.syncPosition();
@@ -107,5 +141,53 @@ export default class RenderSystem extends System {
         if (this.flipX && !this.flipY) return 12;
         if (!this.flipX && this.flipY) return 8;
         if (this.flipX && this.flipY) return 4;
+    }
+
+    public save(): RenderSystemSaveData {
+        return Object.assign({
+            spriteUrl: this.spriteUrl,
+            spriteSheet: this.spriteSheet && {
+                cellWidth: this.spriteSheet.data.cellWidth,
+                cellHeight: this.spriteSheet.data.cellHeight,
+                pivot: this.spriteSheet.data.pivot && Vector.Serialize(this.spriteSheet.data.pivot),
+                index: this.spriteIndex,
+            },
+            flipX: this.flipX,
+            flipY: this.flipY,
+            scale: this.scale,
+            pivot: Vector.Serialize(this.pivot),
+            offset: Vector.Serialize(this.offset),
+            colour: this.colour,
+            alpha: this.alpha,
+            visible: this.visible,
+        }, super.save());
+    }
+
+    public load(data: RenderSystemSaveData): void {
+        super.load(data);
+
+        this.spriteUrl = data.spriteUrl;
+        this.flipX = data.flipX;
+        this.flipY = data.flipY;
+        this.scale = data.scale;
+        this.pivot = Vector.Deserialize(data.pivot);
+        this.offset = Vector.Deserialize(data.offset);
+        this.colour = data.colour;
+        this.alpha = data.alpha;
+        this.visible = data.visible;
+
+        if (data.spriteSheet) {
+            this.spriteSheet = new SpriteSheet({
+                imageUrl: data.spriteUrl,
+                cellHeight: data.spriteSheet.cellHeight,
+                cellWidth: data.spriteSheet.cellWidth,
+                pivot: data.spriteSheet.pivot && Vector.Deserialize(data.spriteSheet.pivot),
+            });
+            this.spriteIndex = data.spriteSheet.index;
+
+            this.setSpriteSheet(this.spriteSheet, this.spriteIndex);
+        } else {
+            this.setSprite(this.spriteUrl);
+        }
     }
 }

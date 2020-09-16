@@ -5,9 +5,24 @@ import * as Planck from "planck-js";
 import { Entity } from "..";
 import { TAG } from "engine/consts";
 import { BodyUserData } from "engine/managers/PhysicsManager";
+import { SystemSaveData } from "./System";
+
+export interface PhysicsSystemSaveData extends SystemSaveData {
+    collider: {
+        type: string;
+        radius?: number;
+        width?: number;
+        height?: number;
+    };
+    isDynamic: boolean;
+    density: number;
+    tag: number;
+    pivot: number[];
+}
 
 export default class PhysicsSystem extends System {
     public id = SYSTEM.PHYSICS_SYSTEM;
+    public type = SYSTEM.PHYSICS_SYSTEM;
 
     public body: Planck.Body;
 
@@ -51,5 +66,20 @@ export default class PhysicsSystem extends System {
 
     public end(): void {
         this.game.physicsManager.removeBody(this.body);
+    }
+
+    public save(): PhysicsSystemSaveData {
+        return Object.assign({
+            collider: {
+                type: this.collider.type,
+                radius: this.collider.radius,
+                width: this.collider.width,
+                height: this.collider.height,
+            },
+            isDynamic: this.isDynamic,
+            density: this.density,
+            tag: this.tag,
+            pivot: Vector.Serialize(this.pivot),
+        }, super.save());
     }
 }

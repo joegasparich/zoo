@@ -1,11 +1,10 @@
-import { Game, Vector } from "engine";
+import { Game } from "engine";
 
-import Player from "entities/Player";
 import World from "world/World";
 import { Config, Inputs } from "consts";
 import UIManager from "ui/UIManager";
-import SaveManager from "SaveManager";
 import ZooScene from "scenes/ZooScene";
+import { createDude } from "helpers/entityGenerators";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -27,7 +26,6 @@ const defaultSettings: DebugSettings = {
 
 class ZooGame extends Game {
     public world: World;
-    public player: Player;
 
     public debugSettings: DebugSettings;
 
@@ -50,6 +48,8 @@ class ZooGame extends Game {
             },
         );
 
+        this.registerEntity(createDude());
+
         UIManager.setup();
     }
 
@@ -71,14 +71,8 @@ class ZooGame extends Game {
     }
 
     private pollInput(): void {
+        // TODO: Move to input manager
         if (UIManager.hasFocus()) return;
-
-        // Test code
-        if (this.input.isInputPressed(Inputs.RightMouse)) {
-            const mousePos: Vector = this.camera.screenToWorldPosition(this.input.getMousePos());
-
-            this.player.pather.pathTo(mousePos.floor());
-        }
     }
 
     private drawDebug(): void {

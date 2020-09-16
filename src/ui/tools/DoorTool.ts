@@ -22,7 +22,7 @@ export default class DoorTool extends Tool {
 
         this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        ghost.setSprite(spriteSheet.getTextureById(WallSpriteIndex.DoorHorizontal));
+        ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.DoorHorizontal);
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
@@ -61,7 +61,7 @@ export default class DoorTool extends Tool {
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
         const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex(true) || [0, 0];
-        ghost.setSprite(spriteSheet.getTextureById(spriteIndex));
+        ghost.setSpriteSheet(spriteSheet, spriteIndex);
 
         switch (side) {
             case Side.North:

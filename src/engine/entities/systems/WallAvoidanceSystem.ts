@@ -9,11 +9,13 @@ const AVOID_STRENGTH = 10;
 
 export default class WallAvoidanceSystem extends System {
     public id = SYSTEM.WALL_AVOIDANCE_SYSTEM;
+    public type = SYSTEM.WALL_AVOIDANCE_SYSTEM;
 
     public shouldAvoid = true;
 
     private physics: PhysicsSystem;
 
+    // TODO: Store this in a singleton somewhere so there isn't an array of walls for every entity
     private walls: Planck.Fixture[];
 
     public start(entity: Entity): void {

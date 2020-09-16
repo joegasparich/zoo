@@ -177,6 +177,11 @@ export default class Game {
         this.camera.update();
     }
 
+    public getEntities(): Entity[] {
+        // TODO: Find out if its cheaper to also store an array of entities instead of converting it each time
+        return Array.from(this.entities.values());
+    }
+
     public registerEntity(entity: Entity): Entity {
         this.entitiesToAdd.push(entity);
         entity.start();

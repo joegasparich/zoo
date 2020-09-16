@@ -4,6 +4,7 @@ import { Camera } from "engine";
 
 export default class CameraFollowSystem extends System {
     public id = SYSTEM.CAMERA_FOLLOW_SYSTEM;
+    public type = SYSTEM.CAMERA_FOLLOW_SYSTEM;
 
     private camera: Camera;
 

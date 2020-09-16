@@ -1,6 +1,0 @@
-{
-    "name": "grass",
-    "tileset": "/assets/img/tileset.png",
-    "variants": [1, 2, 3],
-    "solid": false
-}

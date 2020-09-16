@@ -1,27 +1,28 @@
 import { Vector } from "engine";
+import { AssetManager } from "./managers";
 
 export interface SpriteSheetData {
     cellWidth: number;
     cellHeight: number;
     pivot?: Vector;
-    image: PIXI.Texture;
+    imageUrl: string;
 }
 
 export default class SpriteSheet {
     private texture: PIXI.Texture;
     private rows: number;
     private cols: number;
-    private data: SpriteSheetData;
+    public data: SpriteSheetData;
 
     public constructor(data: SpriteSheetData) {
-        if (!data.image) {
+        if (!data.imageUrl) {
             console.error("Tried to create sprite sheet with no texture");
             return null;
         }
 
-        this.texture = data.image;
-        this.rows = Math.floor(data.image.height / data.cellWidth);
-        this.cols = Math.floor(data.image.width / data.cellWidth);
+        this.texture = AssetManager.getTexture(data.imageUrl);
+        this.rows = Math.floor(this.texture.height / data.cellWidth);
+        this.cols = Math.floor(this.texture.width / data.cellWidth);
         this.data = data;
     }
 
@@ -41,11 +42,11 @@ export default class SpriteSheet {
         return this.texture;
     }
 
-    public getTextureById(id: number): PIXI.Texture {
+    public getTextureByIndex(id: number): PIXI.Texture {
         return new PIXI.Texture(this.texture.baseTexture, this.getRectFromIndex(id));
     }
 
     public getTexturesById(ids: number[]): PIXI.Texture[] {
-        return ids.map(id => this.getTextureById(id));
+        return ids.map(id => this.getTextureByIndex(id));
     }
 }

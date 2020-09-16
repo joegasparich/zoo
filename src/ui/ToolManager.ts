@@ -23,17 +23,19 @@ export default class ToolManager {
     private toolbarRef: React.RefObject<Toolbar>;
 
     public constructor() {
-        this.ghost = new PlacementGhost();
-
-        this.setTool(ToolType.None);
-        this.actionStack = [];
-
         this.toolbarRef = React.createRef();
         ZooGame.canvas.addChild(React.createElement(Toolbar, {
             key: "toolbar",
             toolManager: this,
             ref: this.toolbarRef,
         }));
+    }
+
+    public setup(): void {
+        this.ghost = new PlacementGhost();
+
+        this.setTool(ToolType.None);
+        this.actionStack = [];
     }
 
     public update(): void {
@@ -63,6 +65,11 @@ export default class ToolManager {
     public postUpdate(): void {
         this.activeTool.postUpdate();
         this.ghost.postUpdate();
+    }
+
+    public reset(): void {
+        this.actionStack = [];
+        this.ghost.destroy();
     }
 
     public setTool(tool: ToolType, data?: Record<string, any>): void {
@@ -110,7 +117,7 @@ export default class ToolManager {
     }
 
     public showRadius(): boolean {
-        switch(this.activeTool.type) {
+        switch(this.activeTool?.type) {
             case ToolType.Biome:
             case ToolType.Elevation:
                 return true;
@@ -120,6 +127,6 @@ export default class ToolManager {
     }
 
     public hasFocus(): boolean {
-        return this.activeTool.type !== ToolType.None;
+        return this.activeTool?.type !== ToolType.None;
     }
 }

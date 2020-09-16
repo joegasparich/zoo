@@ -7,6 +7,7 @@ import ZooGame from "ZooGame";
  */
 export default class ElevationSystem extends System {
     public id = "ELEVATION_SYSTEM";
+    public type = "ELEVATION_SYSTEM";
 
     private renderer: RenderSystem;
 

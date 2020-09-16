@@ -1,8 +1,7 @@
-import { Game, Vector } from "engine";
+import { Vector } from "engine";
 import * as React from "react";
 
 import ZooGame from "ZooGame";
-import AreaList from "./components/AreaList";
 import Windows from "./components/Windows";
 import ToolManager from "./ToolManager";
 
@@ -10,13 +9,12 @@ class UIManager {
     private tools: ToolManager;
 
     private windowsRef: React.RefObject<Windows>;
-    private areasRef: React.RefObject<AreaList>;
 
     public setup(): void {
         this.windowsRef = React.createRef();
-        this.areasRef = React.createRef();
 
         this.tools = new ToolManager();
+        this.tools.setup();
 
         ZooGame.canvas.addChild(React.createElement(Windows, {
             key: "windows",
@@ -29,9 +27,12 @@ class UIManager {
     }
 
     public postUpdate(delta: number): void {
-        const mouseScreenPos = ZooGame.input.getMousePos();
-
         this.tools.postUpdate();
+    }
+
+    public reset(): void {
+        this.tools.reset();
+        this.tools.setup();
     }
 
     public hasFocus(): boolean {

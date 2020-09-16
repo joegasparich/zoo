@@ -3,7 +3,7 @@ import { MapCell } from "engine/map";
 
 import ZooGame from "ZooGame";
 import World from "world/World";
-import Player from "entities/Player";
+import UIManager from "ui/UIManager";
 
 const MAP_SIZE = 10;
 
@@ -17,18 +17,13 @@ export default class ZooScene extends Scene {
 
     public start(): void {
         this.generateMap();
-
-        // Create Player
-        const player = ZooGame.registerEntity(new Player(
-            new Vector(4, 4),
-        )) as Player;
-        player.render.scale = 0.5;
     }
 
     public stop(): void {
         ZooGame.world.reset();
         ZooGame.map.clearMap();
         ZooGame.clearEntities();
+        UIManager.reset();
     }
 
     private async generateMap(): Promise<void> {

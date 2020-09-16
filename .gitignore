@@ -17,3 +17,6 @@ dist/
 
 # vscode
 .VSCodeCounter
+
+# save folder
+saves/

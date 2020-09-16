@@ -34,9 +34,9 @@ export default class Wall {
         await AssetManager.loadResource(data.spriteSheet);
 
         const spritesheet = new SpriteSheet({
-            image: AssetManager.getTexture(data.spriteSheet),
-            cellHeight: 32,
-            cellWidth: 16,
+            imageUrl: data.spriteSheet,
+            cellHeight: data.cellHeight,
+            cellWidth: data.cellWidth,
         });
         Wall.wallSprites.set(data.spriteSheet, spritesheet);
 
@@ -106,7 +106,7 @@ export default class Wall {
 
         // Add new sprite
         const [spriteIndex, elevation] = this.getSpriteIndex();
-        const texture = this.spriteSheet.getTextureById(spriteIndex);
+        const texture = this.spriteSheet.getTextureByIndex(spriteIndex);
         this.sprite = new PIXI.Sprite(texture);
         ZooGame.app.stage.addChild(this.sprite);
         this.sprite.parentGroup = Layers.ENTITIES;
@@ -123,10 +123,10 @@ export default class Wall {
         this.isDoor = isDoor;
 
         if (isDoor) {
-            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation === Orientation.Horizontal ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.DoorVertical);
+            this.sprite.texture = this.spriteSheet.getTextureByIndex(this.orientation === Orientation.Horizontal ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.DoorVertical);
             this.body.setActive(false);
         } else {
-            this.sprite.texture = this.spriteSheet.getTextureById(this.orientation === Orientation.Horizontal ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
+            this.sprite.texture = this.spriteSheet.getTextureByIndex(this.orientation === Orientation.Horizontal ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
             this.body.setActive(true);
         }
     }

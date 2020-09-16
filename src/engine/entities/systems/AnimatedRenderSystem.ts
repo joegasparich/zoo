@@ -15,18 +15,24 @@ export class Animation {
     }
 }
 
+// TODO: Make this serializable
 export default class AnimatedRenderSystem extends RenderSystem {
-    public id = SYSTEM.RENDER_SYSTEM;
+    public id = SYSTEM.ANIMATED_RENDER_SYSTEM;
+    public type = SYSTEM.RENDER_SYSTEM;
 
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;
 
-    public constructor(animations: Animation[], layer?: PIXI.display.Group, pivot?: Vector) {
-        super(null, layer, pivot);
+    public constructor(animations?: Animation[], layer?: PIXI.display.Group, pivot?: Vector) {
+        super(undefined, layer, pivot);
 
         this.animations = new Map();
 
-        animations.forEach(animation => this.animations.set(animation.name, animation));
+        this.setAnimations(animations);
+    }
+
+    public setAnimations(animations: Animation[]): void {
+        animations?.forEach(animation => this.animations.set(animation.name, animation));
     }
 
     public setAnimation(key: string): void {
@@ -47,7 +53,7 @@ export default class AnimatedRenderSystem extends RenderSystem {
         animatedSprite.loop = animation.loop;
 
         this.currentAnimation = animation;
-        this.setSprite(animatedSprite);
+        this.updateSprite(animatedSprite);
 
         animatedSprite.play();
     }
