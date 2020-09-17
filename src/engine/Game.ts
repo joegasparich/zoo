@@ -184,11 +184,10 @@ export default class Game {
 
     public registerEntity(entity: Entity): Entity {
         this.entitiesToAdd.push(entity);
-        entity.start();
         return entity;
     }
 
-    public deleteEntity(id: string): void {
+    public unregisterEntity(id: string): void {
         this.entitiesToDelete.push(id);
     }
 
@@ -204,6 +203,7 @@ export default class Game {
     private pushCachedEntities(): void {
         this.entitiesToAdd.forEach(entity => {
             this.entities.set(entity.id, entity);
+            entity.start();
         });
         this.entitiesToAdd = [];
     }

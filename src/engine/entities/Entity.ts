@@ -22,6 +22,8 @@ export default class Entity {
         this.game = game;
         this.id = uuid();
         this.systems = new Map();
+
+        this.game.registerEntity(this);
     }
 
     public start(): void {
@@ -52,7 +54,7 @@ export default class Entity {
         this.systems.forEach(system => {
             system.end();
         });
-        this.game.deleteEntity(this.id);
+        this.game.unregisterEntity(this.id);
     }
 
     public addSystem<T extends System>(system: T): T {

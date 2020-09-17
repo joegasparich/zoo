@@ -20,9 +20,9 @@ export default class ZooScene extends Scene {
     }
 
     public stop(): void {
+        ZooGame.clearEntities();
         ZooGame.world.reset();
         ZooGame.map.clearMap();
-        ZooGame.clearEntities();
         UIManager.reset();
     }
 

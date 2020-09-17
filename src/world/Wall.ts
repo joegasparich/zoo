@@ -61,9 +61,11 @@ export default class Wall {
     public exists: boolean;
     public isDoor: boolean;
 
-    public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, data?: WallData) {
+    public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, public assetPath?: string) {
         this.exists = false;
-        if (data) {
+        if (assetPath) {
+            const data = AssetManager.getJSON(assetPath) as WallData;
+
             this.data = data;
             this.spriteSheet = Wall.wallSprites.get(this.data.spriteSheet);
             this.exists = true;

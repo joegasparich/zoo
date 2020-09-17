@@ -7,6 +7,7 @@ export { default as CameraFollowSystem } from "./CameraFollowSystem";
 export { default as PathFollowSystem } from "./PathFollowSystem";
 export { default as WallAvoidanceSystem } from "./WallAvoidanceSystem";
 export { default as InputToPhysicsSystem } from "./InputToPhysicsSystem";
+export { default as PathBlockSystem } from "./PathBlockSystem";
 
 export const SYSTEM = {
     RENDER_SYSTEM: "RENDER_SYSTEM",
@@ -17,4 +18,5 @@ export const SYSTEM = {
     PATH_FOLLOW_SYSTEM: "PATH_FOLLOW_SYSTEM",
     WALL_AVOIDANCE_SYSTEM: "WALL_AVOIDANCE_SYSTEM",
     INPUT_TO_PHYSICS_SYSTEM: "INPUT_TO_PHYSICS_SYSTEM",
+    PATH_BLOCK_SYSTEM: "PATH_BLOCK_SYSTEM",
 };

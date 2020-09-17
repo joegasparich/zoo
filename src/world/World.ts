@@ -4,14 +4,11 @@ import uuid = require("uuid");
 import { Vector } from "engine";
 import { Side } from "engine/consts";
 import { randomInt } from "engine/helpers/math";
-import { AssetManager } from "engine/managers";
-import { MapCell, MapGrid } from "engine/map";
+import { MapCell } from "engine/map";
 import Mediator from "engine/Mediator";
 
 import { Assets, Config } from "consts";
 import { WorldEvents } from "consts/events";
-import TileObject from "entities/TileObject";
-import { TileObjectData, WallData } from "types/AssetTypes";
 import ZooGame from "ZooGame";
 import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
@@ -19,8 +16,9 @@ import Wall from "./Wall";
 import WallGrid from "./WallGrid";
 import ElevationGrid from "./ElevationGrid";
 import WaterGrid from "./WaterGrid";
+import { Entity } from "engine/entities";
 
-export interface AreaSaveData {
+export interface WorldSaveData {
     areas: {
         id: string;
         name: string;
@@ -39,10 +37,11 @@ export default class World {
     public elevationGrid: ElevationGrid;
     public waterGrid: WaterGrid;
 
-    private tileObjects: Map<string, TileObject>;
+    private tileObjects: Map<string, Entity>;
+    private tileObjectMap: Map<string, Entity>;
+
     private areas: Map<string, Area>;
     private tileAreaMap: Map<string, Area>;
-    private tileObjectMap: Map<string, TileObject>;
 
     public constructor() {
         this.tileObjects = new Map();
@@ -85,14 +84,13 @@ export default class World {
 
     // TODO: Move to scene
     private generateFence(): void {
-        const ironFence = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         for (let i = 0; i < ZooGame.map.cols; i++) {
-            this.wallGrid.placeWallAtTile(ironFence, new Vector(i, 0), Side.North);
-            this.wallGrid.placeWallAtTile(ironFence, new Vector(i, ZooGame.map.rows - 1), Side.South);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, 0), Side.North);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, ZooGame.map.rows - 1), Side.South);
         }
         for (let i = 0; i < ZooGame.map.rows; i++) {
-            this.wallGrid.placeWallAtTile(ironFence, new Vector(0, i), Side.West);
-            this.wallGrid.placeWallAtTile(ironFence, new Vector(ZooGame.map.cols - 1, i), Side.East);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(ZooGame.map.cols - 1, i), Side.East);
         }
         const zooArea = new Area("0", "zoo");
         this.areas.set(zooArea.id, zooArea);
@@ -112,44 +110,21 @@ export default class World {
         });
     }
 
-    public placeTileObject(object: (TileObjectData | string), position: Vector): TileObject {
-        if (!this.isTileFree(position)) return;
-        if (!object) return;
+    public registerTileObject(tileObject: Entity): void {
+        if (!tileObject) return;
 
-        if (typeof object === "string") {
-            object = AssetManager.getJSON(object) as TileObjectData;
-        }
-
-        const tileObject = new TileObject(
-            position,
-            object,
-            true,
-        );
-
-        ZooGame.registerEntity(tileObject);
         this.tileObjects.set(tileObject.id, tileObject);
         this.tileObjectMap.set(tileObject.position.floor().toString(), tileObject);
-        // This assumes that tile objects can't move, will need to be reconsidered if that changes
-        if (tileObject.blocksPath) {
-            ZooGame.map.setTileSolid(tileObject.position.floor(), true);
-        }
-
-        return tileObject;
     }
 
-    public deleteTileObject(tileObject: TileObject): void {
+    public unregisterTileObject(tileObject: Entity): void {
         if (!tileObject) return;
 
         this.tileObjects.delete(tileObject.id);
         this.tileObjectMap.delete(tileObject.position.floor().toString());
-        if (tileObject.blocksPath) {
-            ZooGame.map.setTileSolid(tileObject.position.floor(), false);
-        }
-
-        tileObject.remove();
     }
 
-    public getTileObjectAtPos(pos: Vector): TileObject {
+    public getTileObjectAtPos(pos: Vector): Entity {
         if (!ZooGame.map.isPositionInMap(pos)) return undefined;
 
         return this.tileObjectMap.get(pos.floor().toString());
@@ -310,7 +285,7 @@ export default class World {
         return cells;
     }
 
-    public saveAreas(): AreaSaveData {
+    public save(): WorldSaveData {
         return {
             areas: Array.from(this.areas.values()).map(area => {
                 return {
@@ -329,7 +304,7 @@ export default class World {
         };
     }
 
-    public loadAreas(data: AreaSaveData): void {
+    public load(data: WorldSaveData): void {
         // Create areas
         data.areas.forEach(area => {
             const newArea = new Area(area.id, area.name);

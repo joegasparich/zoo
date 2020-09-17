@@ -1,6 +1,5 @@
 import { Camera, Graphics, Vector } from "engine";
 import { AssetManager } from "engine/managers";
-import { MapGrid } from "engine/map";
 import { MapEvent, Side } from "engine/consts";
 import Mediator from "engine/Mediator";
 
@@ -11,7 +10,7 @@ import ZooGame from "ZooGame";
 
 export interface WallGridSaveData {
     walls: ({
-        type: string;
+        assetPath: string;
         isDoor: boolean;
     } | undefined)[][];
 }
@@ -41,8 +40,7 @@ export default class WallGrid {
                 const worldPos = Wall.wallToWorldPos(new Vector(col, row), orientation);
                 const wallSaveData = data?.walls[col][row];
                 if (wallSaveData) {
-                    const wallData = AssetManager.getJSON(data?.walls[col][row]?.type) as WallData;
-                    this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row), wallData);
+                    this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row), data?.walls[col][row]?.assetPath);
                     this.wallGrid[col][row].setDoor(wallSaveData.isDoor);
                 } else {
                     this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row));
@@ -102,21 +100,16 @@ export default class WallGrid {
      * @param tilePos The tile to place the wall in
      * @param side The side of the tile to place the wall on
      */
-    public placeWallAtTile(wallData: (WallData | string), tilePos: Vector, side: Side): Wall {
+    public placeWallAtTile(assetPath: string, tilePos: Vector, side: Side): Wall {
         if (!this.isSetup) return;
         if (!this.isWallPosInMap(tilePos, side)) return;
         if (this.getWallAtTile(tilePos, side)?.exists) return;
-
-        // Get wall data if not already available
-        if (typeof wallData === "string") {
-            wallData = AssetManager.getJSON(wallData) as WallData;
-        }
 
         // Get grid position
         const { orientation, x, y } = this.getGridPosition(side, tilePos);
 
         // Create wall and put in the grid
-        const wall = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), wallData);
+        const wall = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), assetPath);
         this.wallGrid[x][y] = wall;
 
         this.updatePathfindingAtWall(tilePos, side);
@@ -466,7 +459,7 @@ export default class WallGrid {
         return {
             walls: this.wallGrid.map(row => row.map(wall => {
                 return wall.exists ? {
-                    type: wall.data.assetPath,
+                    assetPath: wall.data.assetPath,
                     isDoor: !!wall.isDoor, // For some reason need to put a !! here for it to save
                 } : undefined;
             })),

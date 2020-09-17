@@ -12,7 +12,8 @@ import ZooGame from "ZooGame";
 export default class WallTool extends Tool {
     public type = ToolType.Wall;
 
-    private currentWall: WallData;
+    private assetPath: string;
+    private wallData: WallData;
 
     private startWallPos: {pos: Vector; quadrant: Side};
     private ghost: PlacementGhost;
@@ -22,8 +23,9 @@ export default class WallTool extends Tool {
         this.ghost = ghost;
         this.ghost.reset();
 
-        this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
-        const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+        this.assetPath =  Assets.WALLS.IRON_BAR;
+        this.wallData = AssetManager.getJSON(this.assetPath) as WallData;
+        const spriteSheet = Wall.wallSprites.get(this.wallData.spriteSheet);
         this.ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.Horizontal);
         this.ghost.setPivot(new Vector(0.5, 1));
         this.ghost.setSnap(true);
@@ -96,7 +98,7 @@ export default class WallTool extends Tool {
                 const tilePos = ghost.getPosition().floor();
 
                 if (this.canPlace(tilePos)) {
-                    walls.push(ZooGame.world.wallGrid.placeWallAtTile(this.currentWall, tilePos, dragQuadrant));
+                    walls.push(ZooGame.world.wallGrid.placeWallAtTile(this.assetPath, tilePos, dragQuadrant));
                 }
 
                 ghost.destroy();
@@ -128,7 +130,7 @@ export default class WallTool extends Tool {
     }
 
     private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
-        const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+        const spriteSheet = Wall.wallSprites.get(this.wallData.spriteSheet);
         const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex() || [0, 0];
         ghost.setSpriteSheet(spriteSheet, spriteIndex);

@@ -48,7 +48,7 @@ class ZooGame extends Game {
             },
         );
 
-        this.registerEntity(createDude());
+        createDude();
 
         UIManager.setup();
     }

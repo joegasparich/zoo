@@ -18,7 +18,7 @@ export default class SceneManager {
         this.mapGrid = mapGrid;
     }
 
-    public async loadScene(scene: Scene, onProgress?: Function): Promise<void> {
+    public loadScene(scene: Scene, onProgress?: Function): void {
         if (this.currentScene) {
             console.log("Stopping scene:", this.currentScene.name);
             this.currentScene.stop();

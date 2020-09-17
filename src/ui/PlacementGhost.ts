@@ -29,7 +29,7 @@ export default class PlacementGhost {
     public constructor() {
         this.world = ZooGame.world;
 
-        this.ghost = ZooGame.registerEntity(new Entity(ZooGame, ZooGame.input.getMousePos(), false));
+        this.ghost = new Entity(ZooGame, ZooGame.input.getMousePos(), false);
         this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));

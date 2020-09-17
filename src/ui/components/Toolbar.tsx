@@ -88,7 +88,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         onClick={(): void => {
                             this.setTool(
                                 ToolType.TileObject,
-                                {object: AssetManager.getJSON(Assets.OBJECTS.TREE) as TileObjectData},
+                                {assetPath: Assets.OBJECTS.TREE},
                             );
                         }}
                     />

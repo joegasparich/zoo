@@ -2,6 +2,7 @@ import { Config } from "consts";
 import { Graphics, Vector } from "engine";
 import { Side } from "engine/consts";
 import { pointInCircle } from "engine/helpers/math";
+import { TileObjectSystem, ZOO_SYSTEM } from "entities/systems";
 
 import ZooGame from "ZooGame";
 import Wall from "./Wall";
@@ -95,8 +96,9 @@ export default class ElevationGrid {
     public canElevate(gridPos: Vector, elevation: Elevation): boolean {
         // Check 4 surrounding tiles for tileObjects that can't be on slopes
         for (const tile of this.getSurroundingTiles(gridPos)) {
-            const object = ZooGame.world.getTileObjectAtPos(tile);
-            if (object && !object.data.canPlaceOnSlopes) return false;
+            const entity = ZooGame.world.getTileObjectAtPos(tile);
+            const tileObject = entity?.getSystem(ZOO_SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+            if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
         }
 
         // Check 4 surrounding wall slots for gates
@@ -107,8 +109,9 @@ export default class ElevationGrid {
         if (elevation === Elevation.Water) {
             // Check 4 surrounding tiles for tileObjects that can't be on slopes
             for (const tile of this.getSurroundingTiles(gridPos)) {
-                const object = ZooGame.world.getTileObjectAtPos(tile);
-                if (object && !object.data.canPlaceInWater) return false;
+                const entity = ZooGame.world.getTileObjectAtPos(tile);
+                const tileObject = entity?.getSystem(ZOO_SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+                if (tileObject && !tileObject.data.canPlaceInWater) return false;
             }
 
             // Check 4 surrounding wall slots for walls

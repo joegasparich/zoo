@@ -59,7 +59,7 @@ export default class DeleteTool extends Tool {
                             ZooGame.world.wallGrid.deleteWallAtTile(pos, side);
                         }
                         // Delete tile objects
-                        ZooGame.world.deleteTileObject(ZooGame.world.getTileObjectAtPos(pos));
+                        ZooGame.world.getTileObjectAtPos(pos)?.remove();
                     }
                 }
 

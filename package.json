@@ -12,7 +12,7 @@
 		"start": "webpack-dev-server",
 		"build": "webpack",
 		"build:watch": "npm run build -- --watch",
-		"electron:start": "npm run electron:build && electron ./dist/electron/index.js",
+		"electron": "npm run electron:build && electron ./dist/electron/index.js",
 		"electron:build": "webpack --config webpack.electron.config.js",
 		"electron:watch": "npm run electron:build -- --watch",
 		"lint": "eslint '**/*.ts' --no-ignore"
