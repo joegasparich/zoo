@@ -1,12 +1,12 @@
-import { Camera, Graphics, Vector } from "engine";
-import { AssetManager } from "engine/managers";
-import { MapEvent, Side } from "engine/consts";
-import Mediator from "engine/Mediator";
+import { MapEvent, Side } from "consts";
+import Mediator from "Mediator";
 
 import Wall, { Orientation } from "./Wall";
-import { WallData } from "types/AssetTypes";
 import { Config } from "consts";
-import ZooGame from "ZooGame";
+import Game from "Game";
+import Camera from "Camera";
+import Vector from "vector";
+import Graphics from "Graphics";
 
 export interface WallGridSaveData {
     walls: ({
@@ -25,7 +25,7 @@ export default class WallGrid {
     private wallGrid: Wall[][];
 
     public constructor() {
-        this.camera = ZooGame.camera;
+        this.camera = Game.camera;
 
         this.isSetup = false;
     }
@@ -33,10 +33,10 @@ export default class WallGrid {
     public setup(data?: WallGridSaveData): void {
         this.wallGrid = [];
 
-        for (let col = 0; col < (ZooGame.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
             this.wallGrid[col] = [];
-            for (let row = 0; row < ZooGame.map.rows + orientation; row++) {
+            for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const worldPos = Wall.wallToWorldPos(new Vector(col, row), orientation);
                 const wallSaveData = data?.walls[col][row];
                 if (wallSaveData) {
@@ -59,9 +59,9 @@ export default class WallGrid {
     }
 
     public reset(): void {
-        for (let col = 0; col < (ZooGame.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
-            for (let row = 0; row < ZooGame.map.rows + orientation; row++) {
+            for (let row = 0; row < Game.map.rows + orientation; row++) {
                 this.wallGrid[col][row].remove();
             }
         }
@@ -74,9 +74,9 @@ export default class WallGrid {
      * Update the position and scale of the tile grid
      */
     private drawWalls(): void {
-        for (let col = 0; col < (ZooGame.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
-            for (let row = 0; row < ZooGame.map.rows + orientation; row++) {
+            for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
                 if (!wall?.exists) { continue; }
                 if (!wall?.data) { continue; }
@@ -117,7 +117,7 @@ export default class WallGrid {
         Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
 
         if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
-            ZooGame.world.formAreas(wall);
+            Game.world.formAreas(wall);
         }
 
         return wall;
@@ -125,28 +125,28 @@ export default class WallGrid {
 
     private updatePathfindingAtWall(tilePos: Vector, side: Side): void {
         if (side === Side.North && tilePos.y > 0) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
         }
-        if (side === Side.South && tilePos.y < ZooGame.map.rows - 1) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+        if (side === Side.South && tilePos.y < Game.map.rows - 1) {
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
         }
         if (side === Side.West && tilePos.x > 0) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
         }
-        if (side === Side.East && tilePos.x < ZooGame.map.cols - 1) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+        if (side === Side.East && tilePos.x < Game.map.cols - 1) {
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
         }
     }
 
     private regeneratePathfinding(): void {
-        for (let i = 0; i < ZooGame.map.cols; i++) {
-            for (let j = 0; j < ZooGame.map.rows; j++) {
+        for (let i = 0; i < Game.map.cols; i++) {
+            for (let j = 0; j < Game.map.rows; j++) {
                 const tile = new Vector(i, j);
-                ZooGame.map.setTileAccess(tile, this.getWalledSides(tile));
+                Game.map.setTileAccess(tile, this.getWalledSides(tile));
             }
         }
     }
@@ -169,26 +169,26 @@ export default class WallGrid {
         this.wallGrid[x][y] = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y));
 
         const [tile1, tile2] = this.getAdjacentTiles(this.wallGrid[x][y]);
-        if (ZooGame.world.getAreaAtPosition(tile1) !== ZooGame.world.getAreaAtPosition(tile2)) {
-            ZooGame.world.joinAreas(this.wallGrid[x][y]);
+        if (Game.world.getAreaAtPosition(tile1) !== Game.world.getAreaAtPosition(tile2)) {
+            Game.world.joinAreas(this.wallGrid[x][y]);
         }
 
         // Update pathfinding information
         if (side === Side.North && tilePos.y > 0) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
         }
-        if (side === Side.South && tilePos.y < ZooGame.map.rows - 1) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+        if (side === Side.South && tilePos.y < Game.map.rows - 1) {
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
         }
         if (side === Side.West && tilePos.x > 0) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
         }
-        if (side === Side.East && tilePos.x < ZooGame.map.cols - 1) {
-            ZooGame.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            ZooGame.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+        if (side === Side.East && tilePos.x < Game.map.cols - 1) {
+            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
+            Game.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
         }
     }
 
@@ -278,11 +278,11 @@ export default class WallGrid {
     public isWallPosInMap(tilePos: Vector, side: Side): boolean {
         if (!this.isSetup) return false;
 
-        return ZooGame.map.isPositionInMap(tilePos.floor()) ||
-               (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) ||
-               (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) ||
-               (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.East) ||
-               (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.West);
+        return Game.map.isPositionInMap(tilePos.floor()) ||
+               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) ||
+               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) ||
+               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.East) ||
+               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.West);
     }
 
     /**
@@ -321,19 +321,19 @@ export default class WallGrid {
 
         if (!this.isWallPosInMap(tilePos, side)) {
             // Invert position and side if tile pos is correct but on the outside of the map
-            if (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) {
+            if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) {
                 tilePos = tilePos.floor().add(new Vector(0, 1));
                 side = Side.North;
             }
-            else if (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) {
+            else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) {
                 tilePos = tilePos.floor().add(new Vector(0, -1));
                 side = Side.South;
             }
-            else if (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.East) {
+            else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.East) {
                 tilePos = tilePos.floor().add(new Vector(-1, 0));
                 side = Side.West;
             }
-            else if (ZooGame.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.West) {
+            else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.West) {
                 tilePos = tilePos.floor().add(new Vector(1, 0));
                 side = Side.East;
             } else {
@@ -371,7 +371,7 @@ export default class WallGrid {
      */
     public getWalledSides(tilePos: Vector): Side[] {
         if (!this.isSetup) return [];
-        if (!ZooGame.map.isPositionInMap(tilePos)) return [];
+        if (!Game.map.isPositionInMap(tilePos)) return [];
 
         const edges: Side[] = [];
 
@@ -423,11 +423,11 @@ export default class WallGrid {
         const {x, y} = wall.position;
 
         if (wall.orientation === Orientation.Horizontal) {
-            if (ZooGame.map.isPositionInMap(new Vector(x - 0.5, y - 1))) adjacentTiles.push(new Vector(x - 0.5, y - 1));
-            if (ZooGame.map.isPositionInMap(new Vector(x - 0.5, y))) adjacentTiles.push(new Vector(x - 0.5, y));
+            if (Game.map.isPositionInMap(new Vector(x - 0.5, y - 1))) adjacentTiles.push(new Vector(x - 0.5, y - 1));
+            if (Game.map.isPositionInMap(new Vector(x - 0.5, y))) adjacentTiles.push(new Vector(x - 0.5, y));
         } else {
-            if (ZooGame.map.isPositionInMap(new Vector(x - 1, y - 0.5))) adjacentTiles.push(new Vector(x - 1, y - 0.5));
-            if (ZooGame.map.isPositionInMap(new Vector(x, y - 0.5))) adjacentTiles.push(new Vector(x, y - 0.5));
+            if (Game.map.isPositionInMap(new Vector(x - 1, y - 0.5))) adjacentTiles.push(new Vector(x - 1, y - 0.5));
+            if (Game.map.isPositionInMap(new Vector(x, y - 0.5))) adjacentTiles.push(new Vector(x, y - 0.5));
         }
 
         return adjacentTiles;
@@ -438,9 +438,9 @@ export default class WallGrid {
 
         const walls: Wall[] = [];
 
-        for (let col = 0; col < (ZooGame.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
-            for (let row = 0; row < ZooGame.map.rows + orientation; row++) {
+            for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
                 if (!wall?.exists) { continue; }
 
@@ -477,12 +477,12 @@ export default class WallGrid {
     public drawDebug(): void {
         if (!this.isSetup) return;
 
-        const xOffset =  ZooGame.map.position.x;
-        const yOffset = ZooGame.map.position.y;
+        const xOffset =  Game.map.position.x;
+        const yOffset = Game.map.position.y;
 
-        for (let col = 0; col < (ZooGame.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
-            for (let row = 0; row < ZooGame.map.rows + orientation; row++) {
+            for (let row = 0; row < Game.map.rows + orientation; row++) {
                 Graphics.setLineStyle(1, 0x00FF00);
                 if (!this.wallGrid[col][row].exists) {
                     Graphics.setLineStyle(1, 0xFF0000);

@@ -1,12 +1,13 @@
-import { Layers, SpriteSheet, Vector } from "engine";
-import { Entity } from "engine/entities";
-import { RenderSystem } from "engine/entities/systems";
-import { FollowMouseSystem, SnapToGridSystem, ZOO_SYSTEM } from "entities/systems";
+import { Entity } from "entities";
+import { RenderSystem, SYSTEM } from "entities/systems";
+import { FollowMouseSystem, SnapToGridSystem } from "entities/systems";
 
-import { Assets } from "consts";
+import { Assets, Layers } from "consts";
 import World from "world/World";
-import ZooGame from "ZooGame";
+import Game from "Game";
 import ElevationSystem from "entities/systems/ElevationSystem";
+import Vector from "vector";
+import SpriteSheet from "SpriteSheet";
 
 // Should never be seen
 const DEFAULT_SPRITE = Assets.SPRITES.TREE;
@@ -27,9 +28,9 @@ export default class PlacementGhost {
     public canPlaceFunction = this.canPlace;
 
     public constructor() {
-        this.world = ZooGame.world;
+        this.world = Game.world;
 
-        this.ghost = new Entity(ZooGame, ZooGame.input.getMousePos(), false);
+        this.ghost = new Entity(Game.input.getMousePos(), false);
         this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
         this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
@@ -46,7 +47,7 @@ export default class PlacementGhost {
             }
         }
 
-        this.drawFunction(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos()));
+        this.drawFunction(Game.camera.screenToWorldPosition(Game.input.getMousePos()));
     }
 
     private canPlace(position: Vector): boolean {
@@ -82,7 +83,7 @@ export default class PlacementGhost {
     }
 
     public setSnap(snap: boolean, gridSize?: number): void {
-        const system = this.ghost.getSystem(ZOO_SYSTEM.SNAP_TO_GRID_SYSTEM) as SnapToGridSystem;
+        const system = this.ghost.getSystem(SYSTEM.SNAP_TO_GRID_SYSTEM) as SnapToGridSystem;
         if (system) {
             system.gridSize = gridSize ?? 1;
         }
@@ -94,7 +95,7 @@ export default class PlacementGhost {
     }
 
     public setFollow(follow: boolean): void {
-        const system = this.ghost.getSystem(ZOO_SYSTEM.FOLLOW_MOUSE_SYSTEM) as FollowMouseSystem;
+        const system = this.ghost.getSystem(SYSTEM.FOLLOW_MOUSE_SYSTEM) as FollowMouseSystem;
 
         if (this.follow === follow) return;
         this.follow = follow;

@@ -1,7 +1,7 @@
-import { Vector } from "engine";
 import * as React from "react";
+import Vector from "vector";
 
-import ZooGame from "ZooGame";
+import Game from "Game";
 import Windows from "./components/Windows";
 import ToolManager from "./ToolManager";
 
@@ -16,7 +16,7 @@ class UIManager {
         this.tools = new ToolManager();
         this.tools.setup();
 
-        ZooGame.canvas.addChild(React.createElement(Windows, {
+        Game.canvas.addChild(React.createElement(Windows, {
             key: "windows",
             ref: this.windowsRef,
         }));

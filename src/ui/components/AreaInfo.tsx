@@ -1,9 +1,9 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
+import { UIComponent, UIComponentProps } from ".";
 import Area from "world/Area";
-import ZooGame from "ZooGame";
+import Game from "Game";
 
 const AREA_UPDATE_INTERVAL = 1000;
 
@@ -39,7 +39,7 @@ export default class AreaInfo extends UIComponent<AreaInfoProps, AreaInfoState> 
 
     private updateArea(): void {
         this.setState({
-            area: ZooGame.world.getAreaById(this.props.areaId),
+            area: Game.world.getAreaById(this.props.areaId),
         });
     }
 

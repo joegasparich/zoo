@@ -1,13 +1,11 @@
-import { InputSystem, PathFollowSystem, SYSTEM, WallAvoidanceSystem } from "engine/entities/systems";
-
-import { ZOO_SYSTEM } from ".";
-import { Entity } from "engine/entities";
-import ZooGame from "ZooGame";
-import { Vector } from "engine";
+import { InputSystem, PathFollowSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
+import { Entity } from "entities";
+import Game from "Game";
 import { Inputs } from "consts";
+import Vector from "vector";
 
 export default class ActorInputSystem extends InputSystem {
-    public id = ZOO_SYSTEM.ACTOR_INPUT_SYSTEM;
+    public id = SYSTEM.ACTOR_INPUT_SYSTEM;
     public type = SYSTEM.INPUT_SYSTEM;
 
     private pathfinder: PathFollowSystem;
@@ -38,8 +36,8 @@ export default class ActorInputSystem extends InputSystem {
         }
 
         // ! Temp
-        if (ZooGame.input.isInputPressed(Inputs.RightMouse)) {
-            const mousePos: Vector = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        if (Game.input.isInputPressed(Inputs.RightMouse)) {
+            const mousePos: Vector = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
             this.pathfinder.pathTo(mousePos.floor());
         }

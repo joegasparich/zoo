@@ -1,6 +1,6 @@
-import { Vector } from "engine";
-import { AssetManager } from "engine/managers";
+import { AssetManager } from "managers";
 import { TileObjectData } from "types/AssetTypes";
+import Vector from "vector";
 
 export async function loadTileObjectData(path: string): Promise<TileObjectData> {
     const resource = await AssetManager.loadResource(path);

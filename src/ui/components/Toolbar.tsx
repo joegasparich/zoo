@@ -2,18 +2,14 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
-
 import { Assets } from "consts";
-import { Button, DebugControls, FloatingPanel, BiomeControls } from "ui/components";
+import { Button, DebugControls, FloatingPanel, BiomeControls, UIComponent, UIComponentProps } from "ui/components";
 import ToolManager from "ui/ToolManager";
 import { ToolType } from "ui/tools";
 import UIManager from "ui/UIManager";
-import { Vector } from "engine";
 import AreaList from "./AreaList";
-import { TileObjectData } from "types/AssetTypes";
-import { AssetManager } from "engine/managers";
-import SaveManager from "SaveManager";
+import SaveManager from "managers/SaveManager";
+import Vector from "vector";
 
 interface ToolbarProps extends UIComponentProps {
     toolManager: ToolManager;

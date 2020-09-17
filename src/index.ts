@@ -1,7 +1,13 @@
-import { AssetManager } from "engine/managers";
+import "pixi.js";
+import "pixi-tilemap";
+import "pixi-layers";
+
+import "./app.scss";
+
+import { AssetManager } from "managers";
 
 import { Assets } from "./consts";
-import ZooGame from "ZooGame";
+import Game from "Game";
 
 import "CameraControl";
 import Wall from "world/Wall";
@@ -17,7 +23,7 @@ async function run(): Promise<void> {
     await Wall.loadWallData(Assets.WALLS.IRON_BAR);
 
     // Load game
-    await ZooGame.load(progress => {
+    await Game.load(progress => {
         console.log(`Game Load Progress: ${progress}%`);
     });
 }

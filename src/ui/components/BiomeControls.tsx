@@ -2,15 +2,12 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
-
-import { Button } from "ui/components";
-import { Assets } from "consts";
-import FloatingPanel from "./FloatingPanel";
-import { Biome } from "world/BiomeGrid";
-import Mediator from "engine/Mediator";
-import { UIEvent } from "engine/consts/events";
+import { Button, FloatingPanel, UIComponent, UIComponentProps } from ".";
 import { ToolType } from "ui/tools";
+import Mediator from "Mediator";
+import { UIEvent } from "consts/events";
+import { Assets } from "consts";
+import { Biome } from "world/BiomeGrid";
 
 interface BiomeControlsProps extends UIComponentProps {
     setTool: (tool: ToolType, data?: Object) => void;

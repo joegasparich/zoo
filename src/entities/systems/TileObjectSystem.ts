@@ -1,18 +1,17 @@
-import {  System } from "engine/entities/systems";
-import { ZOO_SYSTEM } from ".";
+import {  SYSTEM, System } from "entities/systems";
 import { TileObjectData } from "types/AssetTypes";
-import { AssetManager } from "engine/managers";
-import { SystemSaveData } from "engine/entities/systems/System";
-import { Entity } from "engine/entities";
-import ZooGame from "ZooGame";
+import { AssetManager } from "managers";
+import { SystemSaveData } from "entities/systems/System";
+import { Entity } from "entities";
+import Game from "Game";
 
 interface TileObjectSystemSaveData extends SystemSaveData {
     assetPath: string;
 }
 
 export default class TileObjectSystem extends System {
-    public id = ZOO_SYSTEM.TILE_OBJECT_SYSTEM;
-    public type = ZOO_SYSTEM.TILE_OBJECT_SYSTEM;
+    public id = SYSTEM.TILE_OBJECT_SYSTEM;
+    public type = SYSTEM.TILE_OBJECT_SYSTEM;
 
     public assetPath: string;
     public data: TileObjectData;
@@ -20,11 +19,11 @@ export default class TileObjectSystem extends System {
     public start(entity: Entity): void {
         super.start(entity);
 
-        ZooGame.world.registerTileObject(this.entity);
+        Game.world.registerTileObject(this.entity);
     }
 
     public end(): void {
-        ZooGame.world.unregisterTileObject(this.entity);
+        Game.world.unregisterTileObject(this.entity);
     }
 
     public setAsset(assetPath: string): void {

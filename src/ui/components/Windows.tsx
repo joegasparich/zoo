@@ -1,14 +1,13 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
-import { Vector } from "engine";
+import { UIComponent, UIComponentProps, Window } from ".";
 import uuid = require("uuid");
-import Window from "ui/components/Window";
+import Vector from "vector";
 
 interface WindowsState {
     windows: JSX.Element[];
-    windowIds: string[]; 
+    windowIds: string[];
 }
 const defaultState: WindowsState = {
     windows: [],

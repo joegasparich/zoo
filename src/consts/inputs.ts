@@ -1,4 +1,4 @@
-import InputManager, { Input } from "engine/managers/InputManager";
+import InputManager, { Input } from "managers/InputManager";
 
 const LeftMouse: Input = {
     name: "Left Click",

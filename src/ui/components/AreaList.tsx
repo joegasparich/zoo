@@ -1,15 +1,15 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
 import Area from "world/Area";
-import { hexToString } from "engine/helpers/util";
-import { Vector } from "engine";
+import { hexToString } from "helpers/util";
 import AreaInfo from "./AreaInfo";
-import Mediator from "engine/Mediator";
+import Mediator from "Mediator";
 import { WorldEvents } from "consts/events";
-import ZooGame from "ZooGame";
+import Game from "Game";
 import UIManager from "ui/UIManager";
+import Vector from "vector";
+import { UIComponent, UIComponentProps } from ".";
 
 interface AreaListState {
     areas: Area[];
@@ -41,7 +41,7 @@ export default class AreaList extends UIComponent<UIComponentProps, AreaListStat
 
     private updateAreas(): void {
         this.setState({
-            areas: ZooGame.world.getAreas(),
+            areas: Game.world.getAreas(),
         });
     }
 

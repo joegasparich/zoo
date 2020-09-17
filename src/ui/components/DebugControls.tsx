@@ -2,13 +2,11 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
-
-import { Button, FloatingPanel } from "ui/components";
+import { UIComponent, UIComponentProps, Button, FloatingPanel } from ".";
 import { Assets } from "consts";
-import Mediator from "engine/Mediator";
-import { UIEvent } from "engine/consts/events";
-import ZooGame from "ZooGame";
+import Mediator from "Mediator";
+import Game from "Game";
+import { UIEvent } from "consts/events";
 
 interface DebugState {
     panelOpen: boolean;
@@ -67,32 +65,32 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                         <Button
                             key="mapGridButton"
                             image={Assets.UI.GRID_ICON}
-                            onClick={(): void => { ZooGame.debugSettings.showMapGrid = !ZooGame.debugSettings.showMapGrid; }}
+                            onClick={(): void => { Game.debugSettings.showMapGrid = !Game.debugSettings.showMapGrid; }}
                         />
                         <Button
                             key="pathfindingButton"
                             image={Assets.UI.PATHFINDING_ICON}
-                            onClick={(): void => { ZooGame.debugSettings.showPathfinding = !ZooGame.debugSettings.showPathfinding; }}
+                            onClick={(): void => { Game.debugSettings.showPathfinding = !Game.debugSettings.showPathfinding; }}
                         />
                         <Button
                             key="physicsButton"
                             image={Assets.UI.PHYSICS_ICON}
-                            onClick={(): void => { ZooGame.debugSettings.showPhysics = !ZooGame.debugSettings.showPhysics; }}
+                            onClick={(): void => { Game.debugSettings.showPhysics = !Game.debugSettings.showPhysics; }}
                         />
                         <Button
                             key="wallButton"
                             image={Assets.UI.IRON_BAR_FENCE}
-                            onClick={(): void => { ZooGame.debugSettings.showWallGrid = !ZooGame.debugSettings.showWallGrid; }}
+                            onClick={(): void => { Game.debugSettings.showWallGrid = !Game.debugSettings.showWallGrid; }}
                         />
                         <Button
                             key="elevationButton"
                             image={Assets.UI.ELEVATION_ICON}
-                            onClick={(): void => { ZooGame.debugSettings.showElevation = !ZooGame.debugSettings.showElevation; }}
+                            onClick={(): void => { Game.debugSettings.showElevation = !Game.debugSettings.showElevation; }}
                         />
                         <Button
                             key="waterButton"
                             image={Assets.UI.WATER_ICON}
-                            onClick={(): void => { ZooGame.debugSettings.showWater = !ZooGame.debugSettings.showWater; }}
+                            onClick={(): void => { Game.debugSettings.showWater = !Game.debugSettings.showWater; }}
                         />
                     </FloatingPanel>
                 </div>

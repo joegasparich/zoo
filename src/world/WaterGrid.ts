@@ -1,7 +1,8 @@
-import { Config } from "consts";
-import { Graphics, Layers, Vector } from "engine";
+import { Config, Layers } from "consts";
+import Graphics from "Graphics";
+import Vector from "vector";
 
-import ZooGame from "ZooGame";
+import Game from "Game";
 import { SlopeVariant, ELEVATION_HEIGHT } from "./ElevationGrid";
 
 const WATER_COLOUR = 0x4499FF;
@@ -15,8 +16,8 @@ export default class WaterGrid {
     private graphics: PIXI.Graphics;
 
     public setup(): void {
-        this.width = ZooGame.map.cols;
-        this.height = ZooGame.map.rows;
+        this.width = Game.map.cols;
+        this.height = Game.map.rows;
 
         // Initialise grid to empty
         this.grid = [];
@@ -29,17 +30,17 @@ export default class WaterGrid {
 
         this.graphics = new PIXI.Graphics();
         this.graphics.parentGroup = Layers.WATER;
-        this.graphics.position = ZooGame.camera.offset.toPoint();
-        ZooGame.stage.addChild(this.graphics);
+        this.graphics.position = Game.camera.offset.toPoint();
+        Game.stage.addChild(this.graphics);
     }
 
     public postUpdate(): void {
-        this.graphics.scale.set(ZooGame.camera.scale, ZooGame.camera.scale);
-        this.graphics.position = ZooGame.camera.worldToScreenPosition(Vector.Zero()).toPoint();
+        this.graphics.scale.set(Game.camera.scale, Game.camera.scale);
+        this.graphics.position = Game.camera.worldToScreenPosition(Vector.Zero()).toPoint();
     }
 
     public reset(): void {
-        ZooGame.stage.removeChild(this.graphics);
+        Game.stage.removeChild(this.graphics);
         this.graphics.destroy();
         this.graphics = undefined;
         this.grid = [];
@@ -61,7 +62,7 @@ export default class WaterGrid {
     }
 
     private getPolygon(tile: Vector): PIXI.Point[] {
-        const slopeVariant = ZooGame.world.elevationGrid.getSlopeVariant(tile);
+        const slopeVariant = Game.world.elevationGrid.getSlopeVariant(tile);
         let polygon: Vector[] = [];
 
         switch (slopeVariant) {
@@ -98,11 +99,11 @@ export default class WaterGrid {
 
     public regenerateGrid(): void {
         const grid: boolean[][] = [];
-        for (let i = 0; i < ZooGame.map.cols; i++) {
+        for (let i = 0; i < Game.map.cols; i++) {
             grid[i] = [];
-            for (let j = 0; j < ZooGame.map.rows; j++) {
+            for (let j = 0; j < Game.map.rows; j++) {
                 const tile = new Vector(i, j);
-                const baseElevation = ZooGame.world.elevationGrid.getBaseElevation(tile);
+                const baseElevation = Game.world.elevationGrid.getBaseElevation(tile);
 
                 grid[i][j] = baseElevation < 0;
             }
@@ -113,14 +114,14 @@ export default class WaterGrid {
     }
 
     public isPositionWater(position: Vector): boolean {
-        if (!ZooGame.map.isPositionInMap(position)) return false;
+        if (!Game.map.isPositionInMap(position)) return false;
 
         const flPos = position.floor();
         return this.grid[flPos.x][flPos.y];
     }
 
     public setTileWater(tile: Vector): void {
-        if (!ZooGame.map.isPositionInMap(tile)) return;
+        if (!Game.map.isPositionInMap(tile)) return;
 
         // TODO: Optimise whether we need to draw here
         this.draw();
@@ -131,7 +132,7 @@ export default class WaterGrid {
     }
 
     public setTileLand(tile: Vector): void {
-        if (!ZooGame.map.isPositionInMap(tile)) return;
+        if (!Game.map.isPositionInMap(tile)) return;
 
         this.draw();
         if (!this.grid[tile.x][tile.y]) return;

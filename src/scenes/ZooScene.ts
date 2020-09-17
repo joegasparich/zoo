@@ -1,9 +1,9 @@
-import { Scene, Vector } from "engine";
-import { MapCell } from "engine/map";
-
-import ZooGame from "ZooGame";
+import Game from "Game";
 import World from "world/World";
 import UIManager from "ui/UIManager";
+import { Scene } from "./Scene";
+import { MapCell } from "world/MapGrid";
+import Vector from "vector";
 
 const MAP_SIZE = 10;
 
@@ -20,9 +20,9 @@ export default class ZooScene extends Scene {
     }
 
     public stop(): void {
-        ZooGame.clearEntities();
-        ZooGame.world.reset();
-        ZooGame.map.clearMap();
+        Game.clearEntities();
+        Game.world.reset();
+        Game.map.clearMap();
         UIManager.reset();
     }
 
@@ -41,9 +41,9 @@ export default class ZooScene extends Scene {
         }
 
         // Load Map
-        ZooGame.map.setupGrid(cells);
+        Game.map.setupGrid(cells);
 
-        ZooGame.world = new World();
-        await ZooGame.world.setup();
+        Game.world = new World();
+        await Game.world.setup();
     }
 }

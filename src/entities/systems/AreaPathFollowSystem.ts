@@ -1,10 +1,9 @@
-import { Vector } from "engine";
-import { PathFollowSystem, SYSTEM } from "engine/entities/systems";
-import { PathFollowSystemSaveData } from "engine/entities/systems/PathFollowSystem";
+import Vector from "vector";
+import { PathFollowSystem, SYSTEM } from "entities/systems";
+import { PathFollowSystemSaveData } from "entities/systems/PathFollowSystem";
 import Area from "world/Area";
 import Wall from "world/Wall";
-import ZooGame from "ZooGame";
-import { ZOO_SYSTEM } from ".";
+import Game from "Game";
 
 interface AreaPathFollowSystemSaveData extends PathFollowSystemSaveData {
     areaPath: string[];
@@ -15,7 +14,7 @@ interface AreaPathFollowSystemSaveData extends PathFollowSystemSaveData {
 }
 
 export default class AreaPathFollowSystem extends PathFollowSystem {
-    public id = ZOO_SYSTEM.AREA_PATH_FOLLOW_SYSTEM;
+    public id = SYSTEM.AREA_PATH_FOLLOW_SYSTEM;
     public type = SYSTEM.PATH_FOLLOW_SYSTEM;
 
     private areaPath: Area[];
@@ -27,10 +26,10 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
     public async pathTo(location: Vector): Promise<boolean> {
         this.resetAreaPath();
 
-        const currentArea = ZooGame.world.getAreaAtPosition(this.entity.position);
-        const targetArea = ZooGame.world.getAreaAtPosition(location);
+        const currentArea = Game.world.getAreaAtPosition(this.entity.position);
+        const targetArea = Game.world.getAreaAtPosition(location);
         if (currentArea !== targetArea) {
-            const path = ZooGame.world.findAreaPath(currentArea, targetArea);
+            const path = Game.world.findAreaPath(currentArea, targetArea);
             if (path) {
                 this.areaPath = path;
                 this.currentArea = this.areaPath.shift();
@@ -57,14 +56,14 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
                     }
                 });
                 // Go to tile just before door
-                const targetTile = ZooGame.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => ZooGame.world.getAreaAtPosition(tile) === this.currentArea);
+                const targetTile = Game.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => Game.world.getAreaAtPosition(tile) === this.currentArea);
                 super.pathTo(targetTile);
             }
             // Head to door
             if (super.followPath(speed)) {
                 // We've made it to the door
                 // Get path through door
-                this.enterDoorPosition = ZooGame.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => ZooGame.world.getAreaAtPosition(tile) !== this.currentArea).add(new Vector(0.5));
+                this.enterDoorPosition = Game.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => Game.world.getAreaAtPosition(tile) !== this.currentArea).add(new Vector(0.5));
             }
             if (this.enterDoorPosition) {
                 // We are going through the door
@@ -119,11 +118,11 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
     public load(data: AreaPathFollowSystemSaveData): void {
         super.load(data);
 
-        this.areaPath = data.areaPath?.map(areaId => ZooGame.world.getAreaById(areaId));
-        this.currentArea = data.currentArea && ZooGame.world.getAreaById(data.currentArea);
+        this.areaPath = data.areaPath?.map(areaId => Game.world.getAreaById(areaId));
+        this.currentArea = data.currentArea && Game.world.getAreaById(data.currentArea);
         if (data.currentDoor) {
             const {x, y} = Vector.Deserialize(data.currentDoor);
-            this.currentDoor = ZooGame.world.wallGrid.getWallByGridPos(x, y);
+            this.currentDoor = Game.world.wallGrid.getWallByGridPos(x, y);
         }
         this.enterDoorPosition = data.enterDoorPosition && Vector.Deserialize(data.enterDoorPosition);
         this.targetPosition = data.targetPosition && Vector.Deserialize(data.targetPosition);

@@ -1,10 +1,10 @@
-import { Graphics, Vector } from "engine";
-
-import ZooGame from "ZooGame";
+import Game from "Game";
 import { Config, Inputs } from "consts";
 import PlacementGhost from "ui/PlacementGhost";
 import { Elevation } from "world/ElevationGrid";
 import { Tool, ToolType } from ".";
+import Vector from "vector";
+import Graphics from "Graphics";
 
 const ELEVATION_UPDATE_INTERVAL = 50;
 
@@ -27,26 +27,26 @@ export default class ElevationTool extends Tool {
         };
         ghost.setSpriteVisible(false);
 
-        this.prevElevation = ZooGame.world.elevationGrid.getGridCopy();
-        this.prevWater = ZooGame.world.waterGrid.getGridCopy();
+        this.prevElevation = Game.world.elevationGrid.getGridCopy();
+        this.prevWater = Game.world.waterGrid.getGridCopy();
     }
 
     public update(): void {
 
         // TODO: Update every quarter of a second or something
-        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
+        if (Game.input.isInputHeld(Inputs.LeftMouse)) {
             if (this.placementIntervalRef) return;
             this.placementIntervalRef = window.setInterval(() => {
-                const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+                const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
-                ZooGame.world.elevationGrid.setElevationInCircle(mouseWorldPos, this.toolManager.radius, this.targetElevation);
+                Game.world.elevationGrid.setElevationInCircle(mouseWorldPos, this.toolManager.radius, this.targetElevation);
             }, ELEVATION_UPDATE_INTERVAL);
         } else {
             window.clearInterval(this.placementIntervalRef);
             this.placementIntervalRef = undefined;
         }
 
-        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
+        if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             this.toolManager.pushAction({
                 name: "Adjust Elevation",
                 data: {
@@ -54,13 +54,13 @@ export default class ElevationTool extends Tool {
                     prevWater: this.prevWater,
                 },
                 undo: (data: any): void => {
-                    ZooGame.world.elevationGrid.setGrid(data.prevElevation);
-                    ZooGame.world.biomeGrid.redrawAllChunks();
-                    ZooGame.world.waterGrid.setGrid(data.prevWater);
-                    ZooGame.world.waterGrid.draw();
+                    Game.world.elevationGrid.setGrid(data.prevElevation);
+                    Game.world.biomeGrid.redrawAllChunks();
+                    Game.world.waterGrid.setGrid(data.prevWater);
+                    Game.world.waterGrid.draw();
 
-                    this.prevElevation = ZooGame.world.elevationGrid.getGridCopy();
-                    this.prevWater = ZooGame.world.waterGrid.getGridCopy();
+                    this.prevElevation = Game.world.elevationGrid.getGridCopy();
+                    this.prevWater = Game.world.waterGrid.getGridCopy();
                 },
             });
         }

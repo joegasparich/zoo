@@ -1,23 +1,22 @@
-import { Events, Game } from "engine";
-import { lerp } from "engine/helpers/math";
-import Mediator from "engine/Mediator";
-
-import { Inputs } from "consts";
+import { lerp } from "helpers/math";
+import Mediator from "Mediator";
+import Game from "Game";
+import { GameEvent, Inputs } from "consts";
 
 const minZoom = 0.5;
 const maxZoom = 10;
 
-Mediator.on(Events.GameEvent.UPDATE, update);
+Mediator.on(GameEvent.UPDATE, update);
 
-function update(opts: {delta: number; game: Game}): void {
-    const {delta, game} = opts;
+function update(opts: {delta: number}): void {
+    const {delta} = opts;
 
-    if(game.input.isInputHeld(Inputs.ZoomIn)) {
+    if(Game.input.isInputHeld(Inputs.ZoomIn)) {
         // zoom in
-        game.camera.scale = Math.exp(lerp(Math.log(game.camera.scale), Math.log(maxZoom), 0.01));
+        Game.camera.scale = Math.exp(lerp(Math.log(Game.camera.scale), Math.log(maxZoom), 0.01));
     }
-    if(game.input.isInputHeld(Inputs.ZoomOut)) {
+    if(Game.input.isInputHeld(Inputs.ZoomOut)) {
         // zoom out
-        game.camera.scale = Math.exp(lerp(Math.log(game.camera.scale), Math.log(minZoom), 0.01));
+        Game.camera.scale = Math.exp(lerp(Math.log(Game.camera.scale), Math.log(minZoom), 0.01));
     }
 }

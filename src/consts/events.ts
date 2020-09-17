@@ -1,3 +1,24 @@
+export enum GameEvent {
+    LOAD_START = "LOAD_START",
+    LOAD_COMPLETE = "LOAD_COMPLETE",
+    SETUP_COMPLETE = "SETUP_COMPLETE",
+    PRE_UPDATE = "PRE_UPDATE",
+    UPDATE = "UPDATE",
+    POST_UPDATE = "POST_UPDATE",
+};
+
+export enum MapEvent {
+    REQUEST_MAP_LOAD = "REQUEST_MAP_LOAD",
+    MAP_LOAD_START = "MAP_LOAD_START",
+    MAP_LOAD_COMPLETE = "MAP_LOAD_COMPLETE",
+    PLACE_SOLID = "PLACE_SOLID",
+};
+
+export enum UIEvent {
+    FOCUS = "FOCUS",
+    UNFOCUS = "UNFOCUS",
+}
+
 export enum WorldEvents {
     AREAS_UPDATED = "AREAS_UPDATED",
 }

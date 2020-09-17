@@ -1,6 +1,6 @@
-import { Entity } from "engine/entities";
-import { RenderSystem, SYSTEM, System } from "engine/entities/systems";
-import ZooGame from "ZooGame";
+import { Entity } from "entities";
+import { RenderSystem, SYSTEM, System } from "entities/systems";
+import Game from "Game";
 
 /**
  * Note: this should be added after any movement components
@@ -23,6 +23,6 @@ export default class ElevationSystem extends System {
     public update(delta: number): void {
         super.update(delta);
 
-        this.renderer.offset.y = -ZooGame.world.elevationGrid.getElevationAtPoint(this.entity.position);
+        this.renderer.offset.y = -Game.world.elevationGrid.getElevationAtPoint(this.entity.position);
     }
 }

@@ -1,11 +1,12 @@
 import { Config } from "consts";
-import { Graphics, Vector } from "engine";
-import { Side } from "engine/consts";
-import { pointInCircle } from "engine/helpers/math";
-import { TileObjectSystem, ZOO_SYSTEM } from "entities/systems";
+import { Side } from "consts";
+import { pointInCircle } from "helpers/math";
+import { TileObjectSystem, SYSTEM } from "entities/systems";
 
-import ZooGame from "ZooGame";
+import Game from "Game";
 import Wall from "./Wall";
+import Vector from "vector";
+import Graphics from "Graphics";
 
 export const ELEVATION_HEIGHT = 0.5;
 
@@ -33,8 +34,8 @@ export default class ElevationGrid {
     private height: number;
 
     public setup(): void {
-        this.width = ZooGame.map.cols + 1;
-        this.height = ZooGame.map.rows + 1;
+        this.width = Game.map.cols + 1;
+        this.height = Game.map.rows + 1;
 
         // Initialise grid to flat
         this.grid = [];
@@ -51,7 +52,7 @@ export default class ElevationGrid {
     }
 
     public setElevationInCircle(centre: Vector, radius: number, elevation: Elevation): void {
-        if (!ZooGame.map.isPositionInMap(centre)) return;
+        if (!Game.map.isPositionInMap(centre)) return;
 
         for(let i = centre.x - radius; i <= centre.x + radius; i++) {
             for(let j = centre.y - radius; j <= centre.y + radius; j++) {
@@ -64,8 +65,8 @@ export default class ElevationGrid {
             }
         }
 
-        ZooGame.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 3);
-        ZooGame.world.wallGrid.getWallsInRadius(centre, radius + 1).forEach(wall => wall.updateSprite());
+        Game.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 3);
+        Game.world.wallGrid.getWallsInRadius(centre, radius + 1).forEach(wall => wall.updateSprite());
     }
 
     public setElevation(gridPos: Vector, elevation: Elevation): void {
@@ -77,7 +78,7 @@ export default class ElevationGrid {
                     .filter(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation)
                     .forEach(gridPos => {
                         this.setElevation(gridPos, Elevation.Flat);
-                        ZooGame.world.biomeGrid.redrawChunksInRadius(gridPos.multiply(2), 2);
+                        Game.world.biomeGrid.redrawChunksInRadius(gridPos.multiply(2), 2);
                     });
             }
 
@@ -85,9 +86,9 @@ export default class ElevationGrid {
 
             this.getAdjacentGridPositions(gridPos, true).forEach(gridPos => {
                 if (this.getBaseElevation(gridPos) < 0) {
-                    ZooGame.world.waterGrid.setTileWater(gridPos);
+                    Game.world.waterGrid.setTileWater(gridPos);
                 } else {
-                    ZooGame.world.waterGrid.setTileLand(gridPos);
+                    Game.world.waterGrid.setTileLand(gridPos);
                 }
             });
         }
@@ -96,8 +97,8 @@ export default class ElevationGrid {
     public canElevate(gridPos: Vector, elevation: Elevation): boolean {
         // Check 4 surrounding tiles for tileObjects that can't be on slopes
         for (const tile of this.getSurroundingTiles(gridPos)) {
-            const entity = ZooGame.world.getTileObjectAtPos(tile);
-            const tileObject = entity?.getSystem(ZOO_SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+            const entity = Game.world.getTileObjectAtPos(tile);
+            const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
             if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
         }
 
@@ -109,8 +110,8 @@ export default class ElevationGrid {
         if (elevation === Elevation.Water) {
             // Check 4 surrounding tiles for tileObjects that can't be on slopes
             for (const tile of this.getSurroundingTiles(gridPos)) {
-                const entity = ZooGame.world.getTileObjectAtPos(tile);
-                const tileObject = entity?.getSystem(ZOO_SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+                const entity = Game.world.getTileObjectAtPos(tile);
+                const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
                 if (tileObject && !tileObject.data.canPlaceInWater) return false;
             }
 
@@ -225,10 +226,10 @@ export default class ElevationGrid {
 
     private getSurroundingWalls(gridPos: Vector): Wall[] {
         return [
-            ZooGame.world.wallGrid.getWallAtTile(gridPos, Side.North),
-            ZooGame.world.wallGrid.getWallAtTile(gridPos, Side.West),
-            ZooGame.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.South),
-            ZooGame.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.East),
+            Game.world.wallGrid.getWallAtTile(gridPos, Side.North),
+            Game.world.wallGrid.getWallAtTile(gridPos, Side.West),
+            Game.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.South),
+            Game.world.wallGrid.getWallAtTile(gridPos.subtract(new Vector(1)), Side.East),
         ];
     }
 
@@ -261,8 +262,8 @@ export default class ElevationGrid {
         this.reset();
 
         this.setGrid(data.elevationGrid);
-        ZooGame.world.biomeGrid.redrawAllChunks();
-        ZooGame.world.waterGrid.regenerateGrid();
+        Game.world.biomeGrid.redrawAllChunks();
+        Game.world.waterGrid.regenerateGrid();
     }
 
     /**

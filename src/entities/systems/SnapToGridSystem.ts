@@ -1,6 +1,6 @@
-import { Vector } from "engine";
-import { System } from "engine/entities/systems";
-import { SystemSaveData } from "engine/entities/systems/System";
+import { System } from "entities/systems";
+import { SystemSaveData } from "entities/systems/System";
+import Vector from "vector";
 
 /**
  * Note: this should be added after any movement components

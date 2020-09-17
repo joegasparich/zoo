@@ -1,7 +1,8 @@
-import { Camera, Layers, Vector } from "engine";
-import { Side } from "engine/consts";
-import { circleIntersectsRect, clamp, hexToHsl, hslToHex, pointInCircle } from "engine/helpers/math";
-import ZooGame from "ZooGame";
+import Camera from "Camera";
+import { Layers, Side } from "consts";
+import { circleIntersectsRect, clamp, hexToHsl, hslToHex, pointInCircle } from "helpers/math";
+import Vector from "vector";
+import Game from "Game";
 import Area from "./Area";
 import { SlopeVariant } from "./ElevationGrid";
 
@@ -155,7 +156,7 @@ export class BiomeChunk {
     public shouldRedraw: boolean;
 
     public constructor(public pos: Vector, public width: number, public height: number, private cellSize: number) {
-        this.camera = ZooGame.camera;
+        this.camera = Game.camera;
     }
 
     public setup(data?: Biome[][][]): void  {
@@ -175,7 +176,7 @@ export class BiomeChunk {
         this.graphics = new PIXI.Graphics();
         this.graphics.parentGroup = Layers.GROUND;
         this.graphics.position = this.camera.offset.toPoint();
-        ZooGame.stage.addChild(this.graphics);
+        Game.stage.addChild(this.graphics);
 
         this.shouldRedraw = true;
     }
@@ -196,7 +197,7 @@ export class BiomeChunk {
                         .drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
                             let vec = vertex.add(new Vector(this.pos.x, this.pos.y));
                             // Add elevation
-                            const elevation = ZooGame.world.elevationGrid.getElevationAtPoint(vec.divide(2));
+                            const elevation = Game.world.elevationGrid.getElevationAtPoint(vec.divide(2));
                             vec = vec.add(new Vector(0, -(elevation * 2)));
 
                             // Convert to screen space
@@ -221,7 +222,7 @@ export class BiomeChunk {
     }
 
     public remove(): void {
-        ZooGame.app.stage.removeChild(this.graphics);
+        Game.app.stage.removeChild(this.graphics);
     }
 
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {
@@ -254,7 +255,7 @@ export class BiomeChunk {
     }
 
     private getQuadrantSlopeColour(x: number, y: number, quadrant: Side): number {
-        const slopeVariant = ZooGame.world.elevationGrid.getSlopeVariant(new Vector(x, y).divide(2).floor());
+        const slopeVariant = Game.world.elevationGrid.getSlopeVariant(new Vector(x, y).divide(2).floor());
 
         const NW = 1, N = 0.75, W = 0.5, NE = 0.25, F = 0, SW = -0.25, E = -0.5, S = -0.75, SE = -1;
         const xRel = x/2 % 1;
@@ -288,7 +289,7 @@ export class BiomeChunk {
             for(let j = pos.y - (radius); j <= pos.y + (radius); j++) {
                 const cellPos = new Vector(i, j).floor();
                 if (!this.isPositionInGrid(cellPos)) continue;
-                if (area && area !== ZooGame.world.getAreaAtPosition(cellPos.add(this.pos).multiply(0.5))) continue;
+                if (area && area !== Game.world.getAreaAtPosition(cellPos.add(this.pos).multiply(0.5))) continue;
 
                 // Get Triangles in circle
                 for (let q = 0; q < 4; q++) {

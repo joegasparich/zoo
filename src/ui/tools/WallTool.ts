@@ -1,13 +1,12 @@
-import { Vector } from "engine";
-import { Side } from "engine/consts";
-import { AssetManager } from "engine/managers";
+import { AssetManager } from "managers";
 
-import { Assets, Inputs } from "consts";
+import { Assets, Inputs, Side } from "consts";
 import { WallData } from "types/AssetTypes";
 import Wall, { WallSpriteIndex } from "world/Wall";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
-import ZooGame from "ZooGame";
+import Game from "Game";
+import Vector from "vector";
 
 export default class WallTool extends Tool {
     public type = ToolType.Wall;
@@ -33,7 +32,7 @@ export default class WallTool extends Tool {
     }
 
     public update(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
         const xDif = mouseWorldPos.floor().x - this.startWallPos?.pos.floor().x;
         const yDif = mouseWorldPos.floor().y - this.startWallPos?.pos.floor().y;
@@ -43,20 +42,20 @@ export default class WallTool extends Tool {
 
         let dragQuadrant = Side.North;
         if (horizontal) {
-            dragQuadrant = ZooGame.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
+            dragQuadrant = Game.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
         } else {
-            dragQuadrant = ZooGame.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
+            dragQuadrant = Game.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
         }
 
-        if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
+        if (Game.input.isInputPressed(Inputs.LeftMouse)) {
             const tilePos = mouseWorldPos;
-            const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
+            const quadrant = Game.map.getTileQuadrantAtPos(mouseWorldPos);
 
             this.wallGhosts = [];
 
             this.startWallPos = { pos: tilePos, quadrant };
         }
-        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
+        if (Game.input.isInputHeld(Inputs.LeftMouse)) {
 
             this.ghost.setSpriteVisible(false);
 
@@ -79,7 +78,7 @@ export default class WallTool extends Tool {
                 const ghost = new PlacementGhost();
                 ghost.setFollow(false);
                 ghost.canPlaceFunction = (pos: Vector): boolean =>  {
-                    const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
+                    const wall = Game.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
                     return wall && !wall.exists;
                 };
                 this.wallGhosts.push(ghost);
@@ -88,7 +87,7 @@ export default class WallTool extends Tool {
                 this.wallGhosts.pop().destroy();
             }
         }
-        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
+        if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             this.ghost.setSpriteVisible(true);
 
             if (!this.wallGhosts) return;
@@ -98,7 +97,7 @@ export default class WallTool extends Tool {
                 const tilePos = ghost.getPosition().floor();
 
                 if (this.canPlace(tilePos)) {
-                    walls.push(ZooGame.world.wallGrid.placeWallAtTile(this.assetPath, tilePos, dragQuadrant));
+                    walls.push(Game.world.wallGrid.placeWallAtTile(this.assetPath, tilePos, dragQuadrant));
                 }
 
                 ghost.destroy();
@@ -111,7 +110,7 @@ export default class WallTool extends Tool {
                     const walls = data.walls as Wall[];
 
                     walls.forEach(wall => {
-                        ZooGame.world.wallGrid.deleteWall(wall);
+                        Game.world.wallGrid.deleteWall(wall);
                     });
                 },
             });
@@ -121,17 +120,17 @@ export default class WallTool extends Tool {
     }
 
     public postUpdate(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
         this.wallGhosts?.forEach(ghost => ghost.postUpdate());
 
-        const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
+        const quadrant = Game.map.getTileQuadrantAtPos(mouseWorldPos);
         this.setSprite(this.ghost, Vector.Zero(), quadrant);
     }
 
     private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
         const spriteSheet = Wall.wallSprites.get(this.wallData.spriteSheet);
-        const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
+        const wall = Game.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex() || [0, 0];
         ghost.setSpriteSheet(spriteSheet, spriteIndex);
 
@@ -155,13 +154,13 @@ export default class WallTool extends Tool {
 
     private canPlace(pos: Vector): boolean {
         // TODO: placement is incorrect on vertical walls just outside map
-        const quadrant = ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos()));
+        const quadrant = Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos()));
 
         // Check inside map
-        if (!ZooGame.map.isPositionInMap(pos)) return false;
+        if (!Game.map.isPositionInMap(pos)) return false;
 
         // Check for existing wall
-        const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), quadrant);
+        const wall = Game.world.wallGrid.getWallAtTile(pos.floor(), quadrant);
         if (wall && wall.exists) return false;
 
         // Check for water
@@ -186,8 +185,8 @@ export default class WallTool extends Tool {
                 break;
         }
 
-        const elevA = ZooGame.world.elevationGrid.getElevationAtPoint(vertexA);
-        const elevB = ZooGame.world.elevationGrid.getElevationAtPoint(vertexB);
+        const elevA = Game.world.elevationGrid.getElevationAtPoint(vertexA);
+        const elevB = Game.world.elevationGrid.getElevationAtPoint(vertexB);
 
         return elevA >= 0 && elevB >= 0;
     }

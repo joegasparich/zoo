@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
-import { UIComponent, UIComponentProps } from "engine/ui";
+import { UIComponent, UIComponentProps } from ".";
 
 interface ButtonProps extends UIComponentProps {
     image?: string;

@@ -1,13 +1,12 @@
-import { Vector } from "engine";
-import { Side } from "engine/consts";
-import { AssetManager } from "engine/managers";
+import { AssetManager } from "managers";
 
-import { Assets, Inputs } from "consts";
+import { Assets, Inputs, Side } from "consts";
 import { WallData } from "types/AssetTypes";
 import Wall, { WallSpriteIndex } from "world/Wall";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
-import ZooGame from "ZooGame";
+import Game from "Game";
+import Vector from "vector";
 
 export default class DoorTool extends Tool {
     public type = ToolType.Wall;
@@ -26,24 +25,24 @@ export default class DoorTool extends Tool {
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
-            const wall = ZooGame.world.wallGrid.getWallAtTile(pos.floor(), ZooGame.map.getTileQuadrantAtPos(ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos())));
+            const wall = Game.world.wallGrid.getWallAtTile(pos.floor(), Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos())));
             return wall?.exists && !wall.isDoor && !wall.isSloped();
         };
     }
 
     public update(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
-        const wallatMousePos = ZooGame.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), ZooGame.map.getTileQuadrantAtPos(mouseWorldPos));
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
+        const wallatMousePos = Game.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), Game.map.getTileQuadrantAtPos(mouseWorldPos));
 
-        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
+        if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos && !wallatMousePos.isSloped()) {
-                ZooGame.world.placeDoor(wallatMousePos);
+                Game.world.placeDoor(wallatMousePos);
 
                 this.toolManager.pushAction({
                     name: "Create door",
                     data: { wall: wallatMousePos },
                     undo: (data: any): void => {
-                        ZooGame.world.removeDoor(data.wall);
+                        Game.world.removeDoor(data.wall);
                     },
                 });
             }
@@ -51,15 +50,15 @@ export default class DoorTool extends Tool {
     }
 
     public postUpdate(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
-        const quadrant = ZooGame.map.getTileQuadrantAtPos(mouseWorldPos);
+        const quadrant = Game.map.getTileQuadrantAtPos(mouseWorldPos);
         this.setSprite(this.ghost, Vector.Zero(), quadrant);
     }
 
     private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
-        const wall = ZooGame.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
+        const wall = Game.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex(true) || [0, 0];
         ghost.setSpriteSheet(spriteSheet, spriteIndex);
 

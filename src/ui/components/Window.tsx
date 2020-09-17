@@ -1,9 +1,8 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { UIComponent, UIComponentProps } from "engine/ui";
-import Draggable from "engine/ui/Draggable";
-import { Vector } from "engine";
+import { UIComponent, UIComponentProps, Draggable } from ".";
+import Vector from "vector";
 
 interface WindowProps extends UIComponentProps {
     handleClose: (key: string) => void;

@@ -1,8 +1,8 @@
 import { Config } from "consts";
-import { Graphics } from "engine";
-import { rgbToHex } from "engine/helpers/math";
-import { removeItem } from "engine/helpers/util";
-import { MapCell } from "engine/map";
+import Graphics from "Graphics";
+import { rgbToHex } from "helpers/math";
+import { removeItem } from "helpers/util";
+import { MapCell } from "./MapGrid";
 
 import Wall from "./Wall";
 

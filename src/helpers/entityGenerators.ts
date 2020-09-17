@@ -1,12 +1,12 @@
-import { Assets } from "consts";
-import { SpriteSheet, Vector } from "engine";
-import { TAG } from "engine/consts";
-import { Entity } from "engine/entities";
-import { CameraFollowSystem, InputToPhysicsSystem, PathBlockSystem, PhysicsSystem, RenderSystem, SYSTEM, WallAvoidanceSystem } from "engine/entities/systems";
-import { AssetManager, ColliderType } from "engine/managers";
+import { Assets, TAG } from "consts";
+import { Entity } from "entities";
+import { CameraFollowSystem, InputToPhysicsSystem, PathBlockSystem, PhysicsSystem, RenderSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
+import { AssetManager, ColliderType } from "managers";
 import { ActorInputSystem, AreaPathFollowSystem, ElevationSystem, TileObjectSystem } from "entities/systems";
 import { TileObjectData } from "types/AssetTypes";
-import ZooGame from "ZooGame";
+import Game from "Game";
+import SpriteSheet from "SpriteSheet";
+import Vector from "vector";
 
 export function createDude(): Entity {
     const spritesheet = new SpriteSheet({
@@ -30,7 +30,6 @@ export function createDude(): Entity {
 
 export function createActor(position: Vector): Entity {
     const actor = new Entity(
-        ZooGame,
         position,
     );
     actor.addSystem(new RenderSystem());
@@ -44,11 +43,11 @@ export function createActor(position: Vector): Entity {
 
 // This is how we do
 export function createTileObject(assetPath: string, position: Vector): Entity {
-    if (!ZooGame.map.isTileFree(position)) return;
+    if (!Game.map.isTileFree(position)) return;
 
     const data = AssetManager.getJSON(assetPath) as TileObjectData;
 
-    const tileObject = new Entity(ZooGame, position.floor().add(new Vector(0.5)));
+    const tileObject = new Entity(position.floor().add(new Vector(0.5)));
     tileObject.addSystem(new RenderSystem(data.sprite, undefined, data.pivot));
     tileObject.addSystem(new ElevationSystem());
     if (data.solid) {

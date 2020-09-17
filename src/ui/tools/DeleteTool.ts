@@ -1,9 +1,9 @@
-import { Graphics, Vector } from "engine";
-
 import { Assets, Config, Inputs } from "consts";
 import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
-import ZooGame from "ZooGame";
+import Game from "Game";
+import Vector from "vector";
+import Graphics from "Graphics";
 
 export default class DeleteTool extends Tool {
     public type = ToolType.Delete;
@@ -19,7 +19,7 @@ export default class DeleteTool extends Tool {
         ghost.setAlpha(1);
         ghost.setScale(0.5);
         ghost.drawFunction = (pos: Vector): void => {
-            if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) return;
+            if (Game.input.isInputHeld(Inputs.LeftMouse)) return;
 
             const worldCellPos = pos.floor().multiply(Config.WORLD_SCALE);
             Graphics.setLineStyle(1, 0xFF0000);
@@ -28,12 +28,12 @@ export default class DeleteTool extends Tool {
     }
 
     public update(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
-        if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
+        if (Game.input.isInputPressed(Inputs.LeftMouse)) {
             this.startPos = mouseWorldPos;
         }
-        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
+        if (Game.input.isInputHeld(Inputs.LeftMouse)) {
             if (this.startPos) {
                 const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
                 const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
@@ -45,7 +45,7 @@ export default class DeleteTool extends Tool {
                 }
             }
         }
-        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
+        if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             if (this.startPos) {
                 const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
                 const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
@@ -56,10 +56,10 @@ export default class DeleteTool extends Tool {
                         pos = new Vector(i, j);
                         // Delete walls
                         for (let side = 0; side < 4; side++) {
-                            ZooGame.world.wallGrid.deleteWallAtTile(pos, side);
+                            Game.world.wallGrid.deleteWallAtTile(pos, side);
                         }
                         // Delete tile objects
-                        ZooGame.world.getTileObjectAtPos(pos)?.remove();
+                        Game.world.getTileObjectAtPos(pos)?.remove();
                     }
                 }
 

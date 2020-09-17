@@ -1,8 +1,9 @@
 import { Config, Inputs } from "consts";
-import { Graphics, Vector } from "engine";
+import Graphics from "Graphics";
 import PlacementGhost from "ui/PlacementGhost";
+import Vector from "vector";
 import { Biome, BiomeChunk } from "world/BiomeGrid";
-import ZooGame from "ZooGame";
+import Game from "Game";
 import { Tool, ToolType } from ".";
 
 const BIOME_UPDATE_INTERVAL = 50;
@@ -28,24 +29,24 @@ export default class BiomeTool extends Tool {
     }
 
     public update(): void {
-        if (ZooGame.input.isInputHeld(Inputs.LeftMouse)) {
+        if (Game.input.isInputHeld(Inputs.LeftMouse)) {
             if (this.placementIntervalRef) return;
             this.placementIntervalRef = window.setInterval(() => {
-                const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
-                ZooGame.world.biomeGrid.getChunksInRadius(mouseWorldPos.multiply(2), this.toolManager.radius * 2).forEach(chunk => {
+                const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
+                Game.world.biomeGrid.getChunksInRadius(mouseWorldPos.multiply(2), this.toolManager.radius * 2).forEach(chunk => {
                     // Make backup of chunks
                     if (!this.chunksUpdated.has(chunk)) {
                         this.chunksUpdated.set(chunk, chunk.getCopy());
                     }
                 });
-                ZooGame.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, ZooGame.world.getAreaAtPosition(mouseWorldPos));
+                Game.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, Game.world.getAreaAtPosition(mouseWorldPos));
             }, BIOME_UPDATE_INTERVAL);
         } else {
             window.clearInterval(this.placementIntervalRef);
             this.placementIntervalRef = undefined;
         }
 
-        if (ZooGame.input.isInputReleased(Inputs.LeftMouse)) {
+        if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             const chunkData: any[] = [];
             this.chunksUpdated.forEach((data, chunk)  => {
                 chunkData.push([chunk, data]);

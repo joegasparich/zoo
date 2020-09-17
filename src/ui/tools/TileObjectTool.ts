@@ -1,12 +1,11 @@
-import { Vector } from "engine";
-
 import { Inputs } from "consts";
 import { TileObjectData } from "types/AssetTypes";
 import PlacementGhost from "ui/PlacementGhost";
 import { Tool, ToolType } from ".";
-import ZooGame from "ZooGame";
-import { AssetManager } from "engine/managers";
+import Game from "Game";
+import { AssetManager } from "managers";
 import { createTileObject } from "helpers/entityGenerators";
+import Vector from "vector";
 
 export default class TileObjectTool extends Tool {
     public type = ToolType.TileObject;
@@ -27,9 +26,9 @@ export default class TileObjectTool extends Tool {
     }
 
     public update(): void {
-        const mouseWorldPos = ZooGame.camera.screenToWorldPosition(ZooGame.input.getMousePos());
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
-        if (ZooGame.input.isInputPressed(Inputs.LeftMouse)) {
+        if (Game.input.isInputPressed(Inputs.LeftMouse)) {
             if (this.canPlace(mouseWorldPos)) {
                 const placePos: Vector = mouseWorldPos.floor();
 
@@ -49,11 +48,11 @@ export default class TileObjectTool extends Tool {
     public postUpdate(): void {}
 
     private canPlace(position: Vector): boolean {
-        if (!ZooGame.map.isPositionInMap(position)) return false;
-        if (!ZooGame.map.isTileFree(position)) return false;
+        if (!Game.map.isPositionInMap(position)) return false;
+        if (!Game.map.isTileFree(position)) return false;
 
-        if (!this.currentObject.canPlaceOnSlopes && ZooGame.world.elevationGrid.isPositionSloped(position)) return false;
-        if (!this.currentObject.canPlaceInWater && ZooGame.world.waterGrid.isPositionWater(position)) return false;
+        if (!this.currentObject.canPlaceOnSlopes && Game.world.elevationGrid.isPositionSloped(position)) return false;
+        if (!this.currentObject.canPlaceInWater && Game.world.waterGrid.isPositionWater(position)) return false;
 
 
         return true;

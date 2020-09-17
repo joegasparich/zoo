@@ -1,15 +1,15 @@
 import * as React from "react";
 
-import { Vector } from "engine";
-import Mediator from "engine/Mediator";
-import { UIEvent } from "engine/consts/events";
-import { KEY } from "engine/managers/InputManager";
+import Mediator from "Mediator";
+import { UIEvent } from "consts/events";
+import { KEY } from "managers/InputManager";
 
-import ZooGame from "ZooGame";
+import Game from "Game";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
 import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
+import Vector from "vector";
 
 const MAX_UNDOS = 10;
 
@@ -24,7 +24,7 @@ export default class ToolManager {
 
     public constructor() {
         this.toolbarRef = React.createRef();
-        ZooGame.canvas.addChild(React.createElement(Toolbar, {
+        Game.canvas.addChild(React.createElement(Toolbar, {
             key: "toolbar",
             toolManager: this,
             ref: this.toolbarRef,
@@ -39,7 +39,7 @@ export default class ToolManager {
     }
 
     public update(): void {
-        if(ZooGame.input.isInputPressed(Inputs.RightMouse)) {
+        if(Game.input.isInputPressed(Inputs.RightMouse)) {
             this.setTool(ToolType.None);
             this.toolbarRef.current?.setState({activeTool: ToolType.None});
             Mediator.fire(UIEvent.UNFOCUS);
@@ -48,16 +48,16 @@ export default class ToolManager {
         this.activeTool.update();
 
         if (this.showRadius()) {
-            if (ZooGame.input.isInputPressed(Inputs.IncreaseBrushSize)) {
+            if (Game.input.isInputPressed(Inputs.IncreaseBrushSize)) {
                 this.setRadius(Math.min(this.radius + 0.125, 2.5));
             }
-            if (ZooGame.input.isInputPressed(Inputs.DecreaseBrushSize)) {
+            if (Game.input.isInputPressed(Inputs.DecreaseBrushSize)) {
                 this.setRadius(Math.max(this.radius - 0.125, 0.25));
             }
         }
 
         // Undo
-        if (ZooGame.input.isKeyReleased(KEY.Z)) {
+        if (Game.input.isKeyReleased(KEY.Z)) {
             this.undo();
         }
     }

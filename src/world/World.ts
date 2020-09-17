@@ -1,22 +1,22 @@
 import Graph = require("node-dijkstra");
 import uuid = require("uuid");
 
-import { Vector } from "engine";
-import { Side } from "engine/consts";
-import { randomInt } from "engine/helpers/math";
-import { MapCell } from "engine/map";
-import Mediator from "engine/Mediator";
+import { Side } from "consts";
+import { randomInt } from "helpers/math";
+import Mediator from "Mediator";
 
 import { Assets, Config } from "consts";
 import { WorldEvents } from "consts/events";
-import ZooGame from "ZooGame";
+import Game from "Game";
 import Area from "./Area";
 import BiomeGrid from "./BiomeGrid";
 import Wall from "./Wall";
 import WallGrid from "./WallGrid";
 import ElevationGrid from "./ElevationGrid";
 import WaterGrid from "./WaterGrid";
-import { Entity } from "engine/entities";
+import { Entity } from "entities";
+import Vector from "vector";
+import { MapCell } from "./MapGrid";
 
 export interface WorldSaveData {
     areas: {
@@ -52,7 +52,7 @@ export default class World {
 
     public async setup(): Promise<void> {
         this.elevationGrid = new ElevationGrid();
-        this.biomeGrid = new BiomeGrid(ZooGame.map.cols * 2, ZooGame.map.rows * 2, Config.BIOME_SCALE);
+        this.biomeGrid = new BiomeGrid(Game.map.cols * 2, Game.map.rows * 2, Config.BIOME_SCALE);
         this.wallGrid = new WallGrid();
         this.waterGrid = new WaterGrid();
 
@@ -84,18 +84,18 @@ export default class World {
 
     // TODO: Move to scene
     private generateFence(): void {
-        for (let i = 0; i < ZooGame.map.cols; i++) {
+        for (let i = 0; i < Game.map.cols; i++) {
             this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, 0), Side.North);
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, ZooGame.map.rows - 1), Side.South);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, Game.map.rows - 1), Side.South);
         }
-        for (let i = 0; i < ZooGame.map.rows; i++) {
+        for (let i = 0; i < Game.map.rows; i++) {
             this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West);
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(ZooGame.map.cols - 1, i), Side.East);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(Game.map.cols - 1, i), Side.East);
         }
         const zooArea = new Area("0", "zoo");
         this.areas.set(zooArea.id, zooArea);
         Mediator.fire(WorldEvents.AREAS_UPDATED);
-        const zooCells = this.floodFill(ZooGame.map.getCell(new Vector(1)));
+        const zooCells = this.floodFill(Game.map.getCell(new Vector(1)));
         zooArea.setCells(zooCells);
         zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
     }
@@ -125,21 +125,21 @@ export default class World {
     }
 
     public getTileObjectAtPos(pos: Vector): Entity {
-        if (!ZooGame.map.isPositionInMap(pos)) return undefined;
+        if (!Game.map.isPositionInMap(pos)) return undefined;
 
         return this.tileObjectMap.get(pos.floor().toString());
     }
 
     public getRandomCell(): Vector {
-        return new Vector(randomInt(0, ZooGame.map.cols), randomInt(0, ZooGame.map.rows));
+        return new Vector(randomInt(0, Game.map.cols), randomInt(0, Game.map.rows));
     }
 
     public isTileFree(position: Vector): boolean {
-        return ZooGame.map.isTileFree(position);
+        return Game.map.isTileFree(position);
     }
 
     public isSideAccessible(tilePos: Vector, side: Side): boolean {
-        const cell = ZooGame.map.getCellInDirection(tilePos, side);
+        const cell = Game.map.getCellInDirection(tilePos, side);
         const wall = this.wallGrid.getWallAtTile(tilePos, side);
         if (!cell) return false;
         if (cell.isSolid) return false;
@@ -158,7 +158,7 @@ export default class World {
         if (tiles.length < 2) return;
 
         tiles.forEach(tilePos =>{
-            areasCells.push(this.floodFill(ZooGame.map.getCell(tilePos)));
+            areasCells.push(this.floodFill(Game.map.getCell(tilePos)));
         });
 
         const oldArea = this.tileAreaMap.get(tiles[0].toString());
@@ -309,7 +309,7 @@ export default class World {
         data.areas.forEach(area => {
             const newArea = new Area(area.id, area.name);
             newArea.colour = area.colour;
-            newArea.setCells(area.cells.map(pos => ZooGame.map.getCell(Vector.Deserialize(pos))));
+            newArea.setCells(area.cells.map(pos => Game.map.getCell(Vector.Deserialize(pos))));
             newArea.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), newArea));
 
             this.areas.set(newArea.id, newArea);
@@ -335,18 +335,18 @@ export default class World {
      * @param cell The cell to search around
      */
     private getAccessibleAdjacentCells(cell: MapCell): MapCell[] {
-        if (!ZooGame.map.isPositionInMap(cell.position)) return;
+        if (!Game.map.isPositionInMap(cell.position)) return;
 
         const allSides: Side[] = [ Side.East, Side.North, Side.South, Side.West ];
 
         return allSides
             .filter(side => !this.wallGrid.getWallAtTile(cell.position, side).exists)
-            .filter(side => ZooGame.map.isPositionInMap(ZooGame.map.getCellInDirection(cell.position, side)?.position))
-            .map(side => ZooGame.map.getCellInDirection(cell.position, side));
+            .filter(side => Game.map.isPositionInMap(Game.map.getCellInDirection(cell.position, side)?.position))
+            .map(side => Game.map.getCellInDirection(cell.position, side));
     }
 
     public getAreaAtPosition(position: Vector): Area {
-        if (!ZooGame.map.isPositionInMap(position)) return undefined;
+        if (!Game.map.isPositionInMap(position)) return undefined;
 
         return this.tileAreaMap.get(position.floor().toString());
     }

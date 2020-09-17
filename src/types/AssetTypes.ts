@@ -1,5 +1,5 @@
-import { Vector } from "engine";
-import { Collider } from "engine/managers";
+import { Collider } from "managers";
+import Vector from "vector";
 
 export interface TileObjectData {
     name: string;

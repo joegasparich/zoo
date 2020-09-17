@@ -1,12 +1,13 @@
 import * as Planck from "planck-js";
 
-import { SpriteSheet, Vector } from "engine";
-import { Layers, TAG } from "engine/consts";
-import { AssetManager, ColliderType } from "engine/managers";
+import { Layers, TAG } from "consts";
+import { AssetManager, ColliderType } from "managers";
 
 import { WallData } from "types/AssetTypes";
-import ZooGame from "ZooGame";
+import Game from "Game";
 import { ELEVATION_HEIGHT } from "./ElevationGrid";
+import SpriteSheet from "SpriteSheet";
+import Vector from "vector";
 
 export enum WallSpriteIndex {
     Horizontal = 0,
@@ -71,7 +72,7 @@ export default class Wall {
             this.exists = true;
 
             if (data.solid) {
-                this.body = ZooGame.physicsManager.createPhysicsObject({
+                this.body = Game.physicsManager.createPhysicsObject({
                     collider: {
                         type: ColliderType.Rect,
                         height: orientation === Orientation.Horizontal ? 0.2 : 1,
@@ -90,8 +91,8 @@ export default class Wall {
 
     public remove(): void {
         if (this.exists) {
-            ZooGame.app.stage.removeChild(this.sprite);
-            ZooGame.physicsManager.removeBody(this.body);
+            Game.app.stage.removeChild(this.sprite);
+            Game.physicsManager.removeBody(this.body);
         }
         this.data = undefined;
         this.spriteSheet = undefined;
@@ -103,14 +104,14 @@ export default class Wall {
 
         if (this.sprite) {
             // Remove old sprite
-            ZooGame.app.stage.removeChild(this.sprite);
+            Game.app.stage.removeChild(this.sprite);
         }
 
         // Add new sprite
         const [spriteIndex, elevation] = this.getSpriteIndex();
         const texture = this.spriteSheet.getTextureByIndex(spriteIndex);
         this.sprite = new PIXI.Sprite(texture);
-        ZooGame.app.stage.addChild(this.sprite);
+        Game.app.stage.addChild(this.sprite);
         this.sprite.parentGroup = Layers.ENTITIES;
         this.sprite.anchor.set(0.5, 1 + elevation * 0.5);
     }
@@ -135,13 +136,13 @@ export default class Wall {
 
     public isSloped(): boolean {
         if (this.orientation === Orientation.Horizontal) {
-            const left = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
-            const right = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
+            const left = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
+            const right = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
 
             return left !== right
         } else {
-            const up = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
-            const down = !!ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
+            const up = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
+            const down = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
 
             return up !== down
         }
@@ -149,16 +150,16 @@ export default class Wall {
 
     public getSpriteIndex(isDoor = this.isDoor): [index: WallSpriteIndex, elevation: number] {
         if (this.orientation === Orientation.Horizontal) {
-            const left = ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
-            const right = ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
+            const left = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
+            const right = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
             const elevation = Math.min(left, right);
 
             if (left === right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, elevation];
             if (left > right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillWest, elevation];
             if (left < right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillEast, elevation];
         } else {
-            const up = ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
-            const down = ZooGame.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
+            const up = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
+            const down = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
             const elevation = Math.min(up, down);
 
             if (up === down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, elevation];
