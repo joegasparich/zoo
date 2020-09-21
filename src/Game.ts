@@ -118,7 +118,7 @@ class Game {
 
         this.canvas.load();
 
-        this.camera = new Camera(new Vector(20, 20), 1);
+        this.camera = new Camera(new Vector(4, 4), 1);
         this.camera.scale = Config.CAMERA_SCALE;
 
         this.map = new MapGrid();

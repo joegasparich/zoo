@@ -13,9 +13,17 @@ export default class Camera {
         this.target = position;
     }
 
+    public hasTarget(): boolean {
+        return !!this.target;
+    }
+
     public update(): void {
         if (this.target) {
             this.worldPosition = Vector.Lerp(this.worldPosition, this.target, 0.1 * Game.opts.gameSpeed);
+
+            if (Vector.Distance(this.worldPosition, this.target) < 0.1) {
+                this.target = undefined;
+            }
         }
     }
 

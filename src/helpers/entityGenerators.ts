@@ -18,7 +18,6 @@ export function createDude(): Entity {
     const dude = this.createActor(new Vector(4));
 
     dude.addSystem(new AreaPathFollowSystem());
-    dude.addSystem(new CameraFollowSystem());
     dude.addSystem(new ActorInputSystem());
 
     const renderer = dude.getSystem(SYSTEM.RENDER_SYSTEM) as RenderSystem;
