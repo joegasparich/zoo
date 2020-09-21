@@ -2,8 +2,8 @@ import Game from "Game";
 import { v1 as uuid } from "uuid";
 import Vector from "vector";
 
-import { System } from "../entities/systems";
-import { SystemSaveData } from "../entities/systems/System";
+import { System, createSystem } from "./systems";
+import { SystemSaveData } from "./systems/System";
 
 export interface EntitySaveData {
     id: string;
@@ -91,5 +91,20 @@ export default class Entity {
     public load(data: EntitySaveData, systems: System[]): void {
         this.id = data.id;
         this.position = Vector.Deserialize(data.position);
+    }
+
+    public static loadEntity(data: EntitySaveData): Entity {
+        const entity = new Entity(Vector.Deserialize(data.position), true);
+        entity.id = data.id;
+
+        data.systemData.forEach(systemData => {
+            const system = createSystem(systemData);
+            if (!system) return;
+
+            entity.addSystem(system);
+            system.load(systemData);
+        });
+
+        return entity;
     }
 }

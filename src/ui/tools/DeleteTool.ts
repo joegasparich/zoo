@@ -4,6 +4,8 @@ import PlacementGhost from "ui/PlacementGhost";
 import Game from "Game";
 import Vector from "vector";
 import Graphics from "Graphics";
+import { WallGridSaveData } from "world/WallGrid";
+import Entity, { EntitySaveData } from "entities/Entity";
 
 export default class DeleteTool extends Tool {
     public type = ToolType.Delete;
@@ -50,6 +52,21 @@ export default class DeleteTool extends Tool {
                 const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
                 const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
                 let pos;
+
+                this.toolManager.pushAction({
+                    name: "Delete",
+                    data: {
+                        walls: Game.world.wallGrid.save(),
+                        tileObjects: Game.world.getTileObjects().map(obj => obj.save()),
+                    },
+                    undo: (data: any): void => {
+                        const walls = data.walls as WallGridSaveData;
+                        const tileObjects = data.tileObjects as EntitySaveData[];
+
+                        Game.world.wallGrid.load(walls);
+                        tileObjects.forEach(data => Entity.loadEntity(data));
+                    },
+                });
 
                 for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
                     for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {

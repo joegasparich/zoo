@@ -15,6 +15,8 @@ export { default as AreaPathFollowSystem } from "./AreaPathFollowSystem";
 export { default as ElevationSystem } from "./ElevationSystem";
 export { default as TileObjectSystem } from "./TileObjectSystem";
 
+export { createSystem } from "./createSystem";
+
 export const SYSTEM = {
     RENDER_SYSTEM: "RENDER_SYSTEM",
     ANIMATED_RENDER_SYSTEM: "ANIMATED_RENDER_SYSTEM",

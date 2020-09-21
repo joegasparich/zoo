@@ -130,6 +130,11 @@ export default class World {
         return this.tileObjectMap.get(pos.floor().toString());
     }
 
+    // TODO: Might be better to store array rather than convert it every time
+    public getTileObjects(): Entity[] {
+        return Array.from(this.tileObjects.values());
+    }
+
     public getRandomCell(): Vector {
         return new Vector(randomInt(0, Game.map.cols), randomInt(0, Game.map.rows));
     }
