@@ -35,7 +35,7 @@ export default class DoorTool extends Tool {
         const wallatMousePos = Game.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), Game.map.getTileQuadrantAtPos(mouseWorldPos));
 
         if (Game.input.isInputReleased(Inputs.LeftMouse)) {
-            if (wallatMousePos && !wallatMousePos.isSloped()) {
+            if (wallatMousePos && wallatMousePos.exists && !wallatMousePos.isSloped()) {
                 Game.world.placeDoor(wallatMousePos);
 
                 this.toolManager.pushAction({
