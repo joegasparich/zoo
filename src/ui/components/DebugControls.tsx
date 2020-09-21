@@ -99,7 +99,12 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
     }
 
     private handlePanelButtonClick(): void {
+        if (this.state.panelOpen) {
+            Mediator.fire(UIEvent.UNFOCUS);
+        } else {
+            Mediator.fire(UIEvent.FOCUS, {id: this.focusID});
+        }
+
         this.setState({panelOpen: !this.state.panelOpen});
-        Mediator.fire(UIEvent.FOCUS, {id: this.focusID});
     }
 }

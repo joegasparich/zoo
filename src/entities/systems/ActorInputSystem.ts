@@ -3,6 +3,7 @@ import { Entity } from "entities";
 import Game from "Game";
 import { Inputs } from "consts";
 import Vector from "vector";
+import UIManager from "ui/UIManager";
 
 export default class ActorInputSystem extends InputSystem {
     public id = SYSTEM.ACTOR_INPUT_SYSTEM;
@@ -36,7 +37,7 @@ export default class ActorInputSystem extends InputSystem {
         }
 
         // ! Temp
-        if (Game.input.isInputPressed(Inputs.RightMouse)) {
+        if (Game.input.isInputPressed(Inputs.RightMouse) && !UIManager.hasFocus()) {
             const mousePos: Vector = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
             this.pathfinder.pathTo(mousePos.floor());

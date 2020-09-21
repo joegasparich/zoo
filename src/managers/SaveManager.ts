@@ -23,7 +23,6 @@ class SaveManager {
     public saveGame(): void {
 
         const entities = Game.getEntities();
-        console.log(entities);
         // Get a bunch of save data
         const saveData: SaveData = {
             biomes: Game.world.biomeGrid.save(),
@@ -39,6 +38,7 @@ class SaveManager {
     public loadGame(): void {
         FileManager.loadFromFile(SAVE_GAME_LOCATION + "/save.json").then(data => {
             const saveData: SaveData = data as SaveData;
+            console.log("Loading from Save:");
             console.log(saveData);
 
             // Load scene

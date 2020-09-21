@@ -86,7 +86,12 @@ export default class BiomeControls extends UIComponent<BiomeControlsProps, Biome
     }
 
     private handlePanelButtonClick(): void {
+        if (this.state.panelOpen) {
+            Mediator.fire(UIEvent.UNFOCUS);
+        } else {
+            Mediator.fire(UIEvent.FOCUS, {id: this.focusID});
+        }
+
         this.setState({panelOpen: !this.state.panelOpen});
-        Mediator.fire(UIEvent.FOCUS, {id: this.focusID});
     }
 }
