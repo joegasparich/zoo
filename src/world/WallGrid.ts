@@ -100,7 +100,7 @@ export default class WallGrid {
      * @param tilePos The tile to place the wall in
      * @param side The side of the tile to place the wall on
      */
-    public placeWallAtTile(assetPath: string, tilePos: Vector, side: Side): Wall {
+    public placeWallAtTile(assetPath: string, tilePos: Vector, side: Side, indestructable = false): Wall {
         if (!this.isSetup) return;
         if (!this.isWallPosInMap(tilePos, side)) return;
         if (this.getWallAtTile(tilePos, side)?.exists) return;
@@ -110,6 +110,7 @@ export default class WallGrid {
 
         // Create wall and put in the grid
         const wall = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), assetPath);
+        wall.indestructable = indestructable;
         this.wallGrid[x][y] = wall;
 
         this.updatePathfindingAtWall(tilePos, side);
@@ -159,10 +160,10 @@ export default class WallGrid {
     public deleteWallAtTile(tilePos: Vector, side: Side): void {
         if (!this.isSetup) return;
         if (!this.isWallPosInMap(tilePos, side)) return; // Return if out of map
-        if (this.getWallAtTile(tilePos, side) && !this.getWallAtTile(tilePos, side).exists) return; // Return if wall doesn't exist here
 
         // Get grid position
         const { orientation, x, y } = this.getGridPosition(side, tilePos);
+        if (!this.wallGrid[x][y].exists || this.wallGrid[x][y].indestructable) return;
 
         // Set to blank wall
         this.wallGrid[x][y].remove();

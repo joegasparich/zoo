@@ -85,12 +85,12 @@ export default class World {
     // TODO: Move to scene
     private generateFence(): void {
         for (let i = 0; i < Game.map.cols; i++) {
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, 0), Side.North);
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, Game.map.rows - 1), Side.South);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, 0), Side.North, true);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, Game.map.rows - 1), Side.South, true);
         }
         for (let i = 0; i < Game.map.rows; i++) {
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West);
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(Game.map.cols - 1, i), Side.East);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West, true);
+            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(Game.map.cols - 1, i), Side.East, true);
         }
         const zooArea = new Area("0", "zoo");
         this.areas.set(zooArea.id, zooArea);

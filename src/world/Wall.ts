@@ -60,6 +60,7 @@ export default class Wall {
     private body: Planck.Body;
 
     public exists: boolean;
+    public indestructable: boolean;
     public isDoor: boolean;
 
     public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, public assetPath?: string) {
