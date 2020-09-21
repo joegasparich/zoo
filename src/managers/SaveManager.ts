@@ -1,9 +1,5 @@
 import { FileManager } from "managers";
 import Entity, { EntitySaveData } from "entities/Entity";
-import System, { SystemSaveData } from "entities/systems/System";
-import { AnimatedRenderSystem, CameraFollowSystem, InputToPhysicsSystem, PathBlockSystem, PathFollowSystem, PhysicsSystem, RenderSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
-import { PhysicsSystemSaveData } from "entities/systems/PhysicsSystem";
-import { ColliderType } from "managers";
 
 import Game from "Game";
 import { BiomeSaveData } from "world/BiomeGrid";
@@ -11,8 +7,6 @@ import { WallGridSaveData } from "world/WallGrid";
 import { WorldSaveData } from "world/World";
 import { ElevationSaveData } from "world/ElevationGrid";
 import ZooScene from "scenes/ZooScene";
-import { ActorInputSystem, AreaPathFollowSystem, ElevationSystem, FollowMouseSystem, SnapToGridSystem, TileObjectSystem } from "entities/systems";
-import Vector from "vector";
 
 const SAVE_GAME_LOCATION = "saves/";
 
