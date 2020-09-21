@@ -39,12 +39,6 @@ export default class ToolManager {
     }
 
     public update(): void {
-        if(Game.input.isInputPressed(Inputs.RightMouse)) {
-            this.setTool(ToolType.None);
-            this.toolbarRef.current?.setState({activeTool: ToolType.None});
-            Mediator.fire(UIEvent.UNFOCUS);
-        }
-
         this.activeTool.update();
 
         if (this.showRadius()) {
@@ -63,6 +57,12 @@ export default class ToolManager {
     }
 
     public postUpdate(): void {
+        if (Game.input.isInputPressed(Inputs.RightMouse)) {
+            this.setTool(ToolType.None);
+            this.toolbarRef.current?.setState({activeTool: ToolType.None});
+            Mediator.fire(UIEvent.UNFOCUS);
+        }
+
         this.activeTool.postUpdate();
         this.ghost.postUpdate();
     }

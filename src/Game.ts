@@ -185,6 +185,7 @@ class Game {
         const scene = this.sceneManager.getCurrentScene();
         scene && scene.preUpdate();
         Graphics.preUpdate();
+
         this.entities.forEach(entity => {
             entity.preUpdate(delta);
         });
@@ -194,31 +195,33 @@ class Game {
         // Game actions
         const scene = this.sceneManager.getCurrentScene();
         scene && scene.update();
-        this.entities.forEach(entity => {
-            entity.update(delta);
-        });
         // Do Physics
         this.physicsManager.update(delta);
         UIManager.update(delta);
+
+        this.entities.forEach(entity => {
+            entity.update(delta);
+        });
     }
 
     protected postUpdate(delta: number): void {
         // Rendering actions
         const scene = this.sceneManager.getCurrentScene();
         scene && scene.postUpdate();
-        this.entities.forEach(entity => {
-            entity.postUpdate(delta);
-        });
 
         this.drawDebug();
 
         this.map.postUpdate();
         this.world.postUpdate(delta);
         Graphics.postUpdate();
+        UIManager.postUpdate(delta);
+
+        this.entities.forEach(entity => {
+            entity.postUpdate(delta);
+        });
+
         // ! Camera should be last to avoid stuttering
         this.camera.update();
-
-        UIManager.postUpdate(delta);
     }
 
     public getEntities(): Entity[] {
