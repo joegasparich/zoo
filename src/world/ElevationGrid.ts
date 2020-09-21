@@ -7,6 +7,7 @@ import Game from "Game";
 import Wall from "./Wall";
 import Vector from "vector";
 import Graphics from "Graphics";
+import WallGrid from "./WallGrid";
 
 export const ELEVATION_HEIGHT = 0.5;
 
@@ -70,45 +71,35 @@ export default class ElevationGrid {
     }
 
     public setElevation(gridPos: Vector, elevation: Elevation): void {
-        // TODO: Allow elevation if all required points are being elevated
-        if (this.canElevate(gridPos, elevation)) {
-            // Flatten surrounding terrain
-            if (elevation !== Elevation.Flat) {
-                this.getAdjacentGridPositions(gridPos, true)
-                    .filter(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation)
-                    .forEach(gridPos => {
-                        this.setElevation(gridPos, Elevation.Flat);
-                        Game.world.biomeGrid.redrawChunksInRadius(gridPos.multiply(2), 2);
-                    });
-            }
+        if (!this.canElevate(gridPos, elevation)) return;
 
-            this.grid[gridPos.x][gridPos.y] = elevation;
+        // TODO: See if I can get flattening working with gates/tileobjs in corners
+        // Flatten surrounding terrain
+        // if (elevation !== Elevation.Flat) {
+        //     const adjacentPositions = this.getAdjacentGridPositions(gridPos, true)
+        //         .filter(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation);
+        //     this.setMultipleElevations(adjacentPositions, Elevation.Flat);
+        // }
 
-            this.getAdjacentGridPositions(gridPos, true).forEach(gridPos => {
-                if (this.getBaseElevation(gridPos) < 0) {
-                    Game.world.waterGrid.setTileWater(gridPos);
-                } else {
-                    Game.world.waterGrid.setTileLand(gridPos);
-                }
-            });
+        // Prevent overriding inverse terrain
+        if (elevation !== Elevation.Flat) {
+            if (this.getAdjacentGridPositions(gridPos, true).find(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation)) return;
         }
+
+        this.grid[gridPos.x][gridPos.y] = elevation;
+
+        this.getAdjacentGridPositions(gridPos, true).forEach(gridPos => {
+            if (this.getBaseElevation(gridPos) < 0) {
+                Game.world.waterGrid.setTileWater(gridPos);
+            } else {
+                Game.world.waterGrid.setTileLand(gridPos);
+            }
+        });
     }
 
     public canElevate(gridPos: Vector, elevation: Elevation): boolean {
-        // Check 4 surrounding tiles for tileObjects that can't be on slopes
-        for (const tile of this.getSurroundingTiles(gridPos)) {
-            const entity = Game.world.getTileObjectAtPos(tile);
-            const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
-            if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
-        }
-
-        // Check 4 surrounding wall slots for gates
-        for (const wall of this.getSurroundingWalls(gridPos)) {
-            if (wall?.exists && wall?.isDoor) return false;
-        }
-
         if (elevation === Elevation.Water) {
-            // Check 4 surrounding tiles for tileObjects that can't be on slopes
+            // Check 4 surrounding tiles for tileObjects that can't be in water
             for (const tile of this.getSurroundingTiles(gridPos)) {
                 const entity = Game.world.getTileObjectAtPos(tile);
                 const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
@@ -119,6 +110,18 @@ export default class ElevationGrid {
             for (const wall of this.getSurroundingWalls(gridPos)) {
                 if (wall?.exists) return false;
             }
+        }
+
+        // Check 4 surrounding tiles for tileObjects that can't be on slopes
+        for (const tile of this.getSurroundingTiles(gridPos)) {
+            const entity = Game.world.getTileObjectAtPos(tile);
+            const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+            if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
+        }
+
+        // Check 4 surrounding wall slots for gates
+        for (const wall of this.getSurroundingWalls(gridPos)) {
+            if (wall?.exists && wall?.isDoor) return false;
         }
 
         return true;
@@ -193,7 +196,7 @@ export default class ElevationGrid {
     }
 
     public isPositionSloped(position: Vector): boolean {
-        return this.getSlopeVariant(position.floor()) === SlopeVariant.Flat;
+        return this.getSlopeVariant(position.floor()) !== SlopeVariant.Flat;
     }
 
     private isPositionInGrid(pos: Vector): boolean {
@@ -254,7 +257,7 @@ export default class ElevationGrid {
 
     public save(): ElevationSaveData {
         return {
-            elevationGrid: this.grid,
+            elevationGrid: this.getGridCopy(),
         };
     }
 
@@ -262,7 +265,6 @@ export default class ElevationGrid {
         this.reset();
 
         this.setGrid(data.elevationGrid);
-        Game.world.biomeGrid.redrawAllChunks();
         Game.world.waterGrid.regenerateGrid();
     }
 

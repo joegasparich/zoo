@@ -4,6 +4,7 @@ import { AssetManager } from "managers";
 import { SystemSaveData } from "entities/systems/System";
 import { Entity } from "entities";
 import Game from "Game";
+import Vector from "vector";
 
 interface TileObjectSystemSaveData extends SystemSaveData {
     assetPath: string;
@@ -24,6 +25,17 @@ export default class TileObjectSystem extends System {
 
     public end(): void {
         Game.world.unregisterTileObject(this.entity);
+    }
+
+    public getCorners(): Vector[] {
+        const tile = this.entity.position.floor();
+
+        return [
+            tile,
+            tile.add(new Vector(1, 0)),
+            tile.add(new Vector(0, 1)),
+            tile.add(new Vector(1, 1)),
+        ];
     }
 
     public setAsset(assetPath: string): void {

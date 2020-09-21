@@ -81,7 +81,6 @@ export default class WallGrid {
                 if (!wall?.exists) { continue; }
                 if (!wall?.data) { continue; }
 
-                // Texture
                 let wallPos;
                 if (orientation === Orientation.Vertical) {
                     wallPos = new Vector((col/2), row+1);
@@ -242,6 +241,10 @@ export default class WallGrid {
         };
 
         return found;
+    }
+
+    public getAllWalls(): Wall[] {
+        return this.wallGrid.flat().filter(wall => wall.exists);
     }
 
     private getGridPosition(side: Side, tilePos: Vector): { orientation: Orientation; x: number; y: number } {

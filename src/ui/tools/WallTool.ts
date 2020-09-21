@@ -17,6 +17,7 @@ export default class WallTool extends Tool {
     private startWallPos: {pos: Vector; quadrant: Side};
     private ghost: PlacementGhost;
     private wallGhosts: PlacementGhost[];
+    private isDragging: boolean;
 
     public set(ghost: PlacementGhost): void {
         this.ghost = ghost;
@@ -56,6 +57,7 @@ export default class WallTool extends Tool {
             this.startWallPos = { pos: tilePos, quadrant };
         }
         if (Game.input.isInputHeld(Inputs.LeftMouse)) {
+            this.isDragging = true;
 
             this.ghost.setSpriteVisible(false);
 
@@ -77,10 +79,7 @@ export default class WallTool extends Tool {
             while (this.wallGhosts.length < length) {
                 const ghost = new PlacementGhost();
                 ghost.setFollow(false);
-                ghost.canPlaceFunction = (pos: Vector): boolean =>  {
-                    const wall = Game.world.wallGrid.getWallAtTile(pos.floor(), dragQuadrant);
-                    return wall && !wall.exists;
-                };
+                ghost.canPlaceFunction = this.canPlace.bind(this);
                 this.wallGhosts.push(ghost);
             }
             while (this.wallGhosts.length > length) {
@@ -116,6 +115,7 @@ export default class WallTool extends Tool {
             });
 
             this.wallGhosts = [];
+            this.isDragging = false;
         }
     }
 
@@ -153,8 +153,15 @@ export default class WallTool extends Tool {
     }
 
     private canPlace(pos: Vector): boolean {
-        // TODO: placement is incorrect on vertical walls just outside map
-        const quadrant = Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos()));
+        let quadrant = Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos()));
+
+        if (this.isDragging) {
+            if (this.startWallPos?.quadrant === Side.North || this.startWallPos?.quadrant === Side.South) {
+                quadrant = Game.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
+            } else {
+                quadrant = Game.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
+            }
+        }
 
         // Check inside map
         if (!Game.map.isPositionInMap(pos)) return false;

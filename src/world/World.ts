@@ -62,7 +62,6 @@ export default class World {
         this.waterGrid.setup();
 
         // TODO: Store outer fence information in scene & then generate area based on that
-        // TODO: Add unremovable fences
         this.generateFence();
     }
 

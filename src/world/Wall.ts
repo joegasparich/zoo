@@ -64,8 +64,8 @@ export default class Wall {
     public isDoor: boolean;
 
     public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, public assetPath?: string) {
-        this.exists = false;
         if (assetPath) {
+            this.exists = true;
             const data = AssetManager.getJSON(assetPath) as WallData;
 
             this.data = data;
@@ -87,6 +87,9 @@ export default class Wall {
             }
 
             this.updateSprite();
+        } else {
+            // Empty wall pos
+            this.exists = false;
         }
     }
 
@@ -127,12 +130,11 @@ export default class Wall {
         this.isDoor = isDoor;
 
         if (isDoor) {
-            this.sprite.texture = this.spriteSheet.getTextureByIndex(this.orientation === Orientation.Horizontal ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.DoorVertical);
             this.body.setActive(false);
         } else {
-            this.sprite.texture = this.spriteSheet.getTextureByIndex(this.orientation === Orientation.Horizontal ? WallSpriteIndex.Horizontal : WallSpriteIndex.Vertical);
             this.body.setActive(true);
         }
+        this.updateSprite();
     }
 
     public isSloped(): boolean {
@@ -147,6 +149,13 @@ export default class Wall {
 
             return up !== down
         }
+    }
+
+    public getCorners(): Vector[] {
+        const tile = this.position.floor();
+        return this.orientation === Orientation.Horizontal ?
+            [tile, tile.add(new Vector(1, 0))] :
+            [tile, tile.add(new Vector(0, 1))];
     }
 
     public getSpriteIndex(isDoor = this.isDoor): [index: WallSpriteIndex, elevation: number] {

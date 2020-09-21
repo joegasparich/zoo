@@ -13,8 +13,8 @@ export enum ToolType {
 
 export interface Action {
     name: string;
-    data: Object;
-    undo: (data: Object) => void;
+    data: any;
+    undo: (data: any) => void;
 }
 
 export abstract class Tool {

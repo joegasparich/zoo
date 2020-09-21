@@ -51,10 +51,10 @@ class SaveManager {
             );
 
             // Use save data to set game state
+            Game.world.elevationGrid.load(saveData.elevation);
             Game.world.biomeGrid.load(saveData.biomes);
             Game.world.wallGrid.load(saveData.walls);
             Game.world.load(saveData.areas);
-            Game.world.elevationGrid.load(saveData.elevation);
 
             saveData.entities.forEach(entityData => Entity.loadEntity(entityData));
         });

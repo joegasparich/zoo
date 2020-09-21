@@ -1,7 +1,7 @@
 import Game from "Game";
 import { Config, Inputs } from "consts";
 import PlacementGhost from "ui/PlacementGhost";
-import { Elevation } from "world/ElevationGrid";
+import { Elevation, ElevationSaveData } from "world/ElevationGrid";
 import { Tool, ToolType } from ".";
 import Vector from "vector";
 import Graphics from "Graphics";
@@ -12,8 +12,7 @@ export default class ElevationTool extends Tool {
     public type = ToolType.Elevation;
 
     private targetElevation: Elevation;
-    private prevElevation: Elevation[][];
-    private prevWater: boolean[][];
+    private prevElevation: ElevationSaveData;
 
     private placementIntervalRef: number;
 
@@ -27,8 +26,7 @@ export default class ElevationTool extends Tool {
         };
         ghost.setSpriteVisible(false);
 
-        this.prevElevation = Game.world.elevationGrid.getGridCopy();
-        this.prevWater = Game.world.waterGrid.getGridCopy();
+        this.prevElevation = Game.world.elevationGrid.save();
     }
 
     public update(): void {
@@ -49,20 +47,18 @@ export default class ElevationTool extends Tool {
         if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             this.toolManager.pushAction({
                 name: "Adjust Elevation",
-                data: {
-                    prevElevation: this.prevElevation,
-                    prevWater: this.prevWater,
-                },
-                undo: (data: any): void => {
-                    Game.world.elevationGrid.setGrid(data.prevElevation);
+                data: JSON.stringify(this.prevElevation),
+                undo: (json: string): void => {
+                    const data = JSON.parse(json) as ElevationSaveData;
+                    Game.world.elevationGrid.load(data);
                     Game.world.biomeGrid.redrawAllChunks();
-                    Game.world.waterGrid.setGrid(data.prevWater);
-                    Game.world.waterGrid.draw();
+                    Game.world.wallGrid.getAllWalls().forEach(wall => wall.updateSprite());
 
-                    this.prevElevation = Game.world.elevationGrid.getGridCopy();
-                    this.prevWater = Game.world.waterGrid.getGridCopy();
+                    this.prevElevation = Game.world.elevationGrid.save();
                 },
             });
+
+            this.prevElevation = Game.world.elevationGrid.save();
         }
     }
 
