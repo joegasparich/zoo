@@ -7,6 +7,7 @@ import Game from "Game";
 import Camera from "Camera";
 import Vector from "vector";
 import Graphics from "Graphics";
+import { toObservablePoint } from "helpers/vectorHelper";
 
 export interface WallGridSaveData {
     walls: ({
@@ -87,7 +88,7 @@ export default class WallGrid {
                 } else {
                     wallPos = new Vector((col/2), row);
                 }
-                wall.sprite.position = this.camera.worldToScreenPosition(wallPos).toPoint();
+                wall.sprite.position = toObservablePoint(this.camera.worldToScreenPosition(wallPos));
                 wall.sprite.scale.set(this.camera.scale);
             }
         }
@@ -238,7 +239,7 @@ export default class WallGrid {
                 found = this.checkForLoop(startWall, wall, checkedWalls, depth + 1);
             }
             if (found) break;
-        };
+        }
 
         return found;
     }

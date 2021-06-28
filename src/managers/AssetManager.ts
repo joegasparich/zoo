@@ -1,12 +1,14 @@
+import { ILoaderResource, Loader, Texture } from "pixi.js";
+
 import TileSet, { TileSetData } from "TileSet";
 
 class AssetManager {
-    private loader: PIXI.Loader;
+    private loader: Loader;
     private preloadedAssets: string[];
     private tilesets: Map<string, TileSet>;
 
     public constructor() {
-        this.loader = new PIXI.Loader();
+        this.loader = new Loader();
         this.tilesets = new Map();
     }
 
@@ -18,11 +20,11 @@ class AssetManager {
         this.preloadedAssets.push(...assets);
     }
 
-    public async doPreLoad(onProgress?: Function): Promise<PIXI.LoaderResource[]> {
+    public async doPreLoad(onProgress?: Function): Promise<ILoaderResource[]> {
         return this.loadResources(this.preloadedAssets, onProgress);
     }
 
-    public async loadResource(asset: string, onProgress?: Function): Promise<PIXI.LoaderResource> {
+    public async loadResource(asset: string, onProgress?: Function): Promise<ILoaderResource> {
         if (!asset) {
             return null;
         }
@@ -32,7 +34,7 @@ class AssetManager {
         return resources[0];
     }
 
-    public loadResources(assets: string[], onProgress?: Function): Promise<PIXI.LoaderResource[]> {
+    public loadResources(assets: string[], onProgress?: Function): Promise<ILoaderResource[]> {
         if (!assets || !assets.length) {
             return null;
         }
@@ -40,12 +42,12 @@ class AssetManager {
         assets = assets.filter(asset => !this.loader.resources[asset]);
 
         this.loader.add(assets);
-        const progressListener: (loader: PIXI.Loader) => void = loader => onProgress && onProgress(loader.progress);
-        this.loader.on("progress", progressListener);
+        const progressListener: (loader: Loader) => void = loader => onProgress && onProgress(loader.progress);
+        const progressListenerRef = this.loader.onProgress.add(progressListener);
 
         return new Promise((resolve) => {
             this.loader.load((loader, resources) => {
-                this.loader.off("progress", progressListener);
+                this.loader.onProgress.detach(progressListenerRef);
                 const res = assets.map(asset => resources[asset]).concat(existingAssets.map(asset => resources[asset]));
                 resolve(res);
             });
@@ -60,7 +62,7 @@ class AssetManager {
         return this.loader.resources[key].data;
     }
 
-    public getTexture(key: string): PIXI.Texture {
+    public getTexture(key: string): Texture {
         if (!this.hasResource(key)) {
             console.error(`Tried to get unloaded texture: ${key}`);
             return undefined;
@@ -72,7 +74,7 @@ class AssetManager {
         return !!this.loader.resources[key];
     }
 
-    public getTexturesByType(type: object): PIXI.Texture[] {
+    public getTexturesByType(type: object): Texture[] {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
 

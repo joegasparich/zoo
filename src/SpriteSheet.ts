@@ -1,3 +1,5 @@
+import { Rectangle, Texture } from "pixi.js";
+
 import { AssetManager } from "managers";
 import Vector from "vector";
 
@@ -9,7 +11,7 @@ export interface SpriteSheetData {
 }
 
 export default class SpriteSheet {
-    private texture: PIXI.Texture;
+    private texture: Texture;
     private rows: number;
     private cols: number;
     public data: SpriteSheetData;
@@ -26,11 +28,11 @@ export default class SpriteSheet {
         this.data = data;
     }
 
-    protected getRectFromIndex(index: number): PIXI.Rectangle {
+    protected getRectFromIndex(index: number): Rectangle {
         const row = Math.min(index % this.cols, this.cols - 1);
         const col = Math.min(Math.floor(index / this.cols), this.rows - 1);
 
-        return new PIXI.Rectangle(
+        return new Rectangle(
             row * this.data.cellWidth,
             col * this.data.cellHeight,
             this.data.cellWidth,
@@ -38,15 +40,15 @@ export default class SpriteSheet {
         );
     }
 
-    public getTexture(): PIXI.Texture {
+    public getTexture(): Texture {
         return this.texture;
     }
 
-    public getTextureByIndex(id: number): PIXI.Texture {
-        return new PIXI.Texture(this.texture.baseTexture, this.getRectFromIndex(id));
+    public getTextureByIndex(id: number): Texture {
+        return new Texture(this.texture.baseTexture, this.getRectFromIndex(id));
     }
 
-    public getTexturesById(ids: number[]): PIXI.Texture[] {
+    public getTexturesById(ids: number[]): Texture[] {
         return ids.map(id => this.getTextureByIndex(id));
     }
 }

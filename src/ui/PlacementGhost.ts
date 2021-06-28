@@ -2,7 +2,7 @@ import { Entity } from "entities";
 import { RenderSystem, SYSTEM } from "entities/systems";
 import { FollowMouseSystem, SnapToGridSystem } from "entities/systems";
 
-import { Assets, Layers } from "consts";
+import { Assets } from "consts";
 import World from "world/World";
 import Game from "Game";
 import ElevationSystem from "entities/systems/ElevationSystem";
@@ -33,7 +33,7 @@ export default class PlacementGhost {
         this.ghost = new Entity(Game.input.getMousePos(), false);
         this.ghost.addSystem(new FollowMouseSystem());
         this.ghost.addSystem(new SnapToGridSystem());
-        this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE, Layers.UI));
+        this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE));
 
         this.reset();
     }
@@ -84,9 +84,9 @@ export default class PlacementGhost {
 
     public setSnap(snap: boolean, gridSize?: number): void {
         const system = this.ghost.getSystem(SYSTEM.SNAP_TO_GRID_SYSTEM) as SnapToGridSystem;
-        if (system) {
-            system.gridSize = gridSize ?? 1;
-        }
+        if (!system) return;
+
+        system.gridSize = gridSize ?? 1;
 
         if (this.snap === snap) return;
         this.snap = snap;
@@ -96,6 +96,7 @@ export default class PlacementGhost {
 
     public setFollow(follow: boolean): void {
         const system = this.ghost.getSystem(SYSTEM.FOLLOW_MOUSE_SYSTEM) as FollowMouseSystem;
+        if (!system) return;
 
         if (this.follow === follow) return;
         this.follow = follow;

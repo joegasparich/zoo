@@ -1,6 +1,4 @@
-import { Point } from "pixi.js";
-import { lerp } from "helpers/math";
-import * as Planck from "planck-js";
+import { lerp } from "./helpers/math";
 
 export default class Vector {
     public x: number;
@@ -59,16 +57,17 @@ export default class Vector {
         return this.x == vector.x && this.y == vector.y;
     }
 
+    public clone(): Vector {
+        return new Vector(this.x, this.y);
+    }
     public toString(): string {
         return `[${this.x}, ${this.y}]`;
     }
 
-    public toPoint(): Point {
-        return new Point(this.x, this.y);
-    }
+    public toPolar(): [angle: number, magnitude: number] {
+        if (this.x === 0 && this.y === 0) return [0, 0]; // Avoid dividing by zero
 
-    public toVec2(): Planck.Vec2 {
-        return new Planck.Vec2(this.x, this.y);
+        return [Math.atan2(this.y, this.x) + Math.PI/2, this.magnitude()];
     }
 
     public static Distance(vectorA: Vector, vectorB: Vector): number {
@@ -84,13 +83,9 @@ export default class Vector {
             lerp(startPos.y, endPos.y, amount),
         );
     }
-
-    public static FromPoint(point: Point): Vector {
-        return new Vector(point.x, point.y);
-    }
-
-    public static FromVec2(vec2: Planck.Vec2): Vector {
-        return new Vector(vec2.x, vec2.y);
+    public static FromPolar(angle: number, magnitude: number) {
+        angle -= Math.PI/2; //Add 90 degrees to normalise to up
+        return new Vector(Math.cos(angle), Math.sin(angle)).multiply(magnitude);
     }
 
     public static Zero(): Vector {

@@ -1,10 +1,13 @@
+import { Graphics } from "pixi.js";
+
 import Camera from "Camera";
-import { Layers, Side } from "consts";
+import { Layer, Side } from "consts";
 import { circleIntersectsRect, clamp, hexToHsl, hslToHex, pointInCircle } from "helpers/math";
 import Vector from "vector";
 import Game from "Game";
 import Area from "./Area";
 import { SlopeVariant } from "./ElevationGrid";
+import { toObservablePoint } from "helpers/vectorHelper";
 
 export enum Biome {
     Grass = 0xb6d53c,
@@ -151,7 +154,7 @@ export class BiomeChunk {
     private camera: Camera;
 
     private grid: Square[][];
-    private graphics: PIXI.Graphics;
+    private graphics: Graphics;
 
     public shouldRedraw: boolean;
 
@@ -173,10 +176,9 @@ export class BiomeChunk {
             }
         }
 
-        this.graphics = new PIXI.Graphics();
-        this.graphics.parentGroup = Layers.GROUND;
-        this.graphics.position = this.camera.offset.toPoint();
-        Game.stage.addChild(this.graphics);
+        this.graphics = new Graphics();
+        this.graphics.position = toObservablePoint(this.camera.offset);
+        Game.addToStage(this.graphics, Layer.GROUND);
 
         this.shouldRedraw = true;
     }
@@ -201,7 +203,7 @@ export class BiomeChunk {
                             vec = vec.add(new Vector(0, -(elevation * 2)));
 
                             // Convert to screen space
-                            return vec.multiply(this.cellSize).toPoint();
+                            return toObservablePoint(vec.multiply(this.cellSize));
                         }))
                         .endFill();
                 }
@@ -218,11 +220,11 @@ export class BiomeChunk {
 
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
         // TODO: set position and draw triangles locally?
-        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
+        this.graphics.position = toObservablePoint(this.camera.worldToScreenPosition(Vector.Zero()));
     }
 
     public remove(): void {
-        Game.app.stage.removeChild(this.graphics);
+        Game.removeFromStage(this.graphics, Layer.GROUND);
     }
 
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {

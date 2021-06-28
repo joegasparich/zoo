@@ -7,7 +7,6 @@ import Game from "Game";
 import Wall from "./Wall";
 import Vector from "vector";
 import Graphics from "Graphics";
-import WallGrid from "./WallGrid";
 
 export const ELEVATION_HEIGHT = 0.5;
 
@@ -197,6 +196,13 @@ export default class ElevationGrid {
 
     public isPositionSloped(position: Vector): boolean {
         return this.getSlopeVariant(position.floor()) !== SlopeVariant.Flat;
+    }
+    public isPositionSlopeCorner(position: Vector): boolean {
+        return this.getSlopeVariant(position.floor()) !== SlopeVariant.Flat
+            && this.getSlopeVariant(position.floor()) !== SlopeVariant.N
+            && this.getSlopeVariant(position.floor()) !== SlopeVariant.S
+            && this.getSlopeVariant(position.floor()) !== SlopeVariant.E
+            && this.getSlopeVariant(position.floor()) !== SlopeVariant.W;
     }
 
     private isPositionInGrid(pos: Vector): boolean {

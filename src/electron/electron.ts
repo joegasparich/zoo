@@ -1,7 +1,9 @@
-
 import { app, BrowserWindow } from "electron";
+import installExtension from "electron-devtools-installer";
 
-app.on("ready", () => {
+app.on("ready", async () => {
+    await installExtension("aamddddknhcagpehecnhphigffljadon");
+
     // once electron has started up, create a window.
     const window = new BrowserWindow({
         width: 800,

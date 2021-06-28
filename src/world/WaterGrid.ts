@@ -1,9 +1,13 @@
-import { Config, Layers } from "consts";
+import { Graphics as PGraphics, ObservablePoint } from "pixi.js";
+
+import { Config, Layer } from "consts";
 import Graphics from "Graphics";
 import Vector from "vector";
 
+
 import Game from "Game";
 import { SlopeVariant, ELEVATION_HEIGHT } from "./ElevationGrid";
+import { toObservablePoint } from "helpers/vectorHelper";
 
 const WATER_COLOUR = 0x4499FF;
 const WATER_LEVEL = 0.2;
@@ -13,7 +17,7 @@ export default class WaterGrid {
     private width: number;
     private height: number;
 
-    private graphics: PIXI.Graphics;
+    private graphics: PGraphics;
 
     public setup(): void {
         this.width = Game.map.cols;
@@ -28,19 +32,18 @@ export default class WaterGrid {
             }
         }
 
-        this.graphics = new PIXI.Graphics();
-        this.graphics.parentGroup = Layers.WATER;
-        this.graphics.position = Game.camera.offset.toPoint();
-        Game.stage.addChild(this.graphics);
+        this.graphics = new PGraphics();
+        this.graphics.position = toObservablePoint(Game.camera.offset);
+        Game.addToStage(this.graphics, Layer.WATER);
     }
 
     public postUpdate(): void {
         this.graphics.scale.set(Game.camera.scale, Game.camera.scale);
-        this.graphics.position = Game.camera.worldToScreenPosition(Vector.Zero()).toPoint();
+        this.graphics.position = toObservablePoint(Game.camera.worldToScreenPosition(Vector.Zero()));
     }
 
     public reset(): void {
-        Game.stage.removeChild(this.graphics);
+        Game.removeFromStage(this.graphics, Layer.WATER);
         this.graphics.destroy();
         this.graphics = undefined;
         this.grid = [];
@@ -61,7 +64,7 @@ export default class WaterGrid {
         }
     }
 
-    private getPolygon(tile: Vector): PIXI.Point[] {
+    private getPolygon(tile: Vector): ObservablePoint[] {
         const slopeVariant = Game.world.elevationGrid.getSlopeVariant(tile);
         let polygon: Vector[] = [];
 
@@ -86,7 +89,7 @@ export default class WaterGrid {
                 polygon = []; break;
         }
 
-        return polygon.map(point => point.add(new Vector(0, WATER_LEVEL * ELEVATION_HEIGHT)).multiply(Config.WORLD_SCALE).toPoint());
+        return polygon.map(point => toObservablePoint(point.add(new Vector(0, WATER_LEVEL * ELEVATION_HEIGHT)).multiply(Config.WORLD_SCALE)));
     }
 
     public getGridCopy(): boolean[][] {

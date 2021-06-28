@@ -1,7 +1,10 @@
+import { Graphics as PGraphics } from "@pixi/graphics";
+import { toObservablePoint } from "helpers/vectorHelper";
+
 import Camera from "Camera";
-import { Layers } from "consts";
 import Game from "Game";
 import Vector from "vector";
+import { Layer } from "consts";
 
 enum Colour {
     White = 0xFFFFFF,
@@ -9,7 +12,7 @@ enum Colour {
 }
 
 class Graphics {
-    private graphics: PIXI.Graphics;
+    private graphics: PGraphics;
     private camera: Camera;
 
     public Colour = Colour;
@@ -17,11 +20,9 @@ class Graphics {
     public init(): void {
         this.camera = Game.camera;
 
-        this.graphics = new PIXI.Graphics();
-        // TODO: Seperate this class from DEBUG layer
-        this.graphics.parentGroup = Layers.DEBUG;
-        Game.stage.addChild(this.graphics);
-        this.graphics.position = this.camera.offset.toPoint();
+        this.graphics = new PGraphics();
+        Game.addToStage(this.graphics, Layer.DEBUG);
+        this.graphics.position = toObservablePoint(this.camera.offset);
     }
 
     public preUpdate(): void {
@@ -40,7 +41,7 @@ class Graphics {
         if (!this.graphics) return;
 
         this.graphics.scale.set(this.camera.scale, this.camera.scale);
-        this.graphics.position = this.camera.worldToScreenPosition(Vector.Zero()).toPoint();
+        this.graphics.position = toObservablePoint(this.camera.worldToScreenPosition(Vector.Zero()));
     }
 
     public setLineStyle(thickness: number, colour = Colour.Black): void {
@@ -92,7 +93,7 @@ class Graphics {
         if (!this.graphics) return;
 
         if (fill) this.graphics.beginFill(fill, fillAlpha);
-        this.graphics.drawPolygon(vertices.map(vertex => vertex.toPoint()));
+        this.graphics.drawPolygon(vertices.map(vertex => toObservablePoint(vertex)));
         if (fill) this.graphics.endFill();
     }
 

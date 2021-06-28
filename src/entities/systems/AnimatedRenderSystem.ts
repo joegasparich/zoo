@@ -1,13 +1,16 @@
+import { AnimatedSprite, Texture } from "pixi.js";
+
+import { Layer } from "consts";
 import Vector from "vector";
 import { RenderSystem, SYSTEM } from "../../entities/systems";
 
 export class Animation {
     public name: string;
-    public textures: PIXI.Texture[];
+    public textures: Texture[];
     public speed: number;
     public loop: boolean;
 
-    public constructor(name: string, textures: PIXI.Texture[], speed = 0.25, loop = true) {
+    public constructor(name: string, textures: Texture[], speed = 0.25, loop = true) {
         this.name = name;
         this.textures = textures;
         this.speed = speed;
@@ -23,7 +26,7 @@ export default class AnimatedRenderSystem extends RenderSystem {
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;
 
-    public constructor(animations?: Animation[], layer?: PIXI.display.Group, pivot?: Vector) {
+    public constructor(animations?: Animation[], layer?: Layer, pivot?: Vector) {
         super(undefined, layer, pivot);
 
         this.animations = new Map();
@@ -48,7 +51,7 @@ export default class AnimatedRenderSystem extends RenderSystem {
         }
 
         const animation = this.animations.get(key);
-        const animatedSprite = new PIXI.AnimatedSprite(animation.textures);
+        const animatedSprite = new AnimatedSprite(animation.textures);
         animatedSprite.animationSpeed = animation.speed;
         animatedSprite.loop = animation.loop;
 

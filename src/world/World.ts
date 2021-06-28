@@ -1,11 +1,9 @@
 import Graph = require("node-dijkstra");
 import uuid = require("uuid");
 
-import { Side } from "consts";
 import { randomInt } from "helpers/math";
 import Mediator from "Mediator";
-
-import { Assets, Config } from "consts";
+import { Assets, Config, Side } from "consts";
 import { WorldEvents } from "consts/events";
 import Game from "Game";
 import Area from "./Area";

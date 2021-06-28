@@ -1,7 +1,3 @@
-import "pixi.js";
-import "pixi-tilemap";
-import "pixi-layers";
-
 import "./app.scss";
 
 import { AssetManager } from "managers";

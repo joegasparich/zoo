@@ -1,6 +1,7 @@
 import * as Planck from "planck-js";
+import { Sprite } from "pixi.js";
 
-import { Layers, TAG } from "consts";
+import { Layer, TAG } from "consts";
 import { AssetManager, ColliderType } from "managers";
 
 import { WallData } from "types/AssetTypes";
@@ -56,7 +57,7 @@ export default class Wall {
 
     public data: WallData | undefined;
     public spriteSheet: SpriteSheet;
-    public sprite: PIXI.Sprite;
+    public sprite: Sprite;
     private body: Planck.Body;
 
     public exists: boolean;
@@ -95,7 +96,7 @@ export default class Wall {
 
     public remove(): void {
         if (this.exists) {
-            Game.app.stage.removeChild(this.sprite);
+            Game.removeFromStage(this.sprite, Layer.ENTITIES);
             Game.physicsManager.removeBody(this.body);
         }
         this.data = undefined;
@@ -108,15 +109,14 @@ export default class Wall {
 
         if (this.sprite) {
             // Remove old sprite
-            Game.app.stage.removeChild(this.sprite);
+            Game.removeFromStage(this.sprite, Layer.ENTITIES);
         }
 
         // Add new sprite
         const [spriteIndex, elevation] = this.getSpriteIndex();
         const texture = this.spriteSheet.getTextureByIndex(spriteIndex);
-        this.sprite = new PIXI.Sprite(texture);
-        Game.app.stage.addChild(this.sprite);
-        this.sprite.parentGroup = Layers.ENTITIES;
+        this.sprite = new Sprite(texture);
+        Game.addToStage(this.sprite, Layer.ENTITIES);
         this.sprite.anchor.set(0.5, 1 + elevation * 0.5);
     }
 
@@ -142,12 +142,12 @@ export default class Wall {
             const left = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
             const right = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
 
-            return left !== right
+            return left !== right;
         } else {
             const up = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
             const down = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
 
-            return up !== down
+            return up !== down;
         }
     }
 

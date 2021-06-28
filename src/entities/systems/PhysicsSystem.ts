@@ -7,6 +7,7 @@ import { TAG } from "consts";
 import { BodyUserData } from "managers/PhysicsManager";
 import { SystemSaveData } from "./System";
 import Game from "Game";
+import { FromVec2, toVec2 } from "helpers/vectorHelper";
 
 export interface PhysicsSystemSaveData extends SystemSaveData {
     collider: {
@@ -54,15 +55,15 @@ export default class PhysicsSystem extends System {
 
         if (this.entity.position !== this.lastPosition) {
             // Position has been altered somewhere, compensate
-            this.body.setPosition(this.entity.position.add(offset).toVec2());
+            this.body.setPosition(toVec2(this.entity.position.add(offset)));
         }
 
-        this.entity.position = Vector.FromVec2(this.body.getPosition()).subtract(offset);
+        this.entity.position = FromVec2(this.body.getPosition()).subtract(offset);
         this.lastPosition = this.entity.position;
     }
 
     public addForce(force: Vector): void {
-        this.body.applyForceToCenter(force.toVec2(), true);
+        this.body.applyForceToCenter(toVec2(force), true);
     }
 
     public end(): void {

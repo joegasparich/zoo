@@ -17,22 +17,19 @@ module.exports = {
         port: 4200,
     },
     plugins: [
-        new webpack.ProvidePlugin({
-            PIXI: "pixi.js",
-        }),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: "Zoo",
             template: "src/index.html",
         }),
-        new CopyWebpackPlugin([{ from: "./src/assets", to: "assets" }]),
+        new CopyWebpackPlugin({patterns: [{ from: "./src/assets", to: "assets" }]}),
         new webpack.HotModuleReplacementPlugin(),
     ],
     module: {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: "awesome-typescript-loader",
+                use: "ts-loader",
             },
             {
                 test: /\.scss$/,

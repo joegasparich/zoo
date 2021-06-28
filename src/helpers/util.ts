@@ -1,3 +1,5 @@
+import * as PIXI from "pixi.js";
+
 import { hexToRgb } from "./math";
 
 export function removeItem<T>(array: T[], item: T): void {

@@ -2,7 +2,7 @@ export * as Assets from "./Assets";
 export { default as Config } from "./config";
 export { default as Inputs } from "./inputs";
 export { GameEvent, MapEvent } from "./events";
-export { default as Layers } from "./layers";
+export { default as Layer } from "./layers";
 export { TAG } from "./physicsTags";
 
 /**Frames per second */

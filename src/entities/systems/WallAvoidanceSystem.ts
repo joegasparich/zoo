@@ -5,6 +5,7 @@ import { Entity } from "..";
 import * as util from "helpers/util";
 import Vector from "vector";
 import Game from "Game";
+import { FromVec2 } from "helpers/vectorHelper";
 
 const TRIGGER_DISTANCE = 1;
 const AVOID_STRENGTH = 10;
@@ -58,7 +59,7 @@ export default class WallAvoidanceSystem extends System {
         let closestWall: Planck.Fixture;
         let closestDist = Infinity;
         this.walls.forEach((wall: Planck.Fixture) => {
-            const dist = Vector.Distance(this.entity.position, Vector.FromVec2(wall.getBody().getPosition()));
+            const dist = Vector.Distance(this.entity.position, FromVec2(wall.getBody().getPosition()));
             if (dist < closestDist) {
                 closestWall = wall;
                 closestDist = dist;
@@ -66,7 +67,7 @@ export default class WallAvoidanceSystem extends System {
         });
 
         if (closestWall) {
-            const closestWallPos = Vector.FromVec2(closestWall.getBody().getPosition());
+            const closestWallPos = FromVec2(closestWall.getBody().getPosition());
             this.physics.addForce(this.entity.position.subtract(closestWallPos).multiply(AVOID_STRENGTH / closestDist));
         }
     }

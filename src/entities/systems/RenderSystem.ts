@@ -1,14 +1,17 @@
+import { ObservablePoint, Sprite } from "pixi.js";
+
 import { System, SYSTEM } from ".";
 import { AssetManager } from "managers";
 import { Entity } from "entities";
 import { SystemSaveData } from "./System";
-import { Layers } from "consts";
 import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
 import Camera from "Camera";
 import Game from "Game";
+import { toObservablePoint } from "helpers/vectorHelper";
+import { Layer } from "consts";
 
-const DEFAULT_LAYER = Layers.ENTITIES;
+const DEFAULT_LAYER = Layer.ENTITIES;
 
 interface RenderSystemSaveData extends SystemSaveData {
     spriteUrl: string;
@@ -35,8 +38,8 @@ export default class RenderSystem extends System {
     private spriteUrl: string;
     private spriteSheet: SpriteSheet;
     private spriteIndex: number;
-    protected sprite: PIXI.Sprite;
-    private layer: PIXI.display.Group;
+    private layer: Layer;
+    protected sprite: Sprite;
 
     public flipX: boolean;
     public flipY: boolean;
@@ -50,7 +53,7 @@ export default class RenderSystem extends System {
     public alpha = 1;
     public visible = true;
 
-    public constructor(spriteUrl?: string, layer?: PIXI.display.Group, pivot?: Vector) {
+    public constructor(spriteUrl?: string, layer?: Layer, pivot?: Vector) {
         super();
         this.spriteUrl = spriteUrl ?? "";
         this.layer = layer ?? DEFAULT_LAYER;
@@ -78,10 +81,12 @@ export default class RenderSystem extends System {
 
         this.syncPosition();
         this.setColour();
+
+        this.sprite.zIndex = this.entity.position.y;
     }
 
     public end(): void {
-        Game.app.stage.removeChild(this.sprite);
+        Game.removeFromStage(this.sprite, this.layer);
     }
 
     public setSprite(spriteUrl: string): void {
@@ -89,7 +94,7 @@ export default class RenderSystem extends System {
         this.spriteSheet = undefined;
 
         if (this.hasStarted) {
-            const sprite = new PIXI.Sprite(AssetManager.getTexture(spriteUrl));
+            const sprite = new Sprite(AssetManager.getTexture(spriteUrl));
             this.updateSprite(sprite);
         }
     }
@@ -100,25 +105,23 @@ export default class RenderSystem extends System {
         this.spriteIndex = index;
 
         if (this.hasStarted) {
-            const sprite = new PIXI.Sprite(spriteSheet.getTextureByIndex(index));
+            const sprite = new Sprite(spriteSheet.getTextureByIndex(index));
             this.updateSprite(sprite);
         }
     }
 
-    protected updateSprite(sprite: PIXI.Sprite): void {
+    protected updateSprite(sprite: Sprite): void {
         if (!sprite) {
             console.error("Failed to update sprite");
             return;
         }
 
         // Remove old sprite
-        const app = Game.app;
-        app.stage.removeChild(this.sprite);
+        Game.removeFromStage(this.sprite, this.layer);
 
         // Add new sprite
         this.sprite = sprite;
-        app.stage.addChild(this.sprite);
-        this.sprite.parentGroup = this.layer;
+        Game.addToStage(this.sprite, this.layer);
         this.sprite.anchor.set(0.5);
         this.syncPosition();
     }
@@ -132,12 +135,12 @@ export default class RenderSystem extends System {
     protected syncPosition(): void {
         if (!this.sprite) return;
 
-        this.sprite.scale = new PIXI.Point(this.camera.scale * this.scale, this.camera.scale * this.scale);
+        this.sprite.scale = new ObservablePoint(() => {}, undefined, this.camera.scale * this.scale, this.camera.scale * this.scale);
         this.sprite.texture.rotate = this.getRotation();
-        if (this.pivot) this.sprite.anchor.copyFrom(this.pivot.toPoint());
+        if (this.pivot) this.sprite.anchor.copyFrom(toObservablePoint(this.pivot));
 
         // Sync postition
-        this.sprite.position = this.camera.worldToScreenPosition(this.entity.position.add(this.offset)).toPoint();
+        this.sprite.position = toObservablePoint(this.camera.worldToScreenPosition(this.entity.position.add(this.offset)));
     }
 
     private getRotation(): number {

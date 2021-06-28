@@ -1,6 +1,7 @@
+import { Application, Container, SCALE_MODES, settings, Sprite, Ticker } from "pixi.js";
+
 import { AssetManager, InputManager, PhysicsManager, SceneManager } from "./managers";
 import Mediator from "./Mediator";
-
 import { registerPixiInspector } from "./helpers/util";
 import { Canvas } from "ui/components";
 import Camera from "Camera";
@@ -8,7 +9,7 @@ import MapGrid from "world/MapGrid";
 import { Entity } from "entities";
 import Vector from "vector";
 import Graphics from "Graphics";
-import { Config, GameEvent, Inputs, Layers } from "consts";
+import { Config, GameEvent, Inputs, Layer } from "consts";
 import ZooScene from "scenes/ZooScene";
 import UIManager from "ui/UIManager";
 import { createDude } from "helpers/entityGenerators";
@@ -49,8 +50,10 @@ const defaultOpts: GameOpts = {
 };
 
 class Game {
-    public app: PIXI.Application;
-    public stage: PIXI.display.Stage;
+    private app: Application;
+    private stage: Container;
+    private ticker: Ticker;
+    private layers: Container[];
 
     public opts: GameOpts;
 
@@ -75,14 +78,19 @@ class Game {
         this.debugSettings = defaultSettings;
 
         // Set PIXI settings
-        PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+        settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
         // Instantiate app
-        this.app = new PIXI.Application({
+        this.app = new Application({
             width: opts.windowWidth,
             height: opts.windowHeight,
             backgroundColor: 0x000000,
         });
+
+        // Start ticker
+        this.ticker = new Ticker();
+        this.ticker.start();
+
         registerPixiInspector();
 
         // Set up variables
@@ -105,9 +113,6 @@ class Game {
 
         // Now that assets have been loaded we can set up the game
         await this.setup();
-
-        // start up the game loop
-        this.app.ticker.add(this.loop.bind(this));
     }
 
     protected setup(): void {
@@ -143,19 +148,25 @@ class Game {
 
         Mediator.fire(GameEvent.SETUP_COMPLETE);
 
-        createDude();
+        // start up the game loop
+        this.ticker.add(this.loop.bind(this));
+
+        createDude(); //! Temp
     }
 
     private setupStage(): void {
-        this.stage = new PIXI.display.Stage();
+        this.stage = this.app.stage;
+
         this.stage.sortableChildren = true;
 
-        this.stage.addChild(new PIXI.display.Layer(Layers.GROUND));
-        this.stage.addChild(new PIXI.display.Layer(Layers.ENTITIES));
-        this.stage.addChild(new PIXI.display.Layer(Layers.UI));
-        this.stage.addChild(new PIXI.display.Layer(Layers.DEBUG));
-
-        this.app.stage = this.stage;
+        this.layers = [];
+        for(const layer in Layer) {
+            const container = new Container();
+            container.zIndex = +layer;
+            container.sortableChildren = true;
+            this.layers.push(container);
+        }
+        this.stage.addChild(...this.layers);
     }
 
     /**
@@ -222,6 +233,14 @@ class Game {
 
         // ! Camera should be last to avoid stuttering
         this.camera.update();
+    }
+
+    public addToStage(container: Container, layer = Layer.ENTITIES): void {
+        this.layers[+layer].addChild(container);
+    }
+
+    public removeFromStage(container: Container, layer = Layer.ENTITIES): void {
+        this.layers[+layer].removeChild(container);
     }
 
     public getEntities(): Entity[] {

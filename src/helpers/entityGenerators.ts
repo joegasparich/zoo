@@ -1,6 +1,6 @@
 import { Assets, TAG } from "consts";
 import { Entity } from "entities";
-import { CameraFollowSystem, InputToPhysicsSystem, PathBlockSystem, PhysicsSystem, RenderSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
+import { InputToPhysicsSystem, PathBlockSystem, PhysicsSystem, RenderSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
 import { AssetManager, ColliderType } from "managers";
 import { ActorInputSystem, AreaPathFollowSystem, ElevationSystem, TileObjectSystem } from "entities/systems";
 import { TileObjectData } from "types/AssetTypes";

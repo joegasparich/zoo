@@ -5,6 +5,7 @@ import { FRAME_RATE, TAG } from "consts";
 import { Entity } from "entities";
 import Vector from "vector";
 import Game from "Game";
+import { FromVec2, toVec2 } from "helpers/vectorHelper";
 
 export type PhysicsObjOpts = {
     position: Vector;
@@ -20,7 +21,7 @@ export type PhysicsObjOpts = {
 export enum ColliderType {
     Circle = "CIRCLE",
     Rect = "RECTANGLE",
-};
+}
 
 const defaultPhysicsObjOpts: PhysicsObjOpts = {
     position: Vector.Zero(),
@@ -119,7 +120,7 @@ export default class PhysicsManager {
     }
 
     public setGravity(direction: Vector): void {
-        this.world.setGravity(direction.toVec2());
+        this.world.setGravity(toVec2(direction));
     }
 
     public registerBody(entity: Entity, body: Planck.Body): void {
@@ -153,7 +154,7 @@ export default class PhysicsManager {
         const offset = new Vector(
             (opts.pivot.x - 0.5) * (opts.collider.radius ?? opts.collider.width ?? 0),
             (opts.pivot.y - 0.5) * (opts.collider.radius ?? opts.collider.height ?? 0));
-        body.setPosition(opts.position.add(offset).toVec2());
+        body.setPosition(toVec2(opts.position.add(offset)));
         body.createFixture(getShape(opts.collider), {
             friction: opts.friction,
             density: opts.density,
@@ -182,11 +183,11 @@ export default class PhysicsManager {
 
     public rayCast(from: Vector, to: Vector, tags?: TAG[]): RaycastData {
         let rayCastData: RaycastData;
-        this.world.rayCast(from.toVec2(), to.toVec2(), (fixture, point, normal, fraction): number => {
+        this.world.rayCast(toVec2(from), toVec2(to), (fixture, point, normal, fraction): number => {
             const tag = (fixture.getBody().getUserData() as BodyUserData)?.tag;
             if (tag === TAG.Ground) return;
             if (tags && !tags?.includes(tag)) return;
-            rayCastData = {fixture, point: Vector.FromVec2(point), normal: Vector.FromVec2(normal), fraction};
+            rayCastData = {fixture, point: FromVec2(point), normal: FromVec2(normal), fraction};
 
             return fraction;
         });
@@ -204,12 +205,12 @@ export default class PhysicsManager {
                 switch(shape.getType()) {
                     case "circle":
                         const circle = shape as Planck.CircleShape;
-                        Graphics.drawCircle(Vector.FromVec2(body.getPosition()).multiply(Game.opts.worldScale), circle.getRadius() * Game.opts.worldScale);
+                        Graphics.drawCircle(FromVec2(body.getPosition()).multiply(Game.opts.worldScale), circle.getRadius() * Game.opts.worldScale);
                         break;
                     case "polygon":
                         const polygon = shape as Planck.PolygonShape;
                         const vectorList = polygon.m_vertices.map(vec2 => new Vector(vec2.x, vec2.y)
-                            .add(Vector.FromVec2(body.getPosition()))
+                            .add(FromVec2(body.getPosition()))
                             .multiply(Game.opts.worldScale));
                         Graphics.drawVectorList(vectorList);
                         break;
