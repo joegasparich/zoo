@@ -10,6 +10,7 @@ import { Toolbar } from "./components";
 import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
 import Vector from "vector";
+import PathTool from "./tools/PathTool";
 
 const MAX_UNDOS = 10;
 
@@ -80,6 +81,7 @@ export default class ToolManager {
         switch(tool) {
             case ToolType.TileObject: this.activeTool = new TileObjectTool(this); break;
             case ToolType.Wall: this.activeTool = new WallTool(this); break;
+            case ToolType.Path: this.activeTool = new PathTool(this); break;
             case ToolType.Door: this.activeTool = new DoorTool(this); break;
             case ToolType.Delete: this.activeTool = new DeleteTool(this); break;
             case ToolType.Biome: this.activeTool = new BiomeTool(this); break;

@@ -89,6 +89,16 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         }}
                     />
                     <Button
+                        key="pathButton"
+                        image={Assets.UI.PATH_ICON}
+                        onClick={(): void => {
+                            this.setTool(
+                                ToolType.Path,
+                                {assetPath: Assets.PATHS.DIRT},
+                            );
+                        }}
+                    />
+                    <Button
                         key="wallButton"
                         image={Assets.UI.IRON_BAR_FENCE}
                         onClick={(): void => {

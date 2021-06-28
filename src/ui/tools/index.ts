@@ -9,6 +9,7 @@ export enum ToolType {
     Delete,
     Biome,
     Elevation,
+    Path,
 }
 
 export interface Action {

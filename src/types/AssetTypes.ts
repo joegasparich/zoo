@@ -29,3 +29,11 @@ export interface WallData {
     cellWidth: number;
     solid: boolean;
 }
+
+export interface PathData {
+    assetPath: string;
+    name: string;
+    spriteSheet: string;
+    cellHeight: number;
+    cellWidth: number;
+}

@@ -20,6 +20,7 @@ export const UI = {
     PATHFINDING_ICON: "/assets/img/pathfinding_icon.png",
     PHYSICS_ICON: "/assets/img/physics_icon.png",
     WATER_ICON: "/assets/img/water_icon.png",
+    PATH_ICON: "/assets/img/path_icon.png",
     SAVE_ICON: "/assets/img/save_icon.png",
     LOAD_ICON: "/assets/img/load_icon.png",
 };
@@ -46,4 +47,8 @@ export const MAPS = {
 
 export const WALLS = {
     IRON_BAR: "/assets/walls/ironBarFence.json",
+};
+
+export const PATHS = {
+    DIRT: "/assets/paths/dirt.json",
 };
