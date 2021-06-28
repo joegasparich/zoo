@@ -1,9 +1,9 @@
 import { ObservablePoint, Sprite } from "pixi.js";
 
-import { System, SYSTEM } from ".";
+import { Component, COMPONENT } from ".";
 import { AssetManager } from "managers";
 import { Entity } from "entities";
-import { SystemSaveData } from "./System";
+import { ComponentSaveData } from "./Component";
 import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
 import Camera from "Camera";
@@ -13,7 +13,7 @@ import { Layer } from "consts";
 
 const DEFAULT_LAYER = Layer.ENTITIES;
 
-interface RenderSystemSaveData extends SystemSaveData {
+interface RenderComponentSaveData extends ComponentSaveData {
     spriteUrl: string;
     spriteSheet?: {
         cellWidth: number;
@@ -31,9 +31,9 @@ interface RenderSystemSaveData extends SystemSaveData {
     visible: boolean;
 }
 
-export default class RenderSystem extends System {
-    public id = SYSTEM.RENDER_SYSTEM;
-    public type = SYSTEM.RENDER_SYSTEM;
+export default class RenderComponent extends Component {
+    public id = COMPONENT.RENDER_COMPONENT;
+    public type = COMPONENT.RENDER_COMPONENT;
 
     private spriteUrl: string;
     private spriteSheet: SpriteSheet;
@@ -150,7 +150,7 @@ export default class RenderSystem extends System {
         if (this.flipX && this.flipY) return 4;
     }
 
-    public save(): RenderSystemSaveData {
+    public save(): RenderComponentSaveData {
         return Object.assign({
             spriteUrl: this.spriteUrl,
             spriteSheet: this.spriteSheet && {
@@ -170,7 +170,7 @@ export default class RenderSystem extends System {
         }, super.save());
     }
 
-    public load(data: RenderSystemSaveData): void {
+    public load(data: RenderComponentSaveData): void {
         super.load(data);
 
         this.spriteUrl = data.spriteUrl;

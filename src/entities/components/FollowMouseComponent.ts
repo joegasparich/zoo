@@ -1,9 +1,9 @@
-import { System } from "entities/systems";
+import { Component } from "entities/components";
 import Game from "Game";
 
-export default class FollowMouseSystem extends System {
-    public id = "FOLLOW_MOUSE_SYSTEM";
-    public type = "FOLLOW_MOUSE_SYSTEM";
+export default class FollowMouseComponent extends Component {
+    public id = "FOLLOW_MOUSE_COMPONENT";
+    public type = "FOLLOW_MOUSE_COMPONENT";
 
     public update(delta: number): void {
         super.update(delta);

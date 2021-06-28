@@ -1,25 +1,25 @@
-import { InputSystem, PathFollowSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
+import { InputComponent, PathFollowComponent, COMPONENT, WallAvoidanceComponent } from "entities/components";
 import { Entity } from "entities";
 import Game from "Game";
 import { Inputs } from "consts";
 import Vector from "vector";
 import UIManager from "ui/UIManager";
 
-export default class ActorInputSystem extends InputSystem {
-    public id = SYSTEM.ACTOR_INPUT_SYSTEM;
-    public type = SYSTEM.INPUT_SYSTEM;
+export default class ActorInputComponent extends InputComponent {
+    public id = COMPONENT.ACTOR_INPUT_COMPONENT;
+    public type = COMPONENT.INPUT_COMPONENT;
 
-    private pathfinder: PathFollowSystem;
-    private wallAvoid: WallAvoidanceSystem;
+    private pathfinder: PathFollowComponent;
+    private wallAvoid: WallAvoidanceComponent;
 
     public start(entity: Entity): void {
         super.start(entity);
 
-        this.pathfinder = entity.getSystem(SYSTEM.PATH_FOLLOW_SYSTEM) as PathFollowSystem;
+        this.pathfinder = entity.getComponent(COMPONENT.PATH_FOLLOW_COMPONENT) as PathFollowComponent;
         if (!this.pathfinder) {
-            console.error("ActorInputSystem requires PathFollowSystem");
+            console.error("ActorInputComponent requires PathFollowComponent");
         }
-        this.wallAvoid = entity.getSystem(SYSTEM.WALL_AVOIDANCE_SYSTEM) as WallAvoidanceSystem;
+        this.wallAvoid = entity.getComponent(COMPONENT.WALL_AVOIDANCE_COMPONENT) as WallAvoidanceComponent;
     }
 
     public update(delta: number): void {

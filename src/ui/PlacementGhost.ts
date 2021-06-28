@@ -1,11 +1,11 @@
 import { Entity } from "entities";
-import { RenderSystem, SYSTEM } from "entities/systems";
-import { FollowMouseSystem, SnapToGridSystem } from "entities/systems";
+import { RenderComponent, COMPONENT } from "entities/components";
+import { FollowMouseComponent, SnapToGridComponent } from "entities/components";
 
 import { Assets } from "consts";
 import World from "world/World";
 import Game from "Game";
-import ElevationSystem from "entities/systems/ElevationSystem";
+import ElevationComponent from "entities/components/ElevationComponent";
 import Vector from "vector";
 import SpriteSheet from "SpriteSheet";
 
@@ -16,7 +16,7 @@ export default class PlacementGhost {
     private world: World;
 
     private ghost: Entity;
-    private ghostRenderer: RenderSystem;
+    private ghostRenderer: RenderComponent;
 
     public drawFunction: Function;
     private spriteVisible: boolean;
@@ -31,9 +31,9 @@ export default class PlacementGhost {
         this.world = Game.world;
 
         this.ghost = new Entity(Game.input.getMousePos(), false);
-        this.ghost.addSystem(new FollowMouseSystem());
-        this.ghost.addSystem(new SnapToGridSystem());
-        this.ghostRenderer = this.ghost.addSystem(new RenderSystem(DEFAULT_SPRITE));
+        this.ghost.addComponent(new FollowMouseComponent());
+        this.ghost.addComponent(new SnapToGridComponent());
+        this.ghostRenderer = this.ghost.addComponent(new RenderComponent(DEFAULT_SPRITE));
 
         this.reset();
     }
@@ -83,25 +83,25 @@ export default class PlacementGhost {
     }
 
     public setSnap(snap: boolean, gridSize?: number): void {
-        const system = this.ghost.getSystem(SYSTEM.SNAP_TO_GRID_SYSTEM) as SnapToGridSystem;
-        if (!system) return;
+        const component = this.ghost.getComponent(COMPONENT.SNAP_TO_GRID_COMPONENT) as SnapToGridComponent;
+        if (!component) return;
 
-        system.gridSize = gridSize ?? 1;
+        component.gridSize = gridSize ?? 1;
 
         if (this.snap === snap) return;
         this.snap = snap;
 
-        system.disabled = !snap;
+        component.disabled = !snap;
     }
 
     public setFollow(follow: boolean): void {
-        const system = this.ghost.getSystem(SYSTEM.FOLLOW_MOUSE_SYSTEM) as FollowMouseSystem;
-        if (!system) return;
+        const component = this.ghost.getComponent(COMPONENT.FOLLOW_MOUSE_COMPONENT) as FollowMouseComponent;
+        if (!component) return;
 
         if (this.follow === follow) return;
         this.follow = follow;
 
-        system.disabled = !follow;
+        component.disabled = !follow;
     }
 
     public getPosition(): Vector {
@@ -115,13 +115,13 @@ export default class PlacementGhost {
         if (this.elevation) return;
         this.elevation = true;
 
-        this.ghost.addSystem(new ElevationSystem());
+        this.ghost.addComponent(new ElevationComponent());
     }
     public disableElevation(): void {
         if (!this.elevation) return;
         this.elevation = false;
 
-        this.ghost.removeSystem("ELEVATION_SYSTEM");
+        this.ghost.removeComponent("ELEVATION_COMPONENT");
     }
 
     // Based on sprite size

@@ -2,7 +2,7 @@ import { AnimatedSprite, Texture } from "pixi.js";
 
 import { Layer } from "consts";
 import Vector from "vector";
-import { RenderSystem, SYSTEM } from "../../entities/systems";
+import { RenderComponent, COMPONENT } from ".";
 
 export class Animation {
     public name: string;
@@ -19,9 +19,9 @@ export class Animation {
 }
 
 // TODO: Make this serializable
-export default class AnimatedRenderSystem extends RenderSystem {
-    public id = SYSTEM.ANIMATED_RENDER_SYSTEM;
-    public type = SYSTEM.RENDER_SYSTEM;
+export default class AnimatedRenderComponent extends RenderComponent {
+    public id = COMPONENT.ANIMATED_RENDER_COMPONENT;
+    public type = COMPONENT.RENDER_COMPONENT;
 
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;
@@ -40,7 +40,7 @@ export default class AnimatedRenderSystem extends RenderSystem {
 
     public setAnimation(key: string): void {
         if (!this.hasStarted) {
-            console.error("System hasn't been started yet");
+            console.error("Component hasn't been started yet");
             return;
         }
         if (!this.animations.has(key)) {

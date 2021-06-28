@@ -1,17 +1,17 @@
-import { System } from "entities/systems";
-import { SystemSaveData } from "entities/systems/System";
+import { Component } from "entities/components";
+import { ComponentSaveData } from "entities/components/Component";
 import Vector from "vector";
 
 /**
  * Note: this should be added after any movement components
  */
 
-export interface SnapToGridSystemSaveData extends SystemSaveData {
+export interface SnapToGridComponentSaveData extends ComponentSaveData {
     gridSize: number;
 }
-export default class SnapToGridSystem extends System {
-    public id = "SNAP_TO_GRID_SYSTEM";
-    public type = "SNAP_TO_GRID_SYSTEM";
+export default class SnapToGridComponent extends Component {
+    public id = "SNAP_TO_GRID_COMPONENT";
+    public type = "SNAP_TO_GRID_COMPONENT";
 
     public gridSize: number;
 
@@ -26,13 +26,13 @@ export default class SnapToGridSystem extends System {
         this.entity.position = this.entity.position.divide(this.gridSize).floor().multiply(this.gridSize).add(new Vector(0.5, 0.5));
     }
 
-    public save(): SnapToGridSystemSaveData {
+    public save(): SnapToGridComponentSaveData {
         return Object.assign({
             gridSize: this.gridSize,
         }, super.save());
     }
 
-    public load(data: SnapToGridSystemSaveData): void {
+    public load(data: SnapToGridComponentSaveData): void {
         super.load(data);
 
         this.gridSize = data.gridSize;

@@ -1,8 +1,8 @@
 import { Assets, TAG } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsSystem, PathBlockSystem, PhysicsSystem, RenderSystem, SYSTEM, WallAvoidanceSystem } from "entities/systems";
+import { InputToPhysicsComponent, PathBlockComponent, PhysicsComponent, RenderComponent, COMPONENT, WallAvoidanceComponent } from "entities/components";
 import { AssetManager, ColliderType } from "managers";
-import { ActorInputSystem, AreaPathFollowSystem, ElevationSystem, TileObjectSystem } from "entities/systems";
+import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
 import { TileObjectData } from "types/AssetTypes";
 import Game from "Game";
 import SpriteSheet from "SpriteSheet";
@@ -17,10 +17,10 @@ export function createDude(): Entity {
 
     const dude = this.createActor(new Vector(4));
 
-    dude.addSystem(new AreaPathFollowSystem());
-    dude.addSystem(new ActorInputSystem());
+    dude.addComponent(new AreaPathFollowComponent());
+    dude.addComponent(new ActorInputComponent());
 
-    const renderer = dude.getSystem(SYSTEM.RENDER_SYSTEM) as RenderSystem;
+    const renderer = dude.getComponent(COMPONENT.RENDER_COMPONENT) as RenderComponent;
     renderer.setSpriteSheet(spritesheet, 0);
     renderer.scale = 0.5;
 
@@ -31,11 +31,11 @@ export function createActor(position: Vector): Entity {
     const actor = new Entity(
         position,
     );
-    actor.addSystem(new RenderSystem());
-    actor.addSystem(new PhysicsSystem({ type: ColliderType.Circle, radius: 0.15 }, true, 20));
-    actor.addSystem(new ElevationSystem());
-    actor.addSystem(new WallAvoidanceSystem());
-    actor.addSystem(new InputToPhysicsSystem());
+    actor.addComponent(new RenderComponent());
+    actor.addComponent(new PhysicsComponent({ type: ColliderType.Circle, radius: 0.15 }, true, 20));
+    actor.addComponent(new ElevationComponent());
+    actor.addComponent(new WallAvoidanceComponent());
+    actor.addComponent(new InputToPhysicsComponent());
 
     return actor;
 }
@@ -47,13 +47,13 @@ export function createTileObject(assetPath: string, position: Vector): Entity {
     const data = AssetManager.getJSON(assetPath) as TileObjectData;
 
     const tileObject = new Entity(position.floor().add(new Vector(0.5)));
-    tileObject.addSystem(new RenderSystem(data.sprite, undefined, data.pivot));
-    tileObject.addSystem(new ElevationSystem());
+    tileObject.addComponent(new RenderComponent(data.sprite, undefined, data.pivot));
+    tileObject.addComponent(new ElevationComponent());
     if (data.solid) {
-        tileObject.addSystem(new PhysicsSystem(data.collider, false, 1, TAG.Solid, data.pivot));
-        tileObject.addSystem(new PathBlockSystem());
+        tileObject.addComponent(new PhysicsComponent(data.collider, false, 1, TAG.Solid, data.pivot));
+        tileObject.addComponent(new PathBlockComponent());
     }
-    tileObject.addSystem(new TileObjectSystem()).setAsset(assetPath);
+    tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);
 
     return tileObject;
 }

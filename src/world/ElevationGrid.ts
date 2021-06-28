@@ -1,7 +1,7 @@
 import { Config } from "consts";
 import { Side } from "consts";
 import { pointInCircle } from "helpers/math";
-import { TileObjectSystem, SYSTEM } from "entities/systems";
+import { TileObjectComponent, COMPONENT } from "entities/components";
 
 import Game from "Game";
 import Wall from "./Wall";
@@ -101,7 +101,7 @@ export default class ElevationGrid {
             // Check 4 surrounding tiles for tileObjects that can't be in water
             for (const tile of this.getSurroundingTiles(gridPos)) {
                 const entity = Game.world.getTileObjectAtPos(tile);
-                const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+                const tileObject = entity?.getComponent(COMPONENT.TILE_OBJECT_COMPONENT) as TileObjectComponent;
                 if (tileObject && !tileObject.data.canPlaceInWater) return false;
             }
 
@@ -114,7 +114,7 @@ export default class ElevationGrid {
         // Check 4 surrounding tiles for tileObjects that can't be on slopes
         for (const tile of this.getSurroundingTiles(gridPos)) {
             const entity = Game.world.getTileObjectAtPos(tile);
-            const tileObject = entity?.getSystem(SYSTEM.TILE_OBJECT_SYSTEM) as TileObjectSystem;
+            const tileObject = entity?.getComponent(COMPONENT.TILE_OBJECT_COMPONENT) as TileObjectComponent;
             if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
         }
 

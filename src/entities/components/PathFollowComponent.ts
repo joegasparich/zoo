@@ -1,22 +1,22 @@
-import { SYSTEM, System } from ".";
-import { Entity } from "../";
+import { COMPONENT, Component } from ".";
+import { Entity } from "..";
 import Graphics from "Graphics";
 import Mediator from "Mediator";
 import { MapEvent } from "consts";
-import { SystemSaveData } from "./System";
+import { ComponentSaveData } from "./Component";
 import Vector from "vector";
 import Game from "Game";
 
 const DISTANCE_TO_NODE = 0.3;
 
-export interface PathFollowSystemSaveData extends SystemSaveData {
+export interface PathFollowComponentSaveData extends ComponentSaveData {
     path: number[][];
     currentNode: number[];
 }
 
-export default class PathFollowSystem extends System {
-    public id = SYSTEM.PATH_FOLLOW_SYSTEM;
-    public type = SYSTEM.PATH_FOLLOW_SYSTEM;
+export default class PathFollowComponent extends Component {
+    public id = COMPONENT.PATH_FOLLOW_COMPONENT;
+    public type = COMPONENT.PATH_FOLLOW_COMPONENT;
 
     private path: Vector[];
     public currentTarget: Vector;
@@ -109,14 +109,14 @@ export default class PathFollowSystem extends System {
         });
     }
 
-    public save(): PathFollowSystemSaveData {
+    public save(): PathFollowComponentSaveData {
         return Object.assign({
             path: this.path?.map(node => Vector.Serialize(node)),
             currentNode: this.currentTarget && Vector.Serialize(this.currentTarget),
         }, super.save());
     }
 
-    public load(data: PathFollowSystemSaveData): void {
+    public load(data: PathFollowComponentSaveData): void {
         super.load(data);
 
         this.path = data.path?.map(node => Vector.Deserialize(node));
