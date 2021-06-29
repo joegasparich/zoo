@@ -6,6 +6,12 @@ import Graphics from "Graphics";
 import Vector from "vector";
 
 const allDirections: Direction[] = ["BOTTOM", "BOTTOM_LEFT", "BOTTOM_RIGHT", "LEFT", "RIGHT", "TOP", "TOP_LEFT", "TOP_RIGHT"];
+export enum NodeType {
+    CLOSED = 0,
+    OPEN = 1,
+    PATH = 2
+}
+const defaultNodes = [NodeType.OPEN, NodeType.PATH];
 
 export default class PathfindingGrid {
     private pathFinder: Pathfinder;
@@ -19,7 +25,6 @@ export default class PathfindingGrid {
         this.pathFinder.enableDiagonals();
         this.pathFinder.disableCornerCutting();
         this.pathFinder.setGrid(this.grid);
-        this.pathFinder.setAcceptableTiles([0]);
     }
 
     /**
@@ -32,7 +37,7 @@ export default class PathfindingGrid {
         for(let i = 0; i < cols; i++) {
             grid[i] = [];
             for(let j = 0; j < rows; j++) {
-                grid[i][j] = 0;
+                grid[i][j] = NodeType.OPEN;
             }
         }
         return grid;
@@ -61,28 +66,13 @@ export default class PathfindingGrid {
      * @param x The x co ordinate of the node
      * @param y The y co ordinate of the node
      */
-    public disableNode(x: number, y: number): void {
+    public setNode(x: number, y: number, type: NodeType): void {
         if (!Number.isInteger(x) || !Number.isInteger(y)) {
             console.error("Tile position must be integers");
             return;
         }
 
-        this.grid[x][y] = 1;
-        this.pathFinder.setGrid(this.grid);
-    }
-
-    /**
-     * Enables a node in the pathfinding grid
-     * @param x The x co ordinate of the node
-     * @param y The y co ordinate of the node
-     */
-    public enableNode(x: number, y: number): void {
-        if (!Number.isInteger(x) || !Number.isInteger(y)) {
-            console.error("Tile position must be integers");
-            return;
-        }
-
-        this.grid[x][y] = 0;
+        this.grid[x][y] = type;
         this.pathFinder.setGrid(this.grid);
     }
 
@@ -91,12 +81,14 @@ export default class PathfindingGrid {
      * @param start The start co ordinate
      * @param end The end co ordinate
      */
-    public getPath(start: Vector, end: Vector): Promise<Vector[] | void> {
+    public getPath(start: Vector, end: Vector, allowedNodes = defaultNodes): Promise<Vector[] | void> {
         if (!this.isPositionInGrid(start.x, start.y) ||
             !this.isPositionInGrid(end.x, end.y)) return Promise.resolve();
-        if (this.grid[start.x][start.y]) return Promise.resolve(); // TODO: start from next nearest tile?
-        if (this.grid[end.x][end.y]) return Promise.resolve(); // TODO: potentially pick adjacent tile?
+        if (!allowedNodes.includes(this.grid[start.x][start.y])) return Promise.resolve(); // TODO: start from next nearest tile?
+        if (!allowedNodes.includes(this.grid[end.x][end.y])) return Promise.resolve(); // TODO: potentially pick adjacent tile?
         if (start.equals(end)) return Promise.resolve();
+
+        if (allowedNodes) this.pathFinder.setAcceptableTiles([...allowedNodes]);
 
         console.log("Getting path from " + start + " to " + end);
         return new Promise((resolve) => {
@@ -171,19 +163,19 @@ export default class PathfindingGrid {
     /**
      * Draws green & red Xs to show which nodes are pathable
      */
-    public drawDebugPathGrid(): void {
+    public drawDebug(): void {
         const xOffset = Config.WORLD_SCALE / 2;
         const yOffset = Config.WORLD_SCALE / 2;
 
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[i].length; j++) {
-                if (this.grid[i][j] == 0) {
-                    Graphics.setLineStyle(0.5, 0x00FF00);
-                    Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
-                } else {
-                    Graphics.setLineStyle(0.5, 0x000000);
-                    Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
-                }
+                let colour;
+                if (this.grid[i][j] === NodeType.PATH) colour = 0x0000FF;
+                if (this.grid[i][j] === NodeType.OPEN) colour = 0x00FF00;
+                if (this.grid[i][j] === NodeType.CLOSED) colour = 0xFF0000;
+
+                Graphics.setLineStyle(0.5, colour);
+                Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
             }
         }
     }

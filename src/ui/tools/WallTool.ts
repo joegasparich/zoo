@@ -14,7 +14,7 @@ export default class WallTool extends Tool {
     private assetPath: string;
     private wallData: WallData;
 
-    private startWallPos: {pos: Vector; quadrant: Side};
+    private dragStart: {pos: Vector; quadrant: Side};
     private ghost: PlacementGhost;
     private wallGhosts: PlacementGhost[];
     private isDragging: boolean;
@@ -35,17 +35,17 @@ export default class WallTool extends Tool {
     public update(): void {
         const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
-        const xDif = mouseWorldPos.floor().x - this.startWallPos?.pos.floor().x;
-        const yDif = mouseWorldPos.floor().y - this.startWallPos?.pos.floor().y;
-        const horizontal = this.startWallPos?.quadrant === Side.North ||
-                           this.startWallPos?.quadrant === Side.South;
+        const xDif = mouseWorldPos.floor().x - this.dragStart?.pos.floor().x;
+        const yDif = mouseWorldPos.floor().y - this.dragStart?.pos.floor().y;
+        const horizontal = this.dragStart?.quadrant === Side.North ||
+                           this.dragStart?.quadrant === Side.South;
         const length = (horizontal ? Math.abs(xDif) : Math.abs(yDif)) + 1;
 
         let dragQuadrant = Side.North;
         if (horizontal) {
-            dragQuadrant = Game.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
+            dragQuadrant = Game.map.getTileQuadrantAtPos(new Vector(0.5, this.dragStart?.pos.y));
         } else {
-            dragQuadrant = Game.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
+            dragQuadrant = Game.map.getTileQuadrantAtPos(new Vector(this.dragStart?.pos.x, 0.5));
         }
 
         if (Game.input.isInputPressed(Inputs.LeftMouse)) {
@@ -54,15 +54,15 @@ export default class WallTool extends Tool {
 
             this.wallGhosts = [];
 
-            this.startWallPos = { pos: tilePos, quadrant };
+            this.dragStart = { pos: tilePos, quadrant };
         }
         if (Game.input.isInputHeld(Inputs.LeftMouse)) {
             this.isDragging = true;
 
             this.ghost.setSpriteVisible(false);
 
-            let i = Math.floor(this.startWallPos?.pos.x);
-            let j = Math.floor(this.startWallPos?.pos.y);
+            let i = Math.floor(this.dragStart?.pos.x);
+            let j = Math.floor(this.dragStart?.pos.y);
             for (let w = 0; w < this.wallGhosts.length; w++) {
                 const ghost = this.wallGhosts[w];
                 ghost.setPosition(new Vector(i, j));
@@ -73,7 +73,7 @@ export default class WallTool extends Tool {
                 } else {
                     j += Math.sign(mouseWorldPos.floor().y - j);
                 }
-            };
+            }
 
             // Generate the ghost entities after so that they have a chance to initialise
             while (this.wallGhosts.length < length) {
@@ -156,10 +156,10 @@ export default class WallTool extends Tool {
         let quadrant = Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos()));
 
         if (this.isDragging) {
-            if (this.startWallPos?.quadrant === Side.North || this.startWallPos?.quadrant === Side.South) {
-                quadrant = Game.map.getTileQuadrantAtPos(new Vector(0.5, this.startWallPos?.pos.y));
+            if (this.dragStart?.quadrant === Side.North || this.dragStart?.quadrant === Side.South) {
+                quadrant = Game.map.getTileQuadrantAtPos(new Vector(0.5, this.dragStart?.pos.y));
             } else {
-                quadrant = Game.map.getTileQuadrantAtPos(new Vector(this.startWallPos?.pos.x, 0.5));
+                quadrant = Game.map.getTileQuadrantAtPos(new Vector(this.dragStart?.pos.x, 0.5));
             }
         }
 

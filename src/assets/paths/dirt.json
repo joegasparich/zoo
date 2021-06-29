@@ -2,6 +2,6 @@
     "assetPath": "/assets/paths/dirt.json",
     "name": "Dirt Path",
     "spriteSheet": "/assets/img/path.png",
-    "cellHeight": 64,
-    "cellWidth": 32
+    "cellHeight": 32,
+    "cellWidth": 16
 }

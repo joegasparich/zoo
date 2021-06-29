@@ -7,7 +7,6 @@ import Game from "Game";
 import Camera from "Camera";
 import Vector from "vector";
 import Graphics from "Graphics";
-import { toObservablePoint } from "helpers/vectorHelper";
 
 export interface WallGridSaveData {
     walls: ({
@@ -50,13 +49,8 @@ export default class WallGrid {
         }
 
         this.isSetup = true;
+        this.regenerateWallSprites();
         this.regeneratePathfinding();
-    }
-
-    public postUpdate(): void {
-        if (this.isSetup) {
-            this.drawWalls();
-        }
     }
 
     public reset(): void {
@@ -74,22 +68,14 @@ export default class WallGrid {
     /**
      * Update the position and scale of the tile grid
      */
-    private drawWalls(): void {
+    private regenerateWallSprites(): void {
         for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
                 if (!wall?.exists) { continue; }
                 if (!wall?.data) { continue; }
-
-                let wallPos;
-                if (orientation === Orientation.Vertical) {
-                    wallPos = new Vector((col/2), row+1);
-                } else {
-                    wallPos = new Vector((col/2), row);
-                }
-                wall.sprite.position = toObservablePoint(this.camera.worldToScreenPosition(wallPos));
-                wall.sprite.scale.set(this.camera.scale);
+                wall.updateSprite();
             }
         }
     }

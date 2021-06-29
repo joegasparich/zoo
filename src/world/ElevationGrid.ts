@@ -68,8 +68,6 @@ export default class ElevationGrid {
         Game.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 5);
         Game.world.wallGrid.getWallsInRadius(centre, radius + 5).forEach(wall => wall.updateSprite());
         Game.world.waterGrid.regenerateGrid(); //TODO: Do we need to chunk water?
-
-        console.log(this.grid);
     }
 
     public setElevation(gridPos: Vector, elevation: Elevation): boolean {
@@ -104,11 +102,14 @@ export default class ElevationGrid {
             }
         }
 
-        // Check 4 surrounding tiles for tileObjects that can't be on slopes
+        // Check 4 surrounding tiles
         for (const tile of this.getSurroundingTiles(gridPos)) {
+            // Check for tileObjects that can't be on slopes
             const entity = Game.world.getTileObjectAtPos(tile);
             const tileObject = entity?.getComponent(COMPONENT.TILE_OBJECT_COMPONENT) as TileObjectComponent;
             if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
+            // Check for paths
+            if (Game.world.pathGrid.getPathAtTile(tile)) return false;
         }
 
         // Check 4 surrounding wall slots for gates

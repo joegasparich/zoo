@@ -135,12 +135,12 @@ export default class RenderComponent extends Component {
     protected syncPosition(): void {
         if (!this.sprite) return;
 
-        this.sprite.scale = new ObservablePoint(() => {}, undefined, this.camera.scale * this.scale, this.camera.scale * this.scale);
+        this.sprite.scale = toObservablePoint(new Vector(this.scale, this.scale));
         this.sprite.texture.rotate = this.getRotation();
         if (this.pivot) this.sprite.anchor.copyFrom(toObservablePoint(this.pivot));
 
         // Sync postition
-        this.sprite.position = toObservablePoint(this.camera.worldToScreenPosition(this.entity.position.add(this.offset)));
+        this.sprite.position = toObservablePoint(this.entity.position.add(this.offset).multiply(Game.opts.worldScale));
     }
 
     private getRotation(): number {

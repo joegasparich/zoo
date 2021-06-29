@@ -92,6 +92,11 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                             image={Assets.UI.WATER_ICON}
                             onClick={(): void => { Game.debugSettings.showWater = !Game.debugSettings.showWater; }}
                         />
+                        <Button
+                            key="pathButton"
+                            image={Assets.UI.PATH_ICON}
+                            onClick={(): void => { Game.debugSettings.showPath = !Game.debugSettings.showPath; }}
+                        />
                     </FloatingPanel>
                 </div>
             </React.Fragment>

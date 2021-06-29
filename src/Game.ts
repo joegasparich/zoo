@@ -22,6 +22,7 @@ type DebugSettings = {
     showPhysics: boolean;
     showElevation: boolean;
     showWater: boolean;
+    showPath: boolean;
 };
 
 const defaultSettings: DebugSettings = {
@@ -31,6 +32,7 @@ const defaultSettings: DebugSettings = {
     showPhysics: false,
     showElevation: false,
     showWater: false,
+    showPath: false,
 };
 
 type GameOpts = {
@@ -57,6 +59,7 @@ class Game {
 
     public opts: GameOpts;
 
+    public worldContainer: Container;
     public canvas: Canvas;
     public camera: Camera;
     public map: MapGrid;
@@ -123,7 +126,7 @@ class Game {
 
         this.canvas.load();
 
-        this.camera = new Camera(new Vector(4, 4), 1);
+        this.camera = new Camera(new Vector(4, 4), 1, this.worldContainer);
         this.camera.scale = Config.CAMERA_SCALE;
 
         this.map = new MapGrid();
@@ -157,6 +160,7 @@ class Game {
     private setupStage(): void {
         this.stage = this.app.stage;
 
+        // TODO: Figure out Pixi layers?
         this.stage.sortableChildren = true;
 
         this.layers = [];
@@ -166,7 +170,9 @@ class Game {
             container.sortableChildren = true;
             this.layers.push(container);
         }
-        this.stage.addChild(...this.layers);
+        this.worldContainer = new Container();
+        this.worldContainer.addChild(...this.layers);
+        this.stage.addChild(this.worldContainer);
     }
 
     /**
@@ -224,7 +230,6 @@ class Game {
 
         this.map.postUpdate();
         this.world.postUpdate(delta);
-        Graphics.postUpdate();
         UIManager.postUpdate(delta);
 
         this.entities.forEach(entity => {
@@ -283,11 +288,12 @@ class Game {
 
     private drawDebug(): void {
         if (this.debugSettings.showMapGrid) this.map.drawDebug();
-        if (this.debugSettings.showPathfinding) this.map.drawPathfinderDebug();
+        if (this.debugSettings.showPathfinding) this.map.pathfindingGrid.drawDebug();
         if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
         if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
         if (this.debugSettings.showElevation) this.world.elevationGrid.drawDebug();
         if (this.debugSettings.showWater) this.world.waterGrid.drawDebug();
+        if (this.debugSettings.showPath) this.world.pathGrid.drawDebug();
     }
 }
 

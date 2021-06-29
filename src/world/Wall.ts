@@ -9,6 +9,7 @@ import Game from "Game";
 import { ELEVATION_HEIGHT } from "./ElevationGrid";
 import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
+import { toObservablePoint } from "helpers/vectorHelper";
 
 export enum WallSpriteIndex {
     Horizontal = 0,
@@ -29,8 +30,6 @@ export enum Orientation {
 export default class Wall {
 
     public static wallSprites = new Map<string, SpriteSheet>();
-    private currentSpriteIndex: WallSpriteIndex;
-    private currentElevation: number;
 
     public static async loadWallData(path: string): Promise<WallData> {
         const resource = await AssetManager.loadResource(path);
@@ -64,6 +63,8 @@ export default class Wall {
     public exists: boolean;
     public indestructable: boolean;
     public isDoor: boolean;
+    private currentSpriteIndex: WallSpriteIndex;
+    private currentElevation: number;
 
     public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, public assetPath?: string) {
         if (assetPath) {
@@ -123,6 +124,16 @@ export default class Wall {
         this.sprite = new Sprite(texture);
         Game.addToStage(this.sprite, Layer.ENTITIES);
         this.sprite.anchor.set(0.5, 1 + elevation * 0.5);
+
+        // Update position
+        const {x, y} = this.gridPos;
+        let wallPos;
+        if (this.orientation === Orientation.Vertical) {
+            wallPos = new Vector((x/2), y+1);
+        } else {
+            wallPos = new Vector((x/2), y);
+        }
+        this.sprite.position = toObservablePoint(wallPos.multiply(Game.opts.worldScale));
     }
 
     /**

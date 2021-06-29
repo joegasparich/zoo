@@ -177,7 +177,6 @@ export class BiomeChunk {
         }
 
         this.graphics = new Graphics();
-        this.graphics.position = toObservablePoint(this.camera.offset);
         Game.addToStage(this.graphics, Layer.GROUND);
 
         this.shouldRedraw = true;
@@ -217,14 +216,11 @@ export class BiomeChunk {
             this.draw();
             this.shouldRedraw = false;
         }
-
-        this.graphics.scale.set(this.camera.scale, this.camera.scale);
-        // TODO: set position and draw triangles locally?
-        this.graphics.position = toObservablePoint(this.camera.worldToScreenPosition(Vector.Zero()));
     }
 
     public remove(): void {
         Game.removeFromStage(this.graphics, Layer.GROUND);
+        this.graphics.destroy();
     }
 
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {

@@ -6,6 +6,7 @@ import Vector from "vector";
 import Graphics from "Graphics";
 import { WallGridSaveData } from "world/WallGrid";
 import Entity, { EntitySaveData } from "entities/Entity";
+import { PathGridSaveData } from "world/PathGrid";
 
 export default class DeleteTool extends Tool {
     public type = ToolType.Delete;
@@ -56,13 +57,16 @@ export default class DeleteTool extends Tool {
                 this.toolManager.pushAction({
                     name: "Delete",
                     data: {
+                        paths: Game.world.pathGrid.save(),
                         walls: Game.world.wallGrid.save(),
                         tileObjects: Game.world.getTileObjects().map(obj => obj.save()),
                     },
                     undo: (data: any): void => {
+                        const paths = data.paths as PathGridSaveData;
                         const walls = data.walls as WallGridSaveData;
                         const tileObjects = data.tileObjects as EntitySaveData[];
 
+                        Game.world.pathGrid.load(paths);
                         Game.world.wallGrid.load(walls);
                         tileObjects.forEach(data => Entity.loadEntity(data));
                     },
@@ -71,6 +75,8 @@ export default class DeleteTool extends Tool {
                 for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
                     for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {
                         pos = new Vector(i, j);
+                        // Delete paths
+                        Game.world.pathGrid.deletePathAtPosition(pos);
                         // Delete walls
                         for (let side = 0; side < 4; side++) {
                             Game.world.wallGrid.deleteWallAtTile(pos, side);

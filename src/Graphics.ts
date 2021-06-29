@@ -22,7 +22,6 @@ class Graphics {
 
         this.graphics = new PGraphics();
         Game.addToStage(this.graphics, Layer.DEBUG);
-        this.graphics.position = toObservablePoint(this.camera.offset);
     }
 
     public preUpdate(): void {
@@ -35,13 +34,6 @@ class Graphics {
         } else {
             this.graphics.visible = false;
         }
-    }
-
-    public postUpdate(): void {
-        if (!this.graphics) return;
-
-        this.graphics.scale.set(this.camera.scale, this.camera.scale);
-        this.graphics.position = toObservablePoint(this.camera.worldToScreenPosition(Vector.Zero()));
     }
 
     public setLineStyle(thickness: number, colour = Colour.Black): void {

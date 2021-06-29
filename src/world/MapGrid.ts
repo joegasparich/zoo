@@ -4,7 +4,7 @@ import Game from "Game";
 import Graphics from "Graphics";
 import Mediator from "Mediator";
 import Vector from "vector";
-import PathfindingGrid from "./PathfindingGrid";
+import PathfindingGrid, { NodeType } from "./PathfindingGrid";
 
 export class MapCell {
     public position: Vector;
@@ -20,7 +20,7 @@ export default class MapGrid {
     public cellSize: number;
 
     private grid: MapCell[][];
-    private pathfindingGrid: PathfindingGrid;
+    public pathfindingGrid: PathfindingGrid;
 
     private isGridSetup = false;
 
@@ -65,7 +65,7 @@ export default class MapGrid {
      */
     public setTileSolid(position: Vector, solid: boolean): void {
         this.grid[position.x][position.y].isSolid = solid;
-        if (solid) this.setTileNotPathable(position);
+        this.setTilePathable(position, solid ? NodeType.CLOSED : NodeType.OPEN);
 
         Mediator.fire(MapEvent.PLACE_SOLID, { position });
     }
@@ -165,28 +165,20 @@ export default class MapGrid {
      * @param end The target position
      * @param opts Optional arguments
      */
-    public async getPath(start: Vector, end: Vector, opts?: {optimise: boolean}): Promise<Vector[]> {
-        let path = await this.pathfindingGrid?.getPath(start, end);
+    public async getPath(start: Vector, end: Vector, opts?: {optimise?: boolean, allowedNodes?: NodeType[]}): Promise<Vector[]> {
+        let path = await this.pathfindingGrid?.getPath(start, end, opts?.allowedNodes);
         if (!path) return;
 
-        if (opts.optimise) path = this.pathfindingGrid?.optimisePath(path, this.isLineWalkable.bind(this));
+        if (opts?.optimise) path = this.pathfindingGrid?.optimisePath(path, this.isLineWalkable.bind(this));
         return path.map(node => node.add(new Vector(0.5, 0.5)));
-    }
-
-    /**
-     * Disables the pathfinding node at a position
-     * @param position The position to set not pathable
-     */
-    private setTileNotPathable(position: Vector): void {
-        this.pathfindingGrid?.disableNode(position.x, position.y);
     }
 
     /**
      * Enables the pathfinding node at a position
      * @param position The position to set pathable
      */
-    private setTilePathable(position: Vector): void {
-        this.pathfindingGrid?.enableNode(position.x, position.y);
+    public setTilePathable(position: Vector, nodeType: NodeType): void {
+        this.pathfindingGrid?.setNode(position.x, position.y, nodeType);
     }
 
     /**
@@ -254,9 +246,5 @@ export default class MapGrid {
                 this.rows * this.cellSize + yOffset,
             );
         }
-    }
-
-    public drawPathfinderDebug(): void {
-        this.pathfindingGrid.drawDebugPathGrid();
     }
 }

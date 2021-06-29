@@ -7,16 +7,21 @@ import { Assets, Config, Side } from "consts";
 import { WorldEvents } from "consts/events";
 import Game from "Game";
 import Area from "./Area";
-import BiomeGrid from "./BiomeGrid";
+import BiomeGrid, { BiomeSaveData } from "./BiomeGrid";
 import Wall from "./Wall";
-import WallGrid from "./WallGrid";
-import ElevationGrid from "./ElevationGrid";
+import WallGrid, { WallGridSaveData } from "./WallGrid";
+import ElevationGrid, { ElevationSaveData } from "./ElevationGrid";
 import WaterGrid from "./WaterGrid";
 import { Entity } from "entities";
 import Vector from "vector";
 import { MapCell } from "./MapGrid";
+import PathGrid, { PathGridSaveData } from "./PathGrid";
 
 export interface WorldSaveData {
+    biomes: BiomeSaveData,
+    paths: PathGridSaveData,
+    walls: WallGridSaveData,
+    elevation: ElevationSaveData,
     areas: {
         id: string;
         name: string;
@@ -34,6 +39,7 @@ export default class World {
     public wallGrid: WallGrid;
     public elevationGrid: ElevationGrid;
     public waterGrid: WaterGrid;
+    public pathGrid: PathGrid;
 
     private tileObjects: Map<string, Entity>;
     private tileObjectMap: Map<string, Entity>;
@@ -53,11 +59,13 @@ export default class World {
         this.biomeGrid = new BiomeGrid(Game.map.cols * 2, Game.map.rows * 2, Config.BIOME_SCALE);
         this.wallGrid = new WallGrid();
         this.waterGrid = new WaterGrid();
+        this.pathGrid = new PathGrid();
 
         this.elevationGrid.setup();
         this.biomeGrid.setup();
         this.wallGrid.setup();
         this.waterGrid.setup();
+        this.pathGrid.setup();
 
         // TODO: Store outer fence information in scene & then generate area based on that
         this.generateFence();
@@ -70,6 +78,7 @@ export default class World {
         this.wallGrid.reset();
         this.elevationGrid.reset();
         this.waterGrid.reset();
+        this.pathGrid.reset();
 
         this.tileObjectMap = new Map();
     }
@@ -99,8 +108,7 @@ export default class World {
 
     public postUpdate(delta: number): void {
         this.biomeGrid.postUpdate();
-        this.wallGrid.postUpdate();
-        this.waterGrid.postUpdate();
+        // this.pathGrid.postUpdate();
 
         this.areas.forEach(area => {
             area.postUpdate();
@@ -289,6 +297,10 @@ export default class World {
 
     public save(): WorldSaveData {
         return {
+            biomes: Game.world.biomeGrid.save(),
+            paths: Game.world.pathGrid.save(),
+            walls: Game.world.wallGrid.save(),
+            elevation: Game.world.elevationGrid.save(),
             areas: Array.from(this.areas.values()).map(area => {
                 return {
                     id: area.id,
@@ -307,6 +319,11 @@ export default class World {
     }
 
     public load(data: WorldSaveData): void {
+        Game.world.elevationGrid.load(data.elevation);
+        Game.world.biomeGrid.load(data.biomes);
+        Game.world.pathGrid.load(data.paths);
+        Game.world.wallGrid.load(data.walls);
+
         // Create areas
         data.areas.forEach(area => {
             const newArea = new Area(area.id, area.name);

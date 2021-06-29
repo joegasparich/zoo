@@ -6,6 +6,7 @@ import { MapEvent } from "consts";
 import { ComponentSaveData } from "./Component";
 import Vector from "vector";
 import Game from "Game";
+import { NodeType } from "world/PathfindingGrid";
 
 const DISTANCE_TO_NODE = 0.3;
 
@@ -42,7 +43,7 @@ export default class PathFollowComponent extends Component {
     public async pathTo(location: Vector): Promise<boolean> {
         this.resetPath();
 
-        const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: true});
+        const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: false, allowedNodes: [NodeType.PATH]});
         if (!path) return false;
 
         this.setPath(path);

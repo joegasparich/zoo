@@ -11,9 +11,9 @@ export interface SpriteSheetData {
 }
 
 export default class SpriteSheet {
-    private texture: Texture;
-    private rows: number;
-    private cols: number;
+    protected texture: Texture;
+    protected rows: number;
+    protected cols: number;
     public data: SpriteSheetData;
 
     public constructor(data: SpriteSheetData) {
@@ -23,18 +23,18 @@ export default class SpriteSheet {
         }
 
         this.texture = AssetManager.getTexture(data.imageUrl);
-        this.rows = Math.floor(this.texture.height / data.cellWidth);
+        this.rows = Math.floor(this.texture.height / data.cellHeight);
         this.cols = Math.floor(this.texture.width / data.cellWidth);
         this.data = data;
     }
 
     protected getRectFromIndex(index: number): Rectangle {
-        const row = Math.min(index % this.cols, this.cols - 1);
-        const col = Math.min(Math.floor(index / this.cols), this.rows - 1);
+        const col = Math.min(index % this.cols, this.cols - 1);
+        const row = Math.min(Math.floor(index / this.cols), this.rows - 1);
 
         return new Rectangle(
-            row * this.data.cellWidth,
-            col * this.data.cellHeight,
+            col * this.data.cellWidth,
+            row * this.data.cellHeight,
             this.data.cellWidth,
             this.data.cellHeight,
         );

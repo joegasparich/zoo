@@ -33,13 +33,7 @@ export default class WaterGrid {
         }
 
         this.graphics = new PGraphics();
-        this.graphics.position = toObservablePoint(Game.camera.offset);
         Game.addToStage(this.graphics, Layer.WATER);
-    }
-
-    public postUpdate(): void {
-        this.graphics.scale.set(Game.camera.scale, Game.camera.scale);
-        this.graphics.position = toObservablePoint(Game.camera.worldToScreenPosition(Vector.Zero()));
     }
 
     public reset(): void {

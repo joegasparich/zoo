@@ -2,19 +2,13 @@ import { FileManager } from "managers";
 import Entity, { EntitySaveData } from "entities/Entity";
 
 import Game from "Game";
-import { BiomeSaveData } from "world/BiomeGrid";
-import { WallGridSaveData } from "world/WallGrid";
 import { WorldSaveData } from "world/World";
-import { ElevationSaveData } from "world/ElevationGrid";
 import ZooScene from "scenes/ZooScene";
 
 const SAVE_GAME_LOCATION = "saves/";
 
 interface SaveData {
-    biomes: BiomeSaveData;
-    walls: WallGridSaveData;
-    areas: WorldSaveData;
-    elevation: ElevationSaveData;
+    world: WorldSaveData;
     entities: EntitySaveData[];
 }
 
@@ -25,10 +19,7 @@ class SaveManager {
         const entities = Game.getEntities();
         // Get a bunch of save data
         const saveData: SaveData = {
-            biomes: Game.world.biomeGrid.save(),
-            walls: Game.world.wallGrid.save(),
-            areas: Game.world.save(),
-            elevation: Game.world.elevationGrid.save(),
+            world: Game.world.save(),
             entities: entities?.length ? entities.filter(entity => entity.saveable).map(entity => entity.save()) : [],
         };
 
@@ -51,10 +42,7 @@ class SaveManager {
             );
 
             // Use save data to set game state
-            Game.world.elevationGrid.load(saveData.elevation);
-            Game.world.biomeGrid.load(saveData.biomes);
-            Game.world.wallGrid.load(saveData.walls);
-            Game.world.load(saveData.areas);
+            Game.world.load(saveData.world);
 
             saveData.entities.forEach(entityData => Entity.loadEntity(entityData));
         });
