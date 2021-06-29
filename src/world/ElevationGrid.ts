@@ -65,35 +65,28 @@ export default class ElevationGrid {
             }
         }
 
-        Game.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 3);
-        Game.world.wallGrid.getWallsInRadius(centre, radius + 1).forEach(wall => wall.updateSprite());
+        Game.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 5);
+        Game.world.wallGrid.getWallsInRadius(centre, radius + 5).forEach(wall => wall.updateSprite());
+        Game.world.waterGrid.regenerateGrid(); //TODO: Do we need to chunk water?
+
+        console.log(this.grid);
     }
 
-    public setElevation(gridPos: Vector, elevation: Elevation): void {
-        if (!this.canElevate(gridPos, elevation)) return;
+    public setElevation(gridPos: Vector, elevation: Elevation): boolean {
+        if (!this.canElevate(gridPos, elevation)) return false;
 
-        // TODO: See if I can get flattening working with gates/tileobjs in corners
         // Flatten surrounding terrain
-        // if (elevation !== Elevation.Flat) {
-        //     const adjacentPositions = this.getAdjacentGridPositions(gridPos, true)
-        //         .filter(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation);
-        //     this.setMultipleElevations(adjacentPositions, Elevation.Flat);
-        // }
-
-        // Prevent overriding inverse terrain
         if (elevation !== Elevation.Flat) {
-            if (this.getAdjacentGridPositions(gridPos, true).find(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation)) return;
+            const flattened = this.getAdjacentGridPositions(gridPos, true)
+                .filter(gridPos => this.getElevationAtGridPoint(gridPos) === -elevation)
+                .map(gridPos => this.setElevation(gridPos, Elevation.Flat))
+                .every(gridPos => gridPos);
+
+            if (!flattened) return;
         }
 
         this.grid[gridPos.x][gridPos.y] = elevation;
-
-        this.getAdjacentGridPositions(gridPos, true).forEach(gridPos => {
-            if (this.getBaseElevation(gridPos) < 0) {
-                Game.world.waterGrid.setTileWater(gridPos);
-            } else {
-                Game.world.waterGrid.setTileLand(gridPos);
-            }
-        });
+        return true;
     }
 
     public canElevate(gridPos: Vector, elevation: Elevation): boolean {
@@ -219,7 +212,7 @@ export default class ElevationGrid {
     }
 
     private getElevationAtGridPoint(gridPos: Vector): number {
-        return this.grid[gridPos.x] && this.grid[gridPos.x][gridPos.y] ? this.grid[gridPos.x][gridPos.y] : 0;
+        return this.grid?.[gridPos.x]?.[gridPos.y] ? this.grid[gridPos.x][gridPos.y] : 0;
     }
 
     private getSurroundingTiles(gridPos: Vector): Vector[] {

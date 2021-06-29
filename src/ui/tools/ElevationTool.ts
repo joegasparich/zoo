@@ -6,7 +6,7 @@ import { Tool, ToolType } from ".";
 import Vector from "vector";
 import Graphics from "Graphics";
 
-const ELEVATION_UPDATE_INTERVAL = 50;
+const ELEVATION_UPDATE_INTERVAL = 100;
 
 export default class ElevationTool extends Tool {
     public type = ToolType.Elevation;
