@@ -1,18 +1,18 @@
-import {  SYSTEM, System } from "entities/systems";
+import {  COMPONENT, Component } from "entities/components";
 import { TileObjectData } from "types/AssetTypes";
 import { AssetManager } from "managers";
-import { SystemSaveData } from "entities/systems/System";
+import { ComponentSaveData } from "entities/components/Component";
 import { Entity } from "entities";
 import Game from "Game";
 import Vector from "vector";
 
-interface TileObjectSystemSaveData extends SystemSaveData {
+interface TileObjectComponentSaveData extends ComponentSaveData {
     assetPath: string;
 }
 
-export default class TileObjectSystem extends System {
-    public id = SYSTEM.TILE_OBJECT_SYSTEM;
-    public type = SYSTEM.TILE_OBJECT_SYSTEM;
+export default class TileObjectComponent extends Component {
+    public id = COMPONENT.TILE_OBJECT_COMPONENT;
+    public type = COMPONENT.TILE_OBJECT_COMPONENT;
 
     public assetPath: string;
     public data: TileObjectData;
@@ -43,13 +43,13 @@ export default class TileObjectSystem extends System {
         this.data = AssetManager.getJSON(assetPath) as TileObjectData;
     }
 
-    public save(): TileObjectSystemSaveData {
+    public save(): TileObjectComponentSaveData {
         return Object.assign({
             assetPath: this.assetPath,
         }, super.save());
     }
 
-    public load(data: TileObjectSystemSaveData): void {
+    public load(data: TileObjectComponentSaveData): void {
         super.load(data);
 
         this.setAsset(data.assetPath);

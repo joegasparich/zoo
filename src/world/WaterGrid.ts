@@ -123,26 +123,26 @@ export default class WaterGrid {
         return this.grid[flPos.x][flPos.y];
     }
 
-    public setTileWater(tile: Vector): void {
-        if (!Game.map.isPositionInMap(tile)) return;
+    // public setTileWater(tile: Vector): void {
+    //     if (!Game.map.isPositionInMap(tile)) return;
 
-        // TODO: Optimise whether we need to draw here
-        this.draw();
-        if (this.grid[tile.x][tile.y]) return;
+    //     // TODO: Optimise whether we need to draw here
+    //     this.draw();
+    //     if (this.grid[tile.x][tile.y]) return;
 
-        this.grid[tile.x][tile.y] = true;
-        // Disable pathfinding
-    }
+    //     this.grid[tile.x][tile.y] = true;
+    //     // Disable pathfinding
+    // }
 
-    public setTileLand(tile: Vector): void {
-        if (!Game.map.isPositionInMap(tile)) return;
+    // public setTileLand(tile: Vector): void {
+    //     if (!Game.map.isPositionInMap(tile)) return;
 
-        this.draw();
-        if (!this.grid[tile.x][tile.y]) return;
+    //     this.draw();
+    //     if (!this.grid[tile.x][tile.y]) return;
 
-        this.grid[tile.x][tile.y] = false;
-        // Enable pathfinding
-    }
+    //     this.grid[tile.x][tile.y] = false;
+    //     // Enable pathfinding
+    // }
 
     /**
      * Draws blue & black Xs to show water

@@ -29,6 +29,8 @@ export enum Orientation {
 export default class Wall {
 
     public static wallSprites = new Map<string, SpriteSheet>();
+    private currentSpriteIndex: WallSpriteIndex;
+    private currentElevation: number;
 
     public static async loadWallData(path: string): Promise<WallData> {
         const resource = await AssetManager.loadResource(path);
@@ -54,7 +56,6 @@ export default class Wall {
     }
 
     // Class //
-
     public data: WallData | undefined;
     public spriteSheet: SpriteSheet;
     public sprite: Sprite;
@@ -107,13 +108,17 @@ export default class Wall {
     public updateSprite(): void {
         if (!this.exists) return;
 
+        const [spriteIndex, elevation] = this.getSpriteIndex();
+        if (this.currentSpriteIndex === spriteIndex && this.currentElevation === elevation) return;
+
         if (this.sprite) {
             // Remove old sprite
             Game.removeFromStage(this.sprite, Layer.ENTITIES);
         }
 
         // Add new sprite
-        const [spriteIndex, elevation] = this.getSpriteIndex();
+        this.currentSpriteIndex = spriteIndex;
+        this.currentElevation = elevation;
         const texture = this.spriteSheet.getTextureByIndex(spriteIndex);
         this.sprite = new Sprite(texture);
         Game.addToStage(this.sprite, Layer.ENTITIES);

@@ -1,10 +1,10 @@
-import { SYSTEM, System } from "entities/systems";
+import { COMPONENT, Component } from "entities/components";
 import Game from "Game";
 import { Entity } from "..";
 
-export default class PathBlockSystem extends System {
-    public id = SYSTEM.PATH_BLOCK_SYSTEM;
-    public type = SYSTEM.PATH_BLOCK_SYSTEM;
+export default class PathBlockComponent extends Component {
+    public id = COMPONENT.PATH_BLOCK_COMPONENT;
+    public type = COMPONENT.PATH_BLOCK_COMPONENT;
 
     public start(entity: Entity): void {
         super.start(entity);

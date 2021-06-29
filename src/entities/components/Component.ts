@@ -1,11 +1,11 @@
 import { Entity } from "entities";
 
-export interface SystemSaveData {
+export interface ComponentSaveData {
     id: string;
     disabled: boolean;
 }
 
-export default abstract class System {
+export default abstract class Component {
     public id: string;
     public type: string;
     public entity: Entity;
@@ -22,13 +22,13 @@ export default abstract class System {
     public postUpdate(delta: number): void {}
     public end(): void {}
 
-    public save(): SystemSaveData {
+    public save(): ComponentSaveData {
         return {
             id: this.id,
             disabled: this.disabled,
         };
     }
-    public load(data: SystemSaveData): void {
+    public load(data: ComponentSaveData): void {
         this.id = data.id;
         this.disabled = data.disabled;
     }

@@ -1,11 +1,11 @@
 import Vector from "vector";
-import { PathFollowSystem, SYSTEM } from "entities/systems";
-import { PathFollowSystemSaveData } from "entities/systems/PathFollowSystem";
+import { PathFollowComponent, COMPONENT } from "entities/components";
+import { PathFollowComponentSaveData } from "entities/components/PathFollowComponent";
 import Area from "world/Area";
 import Wall from "world/Wall";
 import Game from "Game";
 
-interface AreaPathFollowSystemSaveData extends PathFollowSystemSaveData {
+interface AreaPathFollowComponentSaveData extends PathFollowComponentSaveData {
     areaPath: string[];
     currentArea: string;
     currentDoor: number[];
@@ -13,9 +13,9 @@ interface AreaPathFollowSystemSaveData extends PathFollowSystemSaveData {
     targetPosition: number[];
 }
 
-export default class AreaPathFollowSystem extends PathFollowSystem {
-    public id = SYSTEM.AREA_PATH_FOLLOW_SYSTEM;
-    public type = SYSTEM.PATH_FOLLOW_SYSTEM;
+export default class AreaPathFollowComponent extends PathFollowComponent {
+    public id = COMPONENT.AREA_PATH_FOLLOW_COMPONENT;
+    public type = COMPONENT.PATH_FOLLOW_COMPONENT;
 
     private areaPath: Area[];
     private currentArea: Area;
@@ -105,7 +105,7 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
         return super.hasPath();
     }
 
-    public save(): AreaPathFollowSystemSaveData {
+    public save(): AreaPathFollowComponentSaveData {
         return Object.assign({
             areaPath: this.areaPath?.map(area => area.id),
             currentArea: this.currentArea?.id,
@@ -115,7 +115,7 @@ export default class AreaPathFollowSystem extends PathFollowSystem {
         }, super.save());
     }
 
-    public load(data: AreaPathFollowSystemSaveData): void {
+    public load(data: AreaPathFollowComponentSaveData): void {
         super.load(data);
 
         this.areaPath = data.areaPath?.map(areaId => Game.world.getAreaById(areaId));

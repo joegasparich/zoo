@@ -1,11 +1,11 @@
 import Camera from "Camera";
 import { Entity } from "entities";
 import Game from "Game";
-import { System, SYSTEM } from ".";
+import { Component, COMPONENT } from ".";
 
-export default class CameraFollowSystem extends System {
-    public id = SYSTEM.CAMERA_FOLLOW_SYSTEM;
-    public type = SYSTEM.CAMERA_FOLLOW_SYSTEM;
+export default class CameraFollowComponent extends Component {
+    public id = COMPONENT.CAMERA_FOLLOW_COMPONENT;
+    public type = COMPONENT.CAMERA_FOLLOW_COMPONENT;
 
     private camera: Camera;
 

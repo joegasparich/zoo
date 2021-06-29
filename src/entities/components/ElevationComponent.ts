@@ -1,22 +1,22 @@
 import { Entity } from "entities";
-import { RenderSystem, SYSTEM, System } from "entities/systems";
+import { RenderComponent, COMPONENT, Component } from "entities/components";
 import Game from "Game";
 
 /**
  * Note: this should be added after any movement components
  */
-export default class ElevationSystem extends System {
-    public id = "ELEVATION_SYSTEM";
-    public type = "ELEVATION_SYSTEM";
+export default class ElevationComponent extends Component {
+    public id = "ELEVATION_COMPONENT";
+    public type = "ELEVATION_COMPONENT";
 
-    private renderer: RenderSystem;
+    private renderer: RenderComponent;
 
     public start(entity: Entity): void {
         super.start(entity);
 
-        this.renderer = entity.getSystem(SYSTEM.RENDER_SYSTEM) as RenderSystem;
+        this.renderer = entity.getComponent(COMPONENT.RENDER_COMPONENT) as RenderComponent;
         if (!this.renderer) {
-            console.error("ElevationSystem requires RenderSystem");
+            console.error("ElevationComponent requires RenderComponent");
         }
     }
 

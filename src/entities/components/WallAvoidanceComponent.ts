@@ -1,6 +1,6 @@
 import * as Planck from "planck-js";
 
-import { PhysicsSystem, SYSTEM, System } from ".";
+import { PhysicsComponent, COMPONENT, Component } from ".";
 import { Entity } from "..";
 import * as util from "helpers/util";
 import Vector from "vector";
@@ -10,13 +10,13 @@ import { FromVec2 } from "helpers/vectorHelper";
 const TRIGGER_DISTANCE = 1;
 const AVOID_STRENGTH = 10;
 
-export default class WallAvoidanceSystem extends System {
-    public id = SYSTEM.WALL_AVOIDANCE_SYSTEM;
-    public type = SYSTEM.WALL_AVOIDANCE_SYSTEM;
+export default class WallAvoidanceComponent extends Component {
+    public id = COMPONENT.WALL_AVOIDANCE_COMPONENT;
+    public type = COMPONENT.WALL_AVOIDANCE_COMPONENT;
 
     public shouldAvoid = true;
 
-    private physics: PhysicsSystem;
+    private physics: PhysicsComponent;
 
     // TODO: Store this in a singleton somewhere so there isn't an array of walls for every entity
     private walls: Planck.Fixture[];
@@ -26,9 +26,9 @@ export default class WallAvoidanceSystem extends System {
 
         this.walls = [];
 
-        this.physics = entity.getSystem(SYSTEM.PHYSICS_SYSTEM) as PhysicsSystem;
+        this.physics = entity.getComponent(COMPONENT.PHYSICS_COMPONENT) as PhysicsComponent;
         if (!this.physics) {
-            console.error("WallAvoidanceSystem requires PhysicsSystem");
+            console.error("WallAvoidanceComponent requires PhysicsComponent");
         }
 
         const avoidanceArea = new Planck.Circle(TRIGGER_DISTANCE);

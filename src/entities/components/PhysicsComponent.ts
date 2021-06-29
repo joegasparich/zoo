@@ -1,15 +1,15 @@
-import { System, SYSTEM } from ".";
+import { Component, COMPONENT } from ".";
 import Vector from "vector";
 import { Collider } from "managers";
 import * as Planck from "planck-js";
 import { Entity } from "..";
 import { TAG } from "consts";
 import { BodyUserData } from "managers/PhysicsManager";
-import { SystemSaveData } from "./System";
+import { ComponentSaveData } from "./Component";
 import Game from "Game";
 import { FromVec2, toVec2 } from "helpers/vectorHelper";
 
-export interface PhysicsSystemSaveData extends SystemSaveData {
+export interface PhysicsComponentSaveData extends ComponentSaveData {
     collider: {
         type: string;
         radius?: number;
@@ -22,9 +22,9 @@ export interface PhysicsSystemSaveData extends SystemSaveData {
     pivot: number[];
 }
 
-export default class PhysicsSystem extends System {
-    public id = SYSTEM.PHYSICS_SYSTEM;
-    public type = SYSTEM.PHYSICS_SYSTEM;
+export default class PhysicsComponent extends Component {
+    public id = COMPONENT.PHYSICS_COMPONENT;
+    public type = COMPONENT.PHYSICS_COMPONENT;
 
     public body: Planck.Body;
 
@@ -70,7 +70,7 @@ export default class PhysicsSystem extends System {
         Game.physicsManager.removeBody(this.body);
     }
 
-    public save(): PhysicsSystemSaveData {
+    public save(): PhysicsComponentSaveData {
         return Object.assign({
             collider: {
                 type: this.collider.type,
