@@ -1,6 +1,6 @@
 import { Assets, TAG } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, PathBlockComponent, PhysicsComponent, RenderComponent, COMPONENT, WallAvoidanceComponent } from "entities/components";
+import { InputToPhysicsComponent, PathBlockComponent, PhysicsComponent, RenderComponent, WallAvoidanceComponent } from "entities/components";
 import { AssetManager, ColliderType } from "managers";
 import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
 import { TileObjectData } from "types/AssetTypes";
@@ -20,7 +20,7 @@ export function createDude(): Entity {
     dude.addComponent(new AreaPathFollowComponent());
     dude.addComponent(new ActorInputComponent());
 
-    const renderer = dude.getComponent(COMPONENT.RENDER_COMPONENT) as RenderComponent;
+    const renderer = dude.getComponent("RENDER_COMPONENT");
     renderer.setSpriteSheet(spritesheet, 0);
     renderer.scale = 0.5;
 

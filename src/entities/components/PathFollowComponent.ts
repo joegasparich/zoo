@@ -16,8 +16,8 @@ export interface PathFollowComponentSaveData extends ComponentSaveData {
 }
 
 export default class PathFollowComponent extends Component {
-    public id = COMPONENT.PATH_FOLLOW_COMPONENT;
-    public type = COMPONENT.PATH_FOLLOW_COMPONENT;
+    public id: COMPONENT = "PATH_FOLLOW_COMPONENT";
+    public type: COMPONENT = "PATH_FOLLOW_COMPONENT";
 
     private path: Vector[];
     public currentTarget: Vector;

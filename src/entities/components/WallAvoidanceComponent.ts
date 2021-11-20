@@ -11,8 +11,8 @@ const TRIGGER_DISTANCE = 1;
 const AVOID_STRENGTH = 10;
 
 export default class WallAvoidanceComponent extends Component {
-    public id = COMPONENT.WALL_AVOIDANCE_COMPONENT;
-    public type = COMPONENT.WALL_AVOIDANCE_COMPONENT;
+    public id: COMPONENT = "WALL_AVOIDANCE_COMPONENT";
+    public type: COMPONENT = "WALL_AVOIDANCE_COMPONENT";
 
     public shouldAvoid = true;
 
@@ -26,10 +26,7 @@ export default class WallAvoidanceComponent extends Component {
 
         this.walls = [];
 
-        this.physics = entity.getComponent(COMPONENT.PHYSICS_COMPONENT) as PhysicsComponent;
-        if (!this.physics) {
-            console.error("WallAvoidanceComponent requires PhysicsComponent");
-        }
+        this.physics = entity.getComponent("PHYSICS_COMPONENT");
 
         const avoidanceArea = new Planck.Circle(TRIGGER_DISTANCE);
         const fixture = this.physics.body.createFixture(avoidanceArea, {isSensor: true});

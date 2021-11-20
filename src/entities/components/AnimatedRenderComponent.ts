@@ -20,8 +20,8 @@ export class Animation {
 
 // TODO: Make this serializable
 export default class AnimatedRenderComponent extends RenderComponent {
-    public id = COMPONENT.ANIMATED_RENDER_COMPONENT;
-    public type = COMPONENT.RENDER_COMPONENT;
+    public id: COMPONENT = "ANIMATED_RENDER_COMPONENT";
+    public type: COMPONENT = "RENDER_COMPONENT";
 
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;

@@ -1,4 +1,4 @@
-import { Component } from "entities/components";
+import { COMPONENT, Component } from "entities/components";
 import { ComponentSaveData } from "entities/components/Component";
 import Vector from "vector";
 
@@ -10,8 +10,8 @@ export interface SnapToGridComponentSaveData extends ComponentSaveData {
     gridSize: number;
 }
 export default class SnapToGridComponent extends Component {
-    public id = "SNAP_TO_GRID_COMPONENT";
-    public type = "SNAP_TO_GRID_COMPONENT";
+    public id: COMPONENT = "SNAP_TO_GRID_COMPONENT";
+    public type: COMPONENT = "SNAP_TO_GRID_COMPONENT";
 
     public gridSize: number;
 

@@ -6,8 +6,9 @@ import Vector from "vector";
 import UIManager from "ui/UIManager";
 
 export default class ActorInputComponent extends InputComponent {
-    public id = COMPONENT.ACTOR_INPUT_COMPONENT;
-    public type = COMPONENT.INPUT_COMPONENT;
+    public id: COMPONENT = "ACTOR_INPUT_COMPONENT";
+    public type: COMPONENT = "INPUT_COMPONENT";
+    public requires: COMPONENT[] = ["PATH_FOLLOW_COMPONENT"];
 
     private pathfinder: PathFollowComponent;
     private wallAvoid: WallAvoidanceComponent;
@@ -15,11 +16,8 @@ export default class ActorInputComponent extends InputComponent {
     public start(entity: Entity): void {
         super.start(entity);
 
-        this.pathfinder = entity.getComponent(COMPONENT.PATH_FOLLOW_COMPONENT) as PathFollowComponent;
-        if (!this.pathfinder) {
-            console.error("ActorInputComponent requires PathFollowComponent");
-        }
-        this.wallAvoid = entity.getComponent(COMPONENT.WALL_AVOIDANCE_COMPONENT) as WallAvoidanceComponent;
+        this.pathfinder = entity.getComponent("PATH_FOLLOW_COMPONENT");
+        this.wallAvoid = entity.getComponent("WALL_AVOIDANCE_COMPONENT");
     }
 
     public update(delta: number): void {

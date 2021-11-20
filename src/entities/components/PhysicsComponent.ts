@@ -23,8 +23,8 @@ export interface PhysicsComponentSaveData extends ComponentSaveData {
 }
 
 export default class PhysicsComponent extends Component {
-    public id = COMPONENT.PHYSICS_COMPONENT;
-    public type = COMPONENT.PHYSICS_COMPONENT;
+    public id: COMPONENT = "PHYSICS_COMPONENT";
+    public type: COMPONENT = "PHYSICS_COMPONENT";
 
     public body: Planck.Body;
 

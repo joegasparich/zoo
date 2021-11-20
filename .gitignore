@@ -20,3 +20,5 @@ dist/
 
 # save folder
 saves/
+
+.DS_Store

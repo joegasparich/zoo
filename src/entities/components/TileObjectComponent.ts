@@ -11,8 +11,8 @@ interface TileObjectComponentSaveData extends ComponentSaveData {
 }
 
 export default class TileObjectComponent extends Component {
-    public id = COMPONENT.TILE_OBJECT_COMPONENT;
-    public type = COMPONENT.TILE_OBJECT_COMPONENT;
+    public id: COMPONENT = "TILE_OBJECT_COMPONENT";
+    public type: COMPONENT = "TILE_OBJECT_COMPONENT";
 
     public assetPath: string;
     public data: TileObjectData;

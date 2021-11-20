@@ -83,7 +83,7 @@ export default class PlacementGhost {
     }
 
     public setSnap(snap: boolean, gridSize?: number): void {
-        const component = this.ghost.getComponent(COMPONENT.SNAP_TO_GRID_COMPONENT) as SnapToGridComponent;
+        const component = this.ghost.getComponent("SNAP_TO_GRID_COMPONENT");
         if (!component) return;
 
         component.gridSize = gridSize ?? 1;
@@ -95,7 +95,7 @@ export default class PlacementGhost {
     }
 
     public setFollow(follow: boolean): void {
-        const component = this.ghost.getComponent(COMPONENT.FOLLOW_MOUSE_COMPONENT) as FollowMouseComponent;
+        const component = this.ghost.getComponent("FOLLOW_MOUSE_COMPONENT");
         if (!component) return;
 
         if (this.follow === follow) return;

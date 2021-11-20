@@ -32,8 +32,8 @@ interface RenderComponentSaveData extends ComponentSaveData {
 }
 
 export default class RenderComponent extends Component {
-    public id = COMPONENT.RENDER_COMPONENT;
-    public type = COMPONENT.RENDER_COMPONENT;
+    public id: COMPONENT = "RENDER_COMPONENT";
+    public type: COMPONENT = "RENDER_COMPONENT";
 
     private spriteUrl: string;
     private spriteSheet: SpriteSheet;

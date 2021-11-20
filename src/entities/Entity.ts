@@ -2,7 +2,7 @@ import Game from "Game";
 import { v1 as uuid } from "uuid";
 import Vector from "vector";
 
-import { Component, createComponent } from "./components";
+import { COMPONENT, Component, ComponentType, createComponent } from "./components";
 import { ComponentSaveData } from "./components/Component";
 
 export interface EntitySaveData {
@@ -69,15 +69,15 @@ export default class Entity {
         return component;
     }
 
-    public removeComponent(componentId: string): void {
+    public removeComponent(componentId: COMPONENT): void {
         if (this.components.has(componentId)) {
             this.components.get(componentId).end();
             this.components.delete(componentId);
         }
     }
 
-    public getComponent(type: string): Component {
-        return this.components.get(type);
+    public getComponent<T extends COMPONENT>(type: T) : ComponentType<T> {
+        return this.components.get(type) as ComponentType<T>;
     }
 
     public save(): EntitySaveData {

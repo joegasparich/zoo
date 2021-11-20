@@ -1,13 +1,15 @@
 import { Entity } from "entities";
+import { COMPONENT } from ".";
 
 export interface ComponentSaveData {
-    id: string;
+    id: COMPONENT;
     disabled: boolean;
 }
 
 export default abstract class Component {
-    public id: string;
-    public type: string;
+    public id: COMPONENT;
+    public type: COMPONENT;
+    public requires: COMPONENT[];
     public entity: Entity;
 
     public disabled: boolean;
@@ -16,6 +18,12 @@ export default abstract class Component {
     public start(entity: Entity): void {
         this.entity = entity;
         this.hasStarted = true;
+
+        for (const component of this.requires) {
+            if (!entity.getComponent(component)) {
+                console.error(`${this.id} requires ${component}`);
+            }
+        }
     }
     public preUpdate(delta: number): void {}
     public update(delta: number): void {}

@@ -92,7 +92,7 @@ export default class ElevationGrid {
             // Check 4 surrounding tiles for tileObjects that can't be in water
             for (const tile of this.getSurroundingTiles(gridPos)) {
                 const entity = Game.world.getTileObjectAtPos(tile);
-                const tileObject = entity?.getComponent(COMPONENT.TILE_OBJECT_COMPONENT) as TileObjectComponent;
+                const tileObject = entity?.getComponent("TILE_OBJECT_COMPONENT");
                 if (tileObject && !tileObject.data.canPlaceInWater) return false;
             }
 
@@ -106,7 +106,7 @@ export default class ElevationGrid {
         for (const tile of this.getSurroundingTiles(gridPos)) {
             // Check for tileObjects that can't be on slopes
             const entity = Game.world.getTileObjectAtPos(tile);
-            const tileObject = entity?.getComponent(COMPONENT.TILE_OBJECT_COMPONENT) as TileObjectComponent;
+            const tileObject = entity?.getComponent("TILE_OBJECT_COMPONENT");
             if (tileObject && !tileObject.data.canPlaceOnSlopes) return false;
             // Check for paths
             if (Game.world.pathGrid.getPathAtTile(tile)) return false;

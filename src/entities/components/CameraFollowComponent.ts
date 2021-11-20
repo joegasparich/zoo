@@ -4,8 +4,8 @@ import Game from "Game";
 import { Component, COMPONENT } from ".";
 
 export default class CameraFollowComponent extends Component {
-    public id = COMPONENT.CAMERA_FOLLOW_COMPONENT;
-    public type = COMPONENT.CAMERA_FOLLOW_COMPONENT;
+    public id: COMPONENT = "CAMERA_FOLLOW_COMPONENT";
+    public type: COMPONENT = "CAMERA_FOLLOW_COMPONENT";
 
     private camera: Camera;
 

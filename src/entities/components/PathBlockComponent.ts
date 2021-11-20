@@ -3,8 +3,8 @@ import Game from "Game";
 import { Entity } from "..";
 
 export default class PathBlockComponent extends Component {
-    public id = COMPONENT.PATH_BLOCK_COMPONENT;
-    public type = COMPONENT.PATH_BLOCK_COMPONENT;
+    public id: COMPONENT = "PATH_BLOCK_COMPONENT";
+    public type: COMPONENT = "PATH_BLOCK_COMPONENT";
 
     public start(entity: Entity): void {
         super.start(entity);

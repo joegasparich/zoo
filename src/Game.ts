@@ -164,14 +164,14 @@ class Game {
         this.stage.sortableChildren = true;
 
         this.layers = [];
-        for(const layer in Layer) {
+        for(const layer in Object.values(Layer)) {
             const container = new Container();
             container.zIndex = +layer;
             container.sortableChildren = true;
             this.layers.push(container);
         }
         this.worldContainer = new Container();
-        this.worldContainer.addChild(...this.layers);
+        this.worldContainer.addChild(this.layers[0], ...this.layers.slice(1)); // TODO: Revert when pixi updates
         this.stage.addChild(this.worldContainer);
     }
 

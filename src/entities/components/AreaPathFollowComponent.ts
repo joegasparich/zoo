@@ -14,8 +14,8 @@ interface AreaPathFollowComponentSaveData extends PathFollowComponentSaveData {
 }
 
 export default class AreaPathFollowComponent extends PathFollowComponent {
-    public id = COMPONENT.AREA_PATH_FOLLOW_COMPONENT;
-    public type = COMPONENT.PATH_FOLLOW_COMPONENT;
+    public id: COMPONENT = "AREA_PATH_FOLLOW_COMPONENT";
+    public type: COMPONENT = "PATH_FOLLOW_COMPONENT";
 
     private areaPath: Area[];
     private currentArea: Area;
