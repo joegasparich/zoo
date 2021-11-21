@@ -89,6 +89,16 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         }}
                     />
                     <Button
+                        key="buildingButton"
+                        image={Assets.SPRITES.BUILDING}
+                        onClick={(): void => {
+                            this.setTool(
+                                ToolType.TileObject,
+                                {assetPath: Assets.OBJECTS.BUILDING},
+                            );
+                        }}
+                    />
+                    <Button
                         key="pathButton"
                         image={Assets.UI.PATH_ICON}
                         onClick={(): void => {
@@ -134,6 +144,13 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         image={Assets.UI.ELEVATE_ICON}
                         onClick={(): void => {
                             this.setTool(ToolType.Elevation, { elevation: 1, colour: 0xFFFF00 });
+                        }}
+                    />
+                    <Button
+                        key="flattenButton"
+                        image={Assets.UI.FLATTEN_ICON}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Elevation, { elevation: 0, colour: 0xFFFF00 });
                         }}
                     />
                     <Button

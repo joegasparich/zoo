@@ -111,10 +111,11 @@ export default class PathFollowComponent extends Component {
     }
 
     public save(): PathFollowComponentSaveData {
-        return Object.assign({
+        return {
+            ...super.save(),
             path: this.path?.map(node => Vector.Serialize(node)),
             currentNode: this.currentTarget && Vector.Serialize(this.currentTarget),
-        }, super.save());
+        };
     }
 
     public load(data: PathFollowComponentSaveData): void {

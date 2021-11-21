@@ -27,9 +27,10 @@ export default class SnapToGridComponent extends Component {
     }
 
     public save(): SnapToGridComponentSaveData {
-        return Object.assign({
+        return {
+            ...super.save(),
             gridSize: this.gridSize,
-        }, super.save());
+        };
     }
 
     public load(data: SnapToGridComponentSaveData): void {

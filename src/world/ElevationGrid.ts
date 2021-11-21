@@ -54,16 +54,36 @@ export default class ElevationGrid {
     public setElevationInCircle(centre: Vector, radius: number, elevation: Elevation): void {
         if (!Game.map.isPositionInMap(centre)) return;
 
+        const points: Vector[] = [];
+
         for(let i = centre.x - radius; i <= centre.x + radius; i++) {
             for(let j = centre.y - radius; j <= centre.y + radius; j++) {
                 const gridPos = new Vector(i, j).floor();
                 if (!this.isPositionInGrid(gridPos)) continue;
 
                 if (pointInCircle(centre, radius, gridPos)) {
-                    this.setElevation(gridPos, elevation);
+                    points.push(gridPos);
                 }
             }
         }
+
+        points.forEach(point => this.setElevation(point, elevation));
+
+        // Get each elevate point
+        // Collect the flatten points of each elevate point
+        // Attempt to flatten and record results
+        //     Recursive check for adjacent required points and see if they're also being flattened
+        // For each elevate point check flatten results
+        //     If all succeeded then
+        //     Recursive check for adjacent required points being elevated
+        //     elevate point
+
+        // TODO: Figure out how to do path adjacency requirements (2 adjacent points or all 4)
+        // What if a 4 banger raises a path but an adjacent path is a 3 banger?
+        // Fuck my ass
+        // Collect a list of all recursive points and then check each path around the point? How does that interact with gates and shit
+
+        // This might be more complex than its worth tbh
 
         Game.world.biomeGrid.redrawChunksInRadius(centre.multiply(2), radius + 5);
         Game.world.wallGrid.getWallsInRadius(centre, radius + 5).forEach(wall => wall.updateSprite());

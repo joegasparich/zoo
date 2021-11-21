@@ -1,6 +1,7 @@
 export const SPRITES = {
     HERO: "/assets/img/hero.png",
     TREE: "/assets/img/tree.png",
+    BUILDING: "/assets/img/building.png",
 };
 
 export const UI = {
@@ -35,6 +36,7 @@ export const TILES = {
 
 export const OBJECTS = {
     TREE: "/assets/objects/tree.json",
+    BUILDING: "/assets/objects/building.json",
 };
 
 export const TILESETS = {

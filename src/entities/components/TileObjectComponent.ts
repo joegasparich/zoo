@@ -44,9 +44,10 @@ export default class TileObjectComponent extends Component {
     }
 
     public save(): TileObjectComponentSaveData {
-        return Object.assign({
+        return {
+            ...super.save(),
             assetPath: this.assetPath,
-        }, super.save());
+        };
     }
 
     public load(data: TileObjectComponentSaveData): void {

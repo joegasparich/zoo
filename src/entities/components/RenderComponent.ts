@@ -38,7 +38,7 @@ export default class RenderComponent extends Component {
     private spriteUrl: string;
     private spriteSheet: SpriteSheet;
     private spriteIndex: number;
-    private layer: Layer;
+    private layer: number;
     protected sprite: Sprite;
 
     public flipX: boolean;
@@ -53,7 +53,7 @@ export default class RenderComponent extends Component {
     public alpha = 1;
     public visible = true;
 
-    public constructor(spriteUrl?: string, layer?: Layer, pivot?: Vector) {
+    public constructor(spriteUrl?: string, layer?: number, pivot?: Vector) {
         super();
         this.spriteUrl = spriteUrl ?? "";
         this.layer = layer ?? DEFAULT_LAYER;
@@ -151,7 +151,8 @@ export default class RenderComponent extends Component {
     }
 
     public save(): RenderComponentSaveData {
-        return Object.assign({
+        return {
+            ...super.save(),
             spriteUrl: this.spriteUrl,
             spriteSheet: this.spriteSheet && {
                 cellWidth: this.spriteSheet.data.cellWidth,
@@ -167,7 +168,7 @@ export default class RenderComponent extends Component {
             colour: this.colour,
             alpha: this.alpha,
             visible: this.visible,
-        }, super.save());
+        };
     }
 
     public load(data: RenderComponentSaveData): void {

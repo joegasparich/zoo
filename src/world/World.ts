@@ -16,6 +16,7 @@ import { Entity } from "entities";
 import Vector from "vector";
 import { MapCell } from "./MapGrid";
 import PathGrid, { PathGridSaveData } from "./PathGrid";
+import { COMPONENT } from "entities/components";
 
 export interface WorldSaveData {
     biomes: BiomeSaveData,
@@ -117,9 +118,14 @@ export default class World {
 
     public registerTileObject(tileObject: Entity): void {
         if (!tileObject) return;
+        const component = tileObject.getComponent("TILE_OBJECT_COMPONENT");
 
         this.tileObjects.set(tileObject.id, tileObject);
-        this.tileObjectMap.set(tileObject.position.floor().toString(), tileObject);
+        for (let i=0; i < component.data.size.x; i++) {
+            for (let j=0; j < component.data.size.y; j++) {
+                this.tileObjectMap.set(tileObject.position.floor().add(new Vector(i, j)).toString(), tileObject);
+            }
+        }
     }
 
     public unregisterTileObject(tileObject: Entity): void {

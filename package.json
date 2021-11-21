@@ -3,10 +3,6 @@
 	"version": "0.0.1",
 	"author": "Joe Gasparich",
 	"description": "A Pixi JS Game Engine",
-	"engines": {
-		"node": "~8.11.0",
-		"npm": "~5.8.0"
-	},
 	"main": "./index.html",
 	"scripts": {
 		"start": "webpack serve",
@@ -21,8 +17,8 @@
 		"@emotion/core": "^10.0.28",
 		"easystarjs": "^0.4.3",
 		"node-dijkstra": "^2.5.0",
-		"pixi-inspector": "^1.0.7",
-		"pixi.js": "^6.0.4",
+		"pixi-inspector": "^2.0.0",
+		"pixi.js": "^6.2.0",
 		"planck-js": "^0.3.13",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",

@@ -7,7 +7,7 @@ import CameraFollowComponent from "./CameraFollowComponent";
 import PathFollowComponent from "./PathFollowComponent";
 import WallAvoidanceComponent from "./WallAvoidanceComponent";
 import InputToPhysicsComponent from "./InputToPhysicsComponent";
-import PathBlockComponent from "./PathBlockComponent";
+import SolidComponent from "./SolidComponent";
 import ActorInputComponent from "./ActorInputComponent";
 import SnapToGridComponent from "./SnapToGridComponent";
 import FollowMouseComponent from "./FollowMouseComponent";
@@ -26,7 +26,7 @@ export type COMPONENT =
     | "PATH_FOLLOW_COMPONENT"
     | "WALL_AVOIDANCE_COMPONENT"
     | "INPUT_TO_PHYSICS_COMPONENT"
-    | "PATH_BLOCK_COMPONENT"
+    | "SOLID_COMPONENT"
     | "ACTOR_INPUT_COMPONENT"
     | "SNAP_TO_GRID_COMPONENT"
     | "FOLLOW_MOUSE_COMPONENT"
@@ -43,7 +43,7 @@ export type ComponentType<T> =
     T extends "PATH_FOLLOW_COMPONENT" ? PathFollowComponent :
     T extends "WALL_AVOIDANCE_COMPONENT" ? WallAvoidanceComponent :
     T extends "INPUT_TO_PHYSICS_COMPONENT" ? InputToPhysicsComponent :
-    T extends "PATH_BLOCK_COMPONENT" ? PathBlockComponent :
+    T extends "SOLID_COMPONENT" ? SolidComponent :
     T extends "ACTOR_INPUT_COMPONENT" ? ActorInputComponent :
     T extends "SNAP_TO_GRID_COMPONENT" ? SnapToGridComponent :
     T extends "FOLLOW_MOUSE_COMPONENT" ? FollowMouseComponent :
@@ -62,7 +62,7 @@ export {
     PathFollowComponent,
     WallAvoidanceComponent,
     InputToPhysicsComponent,
-    PathBlockComponent,
+    SolidComponent,
     ActorInputComponent,
     SnapToGridComponent,
     FollowMouseComponent,

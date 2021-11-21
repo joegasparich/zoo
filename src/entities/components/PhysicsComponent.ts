@@ -71,7 +71,8 @@ export default class PhysicsComponent extends Component {
     }
 
     public save(): PhysicsComponentSaveData {
-        return Object.assign({
+        return {
+            ...super.save(),
             collider: {
                 type: this.collider.type,
                 radius: this.collider.radius,
@@ -82,6 +83,6 @@ export default class PhysicsComponent extends Component {
             density: this.density,
             tag: this.tag,
             pivot: Vector.Serialize(this.pivot),
-        }, super.save());
+        };
     }
 }

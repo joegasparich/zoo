@@ -26,7 +26,7 @@ export default class AnimatedRenderComponent extends RenderComponent {
     private animations: Map<string, Animation>;
     private currentAnimation: Animation;
 
-    public constructor(animations?: Animation[], layer?: Layer, pivot?: Vector) {
+    public constructor(animations?: Animation[], layer?: number, pivot?: Vector) {
         super(undefined, layer, pivot);
 
         this.animations = new Map();

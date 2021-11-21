@@ -170,6 +170,12 @@ export default class WallTool extends Tool {
         const wall = Game.world.wallGrid.getWallAtTile(pos.floor(), quadrant);
         if (wall && wall.exists) return false;
 
+        // Check for tile object
+        const [tileA, tileB] = Game.world.wallGrid.getAdjacentTiles(wall);
+        if (Game.world.getTileObjectAtPos(tileA) && Game.world.getTileObjectAtPos(tileA) === Game.world.getTileObjectAtPos(tileB)) {
+            return false;
+        }
+
         // Check for water
         let vertexA: Vector, vertexB: Vector;
         const flPos = pos.floor();

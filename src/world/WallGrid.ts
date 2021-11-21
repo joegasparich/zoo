@@ -444,6 +444,17 @@ export default class WallGrid {
         return walls;
     }
 
+    public areWallsInArea(pos: Vector, size: Vector): boolean {
+        for (let i=0; i < size.x; i++) {
+            for (let j=0; j < size.y; j++) {
+                if (i < size.x - 1 && this.getWallAtTile(pos.add(new Vector(i, j)), Side.East)?.exists) return true;
+                if (j < size.y - 1 && this.getWallAtTile(pos.add(new Vector(i, j)), Side.South)?.exists) return true;
+            }
+        }
+
+        return false;
+    }
+
     public save(): WallGridSaveData {
         if (!this.isSetup) return;
 

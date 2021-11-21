@@ -1,4 +1,4 @@
-import { ILoaderResource, Loader, Texture } from "pixi.js";
+import { LoaderResource, Loader, Texture } from "pixi.js";
 
 import TileSet, { TileSetData } from "TileSet";
 
@@ -20,11 +20,11 @@ class AssetManager {
         this.preloadedAssets.push(...assets);
     }
 
-    public async doPreLoad(onProgress?: Function): Promise<ILoaderResource[]> {
+    public async doPreLoad(onProgress?: Function): Promise<LoaderResource[]> {
         return this.loadResources(this.preloadedAssets, onProgress);
     }
 
-    public async loadResource(asset: string, onProgress?: Function): Promise<ILoaderResource> {
+    public async loadResource(asset: string, onProgress?: Function): Promise<LoaderResource> {
         if (!asset) {
             return null;
         }
@@ -34,7 +34,7 @@ class AssetManager {
         return resources[0];
     }
 
-    public loadResources(assets: string[], onProgress?: Function): Promise<ILoaderResource[]> {
+    public loadResources(assets: string[], onProgress?: Function): Promise<LoaderResource[]> {
         if (!assets || !assets.length) {
             return null;
         }

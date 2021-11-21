@@ -17,6 +17,7 @@ async function run(): Promise<void> {
     AssetManager.preLoadAssets(Object.values(Assets.SPRITESHEETS));
     AssetManager.preLoadAssets(Object.values(Assets.UI));
     await loadTileObjectData(Assets.OBJECTS.TREE);
+    await loadTileObjectData(Assets.OBJECTS.BUILDING); // TODO: batch
     await Wall.loadWallData(Assets.WALLS.IRON_BAR);
     await Path.loadPathData(Assets.PATHS.DIRT);
 

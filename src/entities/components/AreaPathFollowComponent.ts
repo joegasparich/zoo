@@ -106,13 +106,14 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
     }
 
     public save(): AreaPathFollowComponentSaveData {
-        return Object.assign({
+        return {
+            ...super.save(),
             areaPath: this.areaPath?.map(area => area.id),
             currentArea: this.currentArea?.id,
             currentDoor: this.currentDoor && Vector.Serialize(this.currentDoor.gridPos),
             enterDoorPosition: this.enterDoorPosition && Vector.Serialize(this.enterDoorPosition),
             targetPosition: this.targetPosition && Vector.Serialize(this.targetPosition),
-        }, super.save());
+        };
     }
 
     public load(data: AreaPathFollowComponentSaveData): void {

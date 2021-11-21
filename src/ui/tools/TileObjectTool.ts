@@ -19,7 +19,10 @@ export default class TileObjectTool extends Tool {
 
         ghost.reset();
         ghost.setSprite(this.currentObject.sprite);
-        ghost.setPivot(this.currentObject.pivot);
+        ghost.setPivot(new Vector(
+            1/this.currentObject.size.x * this.currentObject.pivot.x,
+            1/this.currentObject.size.y * this.currentObject.pivot.y,
+        ));
         ghost.setSnap(true);
         ghost.applyElevation();
         ghost.canPlaceFunction = this.canPlace.bind(this);
@@ -32,7 +35,7 @@ export default class TileObjectTool extends Tool {
             if (this.canPlace(mouseWorldPos)) {
                 const placePos: Vector = mouseWorldPos.floor();
 
-                const tileObject = createTileObject(this.assetPath, placePos);
+                const tileObject = createTileObject(this.assetPath, placePos, this.currentObject.size);
 
                 this.toolManager.pushAction({
                     name: `Place ${this.currentObject.name}`,
@@ -47,13 +50,19 @@ export default class TileObjectTool extends Tool {
 
     public postUpdate(): void {}
 
-    private canPlace(position: Vector): boolean {
-        if (!Game.map.isPositionInMap(position)) return false;
-        if (!Game.map.isTileFree(position)) return false;
+    private canPlace(pos: Vector): boolean {
+        const position = pos.floor();
+        for (let i=0; i< this.currentObject.size.x; i++) {
+            for (let j=0; j< this.currentObject.size.y; j++) {
+                const pos = new Vector(position.x + i, position.y + j);
+                if (!Game.map.isTileFree(pos)) return false;
+                if (!Game.map.isPositionInMap(pos)) return false;
+                if (!this.currentObject.canPlaceOnSlopes && Game.world.elevationGrid.isPositionSloped(pos)) return false;
+                if (!this.currentObject.canPlaceInWater && Game.world.waterGrid.isPositionWater(pos)) return false;
+            }
+        }
 
-        if (!this.currentObject.canPlaceOnSlopes && Game.world.elevationGrid.isPositionSloped(position)) return false;
-        if (!this.currentObject.canPlaceInWater && Game.world.waterGrid.isPositionWater(position)) return false;
-
+        if (Game.world.wallGrid.areWallsInArea(position, this.currentObject.size)) return false;
 
         return true;
     }

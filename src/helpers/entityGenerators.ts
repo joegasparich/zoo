@@ -1,6 +1,6 @@
 import { Assets, TAG } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, PathBlockComponent, PhysicsComponent, RenderComponent, WallAvoidanceComponent } from "entities/components";
+import { InputToPhysicsComponent, SolidComponent, PhysicsComponent, RenderComponent, WallAvoidanceComponent } from "entities/components";
 import { AssetManager, ColliderType } from "managers";
 import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
 import { TileObjectData } from "types/AssetTypes";
@@ -41,17 +41,22 @@ export function createActor(position: Vector): Entity {
 }
 
 // This is how we do
-export function createTileObject(assetPath: string, position: Vector): Entity {
+export function createTileObject(assetPath: string, position: Vector, size = new Vector(1, 1)): Entity {
     if (!Game.map.isTileFree(position)) return;
 
     const data = AssetManager.getJSON(assetPath) as TileObjectData;
 
     const tileObject = new Entity(position.floor().add(new Vector(0.5)));
-    tileObject.addComponent(new RenderComponent(data.sprite, undefined, data.pivot));
+    tileObject.addComponent(new RenderComponent(data.sprite, undefined,
+        new Vector(
+            1/size.x * data.pivot.x,
+            1/size.y * data.pivot.y,
+        ),
+    ));
     tileObject.addComponent(new ElevationComponent());
     if (data.solid) {
         tileObject.addComponent(new PhysicsComponent(data.collider, false, 1, TAG.Solid, data.pivot));
-        tileObject.addComponent(new PathBlockComponent());
+        tileObject.addComponent(new SolidComponent(size));
     }
     tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);
 

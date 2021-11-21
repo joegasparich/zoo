@@ -9,7 +9,7 @@ export interface ComponentSaveData {
 export default abstract class Component {
     public id: COMPONENT;
     public type: COMPONENT;
-    public requires: COMPONENT[];
+    public requires: COMPONENT[] = [];
     public entity: Entity;
 
     public disabled: boolean;

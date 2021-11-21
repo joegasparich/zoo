@@ -5,9 +5,8 @@ export interface TileObjectData {
     name: string;
     solid: boolean;
     collider: Collider;
-    width: number;
-    height: number;
     pivot: Vector;
+    size: Vector;
     sprite: string;
     canPlaceOnSlopes: boolean;
     canPlaceInWater: boolean;
