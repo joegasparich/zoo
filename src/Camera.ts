@@ -1,13 +1,13 @@
+import { Stage } from "@pixi/layers";
 import Game from "Game";
 import { toObservablePoint } from "helpers/vectorHelper";
-import { Container } from "pixi.js";
 import Vector from "vector";
 
 export default class Camera {
     private target: Vector;
     public offset: Vector;
 
-    public constructor(public worldPosition: Vector, public scale: number, public worldContainer: Container) {
+    public constructor(public worldPosition: Vector, public scale: number, public stage: Stage) {
         this.offset = new Vector(Game.opts.windowWidth/2, Game.opts.windowHeight/2);
     }
 
@@ -28,8 +28,8 @@ export default class Camera {
             }
         }
 
-        this.worldContainer.scale.set(this.scale, this.scale);
-        this.worldContainer.position = toObservablePoint(this.worldToScreenPosition(Vector.Zero()));
+        this.stage.scale.set(this.scale, this.scale);
+        this.stage.position = toObservablePoint(this.worldToScreenPosition(Vector.Zero()));
     }
 
     public worldToScreenPosition(worldPos: Vector): Vector {

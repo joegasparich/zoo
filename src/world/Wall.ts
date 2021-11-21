@@ -1,7 +1,7 @@
 import * as Planck from "planck-js";
 import { Sprite } from "pixi.js";
 
-import { Layer, TAG } from "consts";
+import { RenderLayers, TAG } from "consts";
 import { AssetManager, ColliderType } from "managers";
 
 import { WallData } from "types/AssetTypes";
@@ -98,7 +98,7 @@ export default class Wall {
 
     public remove(): void {
         if (this.exists) {
-            Game.removeFromStage(this.sprite, Layer.ENTITIES);
+            Game.removeFromStage(this.sprite, RenderLayers.ENTITIES);
             Game.physicsManager.removeBody(this.body);
         }
         this.data = undefined;
@@ -114,7 +114,7 @@ export default class Wall {
 
         if (this.sprite) {
             // Remove old sprite
-            Game.removeFromStage(this.sprite, Layer.ENTITIES);
+            Game.removeFromStage(this.sprite, RenderLayers.ENTITIES);
         }
 
         // Add new sprite
@@ -122,7 +122,7 @@ export default class Wall {
         this.currentElevation = elevation;
         const texture = this.spriteSheet.getTextureByIndex(spriteIndex);
         this.sprite = new Sprite(texture);
-        Game.addToStage(this.sprite, Layer.ENTITIES);
+        Game.addToStage(this.sprite, RenderLayers.ENTITIES);
         this.sprite.anchor.set(0.5, 1 + elevation * 0.5);
 
         // Update position

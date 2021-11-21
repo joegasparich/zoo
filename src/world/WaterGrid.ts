@@ -1,6 +1,6 @@
 import { Graphics as PGraphics, ObservablePoint } from "pixi.js";
 
-import { Config, Layer } from "consts";
+import { Config, RenderLayers } from "consts";
 import Graphics from "Graphics";
 import Vector from "vector";
 
@@ -33,11 +33,11 @@ export default class WaterGrid {
         }
 
         this.graphics = new PGraphics();
-        Game.addToStage(this.graphics, Layer.WATER);
+        Game.addToStage(this.graphics, RenderLayers.WATER);
     }
 
     public reset(): void {
-        Game.removeFromStage(this.graphics, Layer.WATER);
+        Game.removeFromStage(this.graphics, RenderLayers.WATER);
         this.graphics.destroy();
         this.graphics = undefined;
         this.grid = [];

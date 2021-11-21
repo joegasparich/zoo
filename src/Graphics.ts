@@ -4,7 +4,7 @@ import { toObservablePoint } from "helpers/vectorHelper";
 import Camera from "Camera";
 import Game from "Game";
 import Vector from "vector";
-import { Layer } from "consts";
+import { RenderLayers } from "consts";
 
 enum Colour {
     White = 0xFFFFFF,
@@ -21,7 +21,7 @@ class Graphics {
         this.camera = Game.camera;
 
         this.graphics = new PGraphics();
-        Game.addToStage(this.graphics, Layer.DEBUG);
+        Game.addToStage(this.graphics, RenderLayers.DEBUG);
     }
 
     public preUpdate(): void {

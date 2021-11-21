@@ -1,4 +1,4 @@
-import { ObservablePoint, Sprite } from "pixi.js";
+import { Sprite } from "pixi.js";
 
 import { Component, COMPONENT } from ".";
 import { AssetManager } from "managers";
@@ -9,9 +9,9 @@ import Vector from "vector";
 import Camera from "Camera";
 import Game from "Game";
 import { toObservablePoint } from "helpers/vectorHelper";
-import { Layer } from "consts";
+import { RenderLayers } from "consts";
 
-const DEFAULT_LAYER = Layer.ENTITIES;
+const DEFAULT_LAYER = RenderLayers.ENTITIES;
 
 interface RenderComponentSaveData extends ComponentSaveData {
     spriteUrl: string;

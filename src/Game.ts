@@ -1,4 +1,5 @@
-import { Application, Container, SCALE_MODES, settings, Sprite, Ticker } from "pixi.js";
+import { Application, Container, SCALE_MODES, settings, Ticker } from "pixi.js";
+import { Group, Layer, Stage } from "@pixi/layers";
 
 import { AssetManager, InputManager, PhysicsManager, SceneManager } from "./managers";
 import Mediator from "./Mediator";
@@ -9,7 +10,7 @@ import MapGrid from "world/MapGrid";
 import { Entity } from "entities";
 import Vector from "vector";
 import Graphics from "Graphics";
-import { Config, GameEvent, Inputs, Layer } from "consts";
+import { Config, GameEvent, Inputs, RenderLayers } from "consts";
 import ZooScene from "scenes/ZooScene";
 import UIManager from "ui/UIManager";
 import { createDude } from "helpers/entityGenerators";
@@ -53,13 +54,13 @@ const defaultOpts: GameOpts = {
 
 class Game {
     private app: Application;
-    private stage: Container;
+    private stage: Stage;
     private ticker: Ticker;
     private layers: Container[];
+    private groups: Group[];
 
     public opts: GameOpts;
 
-    public worldContainer: Container;
     public canvas: Canvas;
     public camera: Camera;
     public map: MapGrid;
@@ -126,7 +127,7 @@ class Game {
 
         this.canvas.load();
 
-        this.camera = new Camera(new Vector(4, 4), 1, this.worldContainer);
+        this.camera = new Camera(new Vector(4, 4), 1, this.stage);
         this.camera.scale = Config.CAMERA_SCALE;
 
         this.map = new MapGrid();
@@ -158,21 +159,23 @@ class Game {
     }
 
     private setupStage(): void {
-        this.stage = this.app.stage;
-
-        // TODO: Figure out Pixi layers?
-        this.stage.sortableChildren = true;
+        this.stage = new Stage();
+        this.app.stage = this.stage;
 
         this.layers = [];
-        for(const layer in Object.values(Layer)) {
-            const container = new Container();
-            container.zIndex = +layer;
-            container.sortableChildren = true;
-            this.layers.push(container);
+        this.groups = [];
+        for(const l in Object.values(RenderLayers)) {
+            const group = new Group(+l, true);
+            group.on("sort", (sprite) => {
+                sprite.zOrder = sprite.y;
+            });
+
+            const layerContainer = new Container();
+            this.layers.push(layerContainer);
+            this.groups.push(group);
+
+            this.stage.addChild(new Layer(group), layerContainer);
         }
-        this.worldContainer = new Container();
-        this.worldContainer.addChild(this.layers[0], ...this.layers.slice(1)); // TODO: Revert when pixi updates
-        this.stage.addChild(this.worldContainer);
     }
 
     /**
@@ -240,11 +243,12 @@ class Game {
         this.camera.update();
     }
 
-    public addToStage(container: Container, layer = Layer.ENTITIES): void {
+    public addToStage(container: Container, layer = RenderLayers.ENTITIES): void {
+        container.parentGroup = this.groups[+layer];
         this.layers[+layer].addChild(container);
     }
 
-    public removeFromStage(container: Container, layer = Layer.ENTITIES): void {
+    public removeFromStage(container: Container, layer = RenderLayers.ENTITIES): void {
         this.layers[+layer].removeChild(container);
     }
 

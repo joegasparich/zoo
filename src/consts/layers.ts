@@ -1,8 +1,9 @@
-const Layer = {
+const RenderLayers = {
     GROUND: 0,
     WATER: 1,
     ENTITIES: 2,
-    DEBUG: 3,
+    GHOSTS: 3,
+    DEBUG: 4,
 };
 
-export default Layer;
+export default RenderLayers;

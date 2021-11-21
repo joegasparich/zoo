@@ -64,16 +64,16 @@ export default class DoorTool extends Tool {
 
         switch (side) {
             case Side.North:
-                ghost.setOffset(new Vector(0, -0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(0, -0.5 - elevation).subtract(offset));
                 break;
             case Side.South:
-                ghost.setOffset(new Vector(0, 0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(0, 0.5 - elevation).subtract(offset));
                 break;
             case Side.West:
-                ghost.setOffset(new Vector(-0.5, 0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(-0.5, 0.5 - elevation).subtract(offset));
                 break;
             case Side.East:
-                ghost.setOffset(new Vector(0.5, 0.5 - elevation * 0.5).subtract(offset));
+                ghost.setOffset(new Vector(0.5, 0.5 - elevation).subtract(offset));
                 break;
             default:
                 break;

@@ -1,6 +1,5 @@
 import { AnimatedSprite, Texture } from "pixi.js";
 
-import { Layer } from "consts";
 import Vector from "vector";
 import { RenderComponent, COMPONENT } from ".";
 

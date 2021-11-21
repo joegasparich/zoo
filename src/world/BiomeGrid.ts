@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 
 import Camera from "Camera";
-import { Layer, Side } from "consts";
+import { RenderLayers, Side } from "consts";
 import { circleIntersectsRect, clamp, hexToHsl, hslToHex, pointInCircle } from "helpers/math";
 import Vector from "vector";
 import Game from "Game";
@@ -177,7 +177,7 @@ export class BiomeChunk {
         }
 
         this.graphics = new Graphics();
-        Game.addToStage(this.graphics, Layer.GROUND);
+        Game.addToStage(this.graphics, RenderLayers.GROUND);
 
         this.shouldRedraw = true;
     }
@@ -219,7 +219,7 @@ export class BiomeChunk {
     }
 
     public remove(): void {
-        Game.removeFromStage(this.graphics, Layer.GROUND);
+        Game.removeFromStage(this.graphics, RenderLayers.GROUND);
         this.graphics.destroy();
     }
 

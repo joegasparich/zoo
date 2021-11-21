@@ -1,8 +1,8 @@
 import { Entity } from "entities";
-import { RenderComponent, COMPONENT } from "entities/components";
+import { RenderComponent } from "entities/components";
 import { FollowMouseComponent, SnapToGridComponent } from "entities/components";
 
-import { Assets } from "consts";
+import { Assets, RenderLayers } from "consts";
 import World from "world/World";
 import Game from "Game";
 import ElevationComponent from "entities/components/ElevationComponent";
@@ -33,7 +33,7 @@ export default class PlacementGhost {
         this.ghost = new Entity(Game.input.getMousePos(), false);
         this.ghost.addComponent(new FollowMouseComponent());
         this.ghost.addComponent(new SnapToGridComponent());
-        this.ghostRenderer = this.ghost.addComponent(new RenderComponent(DEFAULT_SPRITE));
+        this.ghostRenderer = this.ghost.addComponent(new RenderComponent(DEFAULT_SPRITE, RenderLayers.GHOSTS));
 
         this.reset();
     }

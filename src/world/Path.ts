@@ -1,4 +1,4 @@
-import { Layer } from "consts";
+import { RenderLayers } from "consts";
 import Game from "Game";
 import { toObservablePoint } from "helpers/vectorHelper";
 import { AssetManager } from "managers";
@@ -68,7 +68,7 @@ export default class Path {
     }
 
     public remove(): void {
-        Game.removeFromStage(this.sprite, Layer.GROUND);
+        Game.removeFromStage(this.sprite, RenderLayers.GROUND);
         this.data = undefined;
         this.spriteSheet = undefined;
     }
@@ -79,7 +79,7 @@ export default class Path {
 
         if (this.sprite) {
             // Remove old sprite
-            Game.removeFromStage(this.sprite, Layer.GROUND);
+            Game.removeFromStage(this.sprite, RenderLayers.GROUND);
         }
 
         // Add new sprite
@@ -87,7 +87,7 @@ export default class Path {
         this.currentElevation = elevation;
         const texture = this.spriteSheet.getTextureByIndex(spriteIndex);
         this.sprite = new Sprite(texture);
-        Game.addToStage(this.sprite, Layer.GROUND);
+        Game.addToStage(this.sprite, RenderLayers.GROUND);
         this.sprite.anchor.set(0, 0.5 + elevation * 0.5);
 
         this.sprite.position = toObservablePoint(this.position.multiply(Game.opts.worldScale));
