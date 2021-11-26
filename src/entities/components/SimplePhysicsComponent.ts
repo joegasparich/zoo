@@ -1,5 +1,12 @@
 import Vector from "vector";
 import { COMPONENT, Component } from ".";
+import { ComponentSaveData } from "./Component";
+
+interface SimplePhysicsComponentSaveData extends ComponentSaveData {
+    velocity: number[];
+    force: number[];
+}
+
 
 export default class SimplePhysicsComponent extends Component {
     public id: COMPONENT = "SIMPLE_PHYSICS_COMPONENT";
@@ -46,5 +53,18 @@ export default class SimplePhysicsComponent extends Component {
         return this._velocity;
     }
 
-    // TODO: Serialize
+    public save(): SimplePhysicsComponentSaveData {
+        return {
+            ...super.save(),
+            velocity: Vector.Serialize(this._velocity),
+            force: Vector.Serialize(this._force),
+        };
+    }
+
+    public load(data: SimplePhysicsComponentSaveData): void {
+        super.load(data);
+
+        this._velocity = Vector.Deserialize(data.velocity);
+        this._force = Vector.Deserialize(data.force);
+    }
 }

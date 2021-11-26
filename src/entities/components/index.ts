@@ -21,6 +21,7 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "RENDER_COMPONENT": return new RenderComponent();
         case "ANIMATED_RENDER_COMPONENT": return new AnimatedRenderComponent();
         case "CAMERA_FOLLOW_COMPONENT": return new CameraFollowComponent();
+        case "SIMPLE_PHYSICS_COMPONENT": return new SimplePhysicsComponent();
         case "PATH_FOLLOW_COMPONENT": return new PathFollowComponent();
         case "INPUT_TO_PHYSICS_COMPONENT": return new InputToPhysicsComponent();
         case "SOLID_COMPONENT": return new SolidComponent();
