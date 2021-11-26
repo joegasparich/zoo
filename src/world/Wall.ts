@@ -31,21 +31,6 @@ export default class Wall {
 
     public static wallSprites = new Map<string, SpriteSheet>();
 
-    public static async loadWallData(path: string): Promise<WallData> {
-        const resource = await AssetManager.loadResource(path);
-        const data = resource.data as WallData;
-        await AssetManager.loadResource(data.spriteSheet);
-
-        const spritesheet = new SpriteSheet({
-            imageUrl: data.spriteSheet,
-            cellHeight: data.cellHeight,
-            cellWidth: data.cellWidth,
-        });
-        Wall.wallSprites.set(data.spriteSheet, spritesheet);
-
-        return data;
-    }
-
     public static wallToWorldPos(wallPos: Vector, orientation: Orientation): Vector {
         if (orientation === Orientation.Horizontal) {
             return new Vector(wallPos.x / 2, wallPos.y);

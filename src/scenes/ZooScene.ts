@@ -5,7 +5,7 @@ import { Scene } from "./Scene";
 import { MapCell } from "world/MapGrid";
 import Vector from "vector";
 
-const MAP_SIZE = 10;
+const MAP_SIZE = 20;
 
 export default class ZooScene extends Scene {
 

@@ -30,21 +30,14 @@ export const SPRITESHEETS = {
     DUDE_RUN: "/assets/img/dude_run.png",
 };
 
-export const TILES = {
-    GRASS: "/assets/tiles/grass.json",
+export const ANIMALS = {
+    PLAINS_ZEBRA: "/assets/animals/plains_zebra.json",
 };
+
 
 export const OBJECTS = {
     TREE: "/assets/objects/tree.json",
     BUILDING: "/assets/objects/building.json",
-};
-
-export const TILESETS = {
-    TEST: "/assets/tilesets/testTileSet.json",
-};
-
-export const MAPS = {
-    TEST: "/assets/maps/testMap.json",
 };
 
 export const WALLS = {

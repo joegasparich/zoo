@@ -43,7 +43,7 @@ export default class PathFollowComponent extends Component {
     public async pathTo(location: Vector): Promise<boolean> {
         this.resetPath();
 
-        const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: false, allowedNodes: [NodeType.PATH]});
+        const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: false, allowedNodes: [NodeType.OPEN, NodeType.PATH]});
         if (!path) return false;
 
         this.setPath(path);
@@ -74,8 +74,9 @@ export default class PathFollowComponent extends Component {
             this.currentTarget = this.path.shift();
         }
 
-        // TODO: Add debug button for this
-        this.drawDebugPath();
+        if (Game.debugSettings.showPathfinding) {
+            this.drawDebugPath();
+        }
 
         return false;
     }

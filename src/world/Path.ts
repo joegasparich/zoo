@@ -20,22 +20,6 @@ export default class Path {
 
     public static pathSprites = new Map<string, SpriteSheet>();
 
-    public static async loadPathData(path: string): Promise<PathData> {
-        const resource = await AssetManager.loadResource(path);
-        const data = resource.data as PathData;
-        await AssetManager.loadResource(data.spriteSheet);
-
-        const spritesheet = new SpriteSheet({
-            imageUrl: data.spriteSheet,
-            cellHeight: data.cellHeight,
-            cellWidth: data.cellWidth,
-        });
-
-        Path.pathSprites.set(data.spriteSheet, spritesheet);
-
-        return data;
-    }
-
     public static getSpriteIndex(pos: Vector): [index: PathSpriteIndex, elevation: number] {
         pos = pos.floor();
         switch(Game.world.elevationGrid.getSlopeVariant(pos)) {

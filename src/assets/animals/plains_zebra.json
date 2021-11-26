@@ -1,0 +1,30 @@
+{
+    "id": "plains_zebra",
+    "assetPath": "/assets/animals/plains_zebra",
+    "sprite": "/assets/img/animals/zebra.png",
+    "name": "Plains Zebra",
+    "species": "Equus quagga",
+    "class": "Mammal",
+    "conversationStatus": "Near Threatened",
+    "location": ["Africa"],
+    "weight": {
+        "male": [220, 320],
+        "female": [175, 250],
+        "newborn": [30, 35]
+    },
+    "habitat": [
+        "grassland",
+        "savannah"
+    ],
+    "foliage": [10, 20],
+    "diet": [
+        "grass",
+        "hay"
+    ],
+    "sociability": [4, 25],
+    "space": 5,
+    "lifespan": 25,
+    "gestationPeriod": 12,
+    "offspringCount": 1,
+    "pubertyLength": 36
+}

@@ -1,13 +1,64 @@
 import { AssetManager } from "managers";
-import { TileObjectData } from "types/AssetTypes";
+import SpriteSheet from "SpriteSheet";
+import { AnimalData, PathData, TileObjectData, WallData } from "types/AssetTypes";
 import Vector from "vector";
+import Path from "world/Path";
+import Wall from "world/Wall";
 
-export async function loadTileObjectData(path: string): Promise<TileObjectData> {
-    const resource = await AssetManager.loadResource(path);
-    const data = resource.data as TileObjectData;
+export async function loadAnimalData(...paths: string[]): Promise<AnimalData[]> {
+    const resources = await AssetManager.loadResources(paths);
+    await AssetManager.loadResources(resources.map(resource => resource.data.sprite));
 
-    data.pivot = new Vector(data.pivot.x, data.pivot.y); // Ensure data from json is a vector
+    return resources.map(resource => resource.data);
+}
 
-    await AssetManager.loadResource(data.sprite);
-    return data;
+export async function loadTileObjectData(...paths: string[]): Promise<TileObjectData[]> {
+    const resources = await AssetManager.loadResources(paths);
+    await AssetManager.loadResources(resources.map(resource => resource.data.sprite));
+
+    resources.forEach(resource => {
+        const data = resource.data as TileObjectData;
+
+        data.size = new Vector(data.size.x, data.size.y);
+        data.pivot = new Vector(data.pivot.x, data.pivot.y);
+    });
+
+    return resources.map(resource => resource.data);
+}
+
+export async function loadWallData(...paths: string[]): Promise<WallData[]> {
+    const resources = await AssetManager.loadResources(paths);
+    await AssetManager.loadResources(resources.map(resource => resource.data.spriteSheet));
+
+    resources.forEach(resource => {
+        const data = resource.data as WallData;
+
+        const spritesheet = new SpriteSheet({
+            imageUrl: data.spriteSheet,
+            cellHeight: data.cellHeight,
+            cellWidth: data.cellWidth,
+        });
+        Wall.wallSprites.set(data.spriteSheet, spritesheet);
+    });
+
+    return resources.map(resource => resource.data);
+}
+
+export async function loadPathData(...paths: string[]): Promise<PathData[]> {
+    const resources = await AssetManager.loadResources(paths);
+    await AssetManager.loadResources(resources.map(resource => resource.data.spriteSheet));
+
+    resources.forEach(resource => {
+        const data = resource.data as PathData;
+
+        const spritesheet = new SpriteSheet({
+            imageUrl: data.spriteSheet,
+            cellHeight: data.cellHeight,
+            cellWidth: data.cellWidth,
+        });
+
+        Path.pathSprites.set(data.spriteSheet, spritesheet);
+    });
+
+    return resources.map(resource => resource.data);
 }

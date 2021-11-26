@@ -30,8 +30,6 @@ export default class ElevationTool extends Tool {
     }
 
     public update(): void {
-
-        // TODO: Update every quarter of a second or something
         if (Game.input.isInputHeld(Inputs.LeftMouse)) {
             if (this.placementIntervalRef) return;
             this.placementIntervalRef = window.setInterval(() => {
@@ -51,7 +49,7 @@ export default class ElevationTool extends Tool {
                 undo: (json: string): void => {
                     const data = JSON.parse(json) as ElevationSaveData;
                     Game.world.elevationGrid.load(data);
-                    Game.world.biomeGrid.redrawAllChunks();
+                    Game.world.biomeGrid.redrawAllChunks(); // TODO: optimise
                     Game.world.wallGrid.getAllWalls().forEach(wall => wall.updateSprite());
 
                     this.prevElevation = Game.world.elevationGrid.save();

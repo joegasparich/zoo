@@ -6,20 +6,18 @@ import { Assets } from "./consts";
 import Game from "Game";
 
 import "CameraControl";
-import Wall from "world/Wall";
-import { loadTileObjectData } from "helpers/assetLoaders";
-import Path from "world/Path";
+import { loadAnimalData, loadPathData, loadTileObjectData, loadWallData } from "helpers/assetLoaders";
 
 async function run(): Promise<void> {
-    // Create game
     // Load Assets
     AssetManager.preLoadAssets(Object.values(Assets.SPRITES));
     AssetManager.preLoadAssets(Object.values(Assets.SPRITESHEETS));
     AssetManager.preLoadAssets(Object.values(Assets.UI));
-    await loadTileObjectData(Assets.OBJECTS.TREE);
-    await loadTileObjectData(Assets.OBJECTS.BUILDING); // TODO: batch
-    await Wall.loadWallData(Assets.WALLS.IRON_BAR);
-    await Path.loadPathData(Assets.PATHS.DIRT);
+    // TODO: get progress for these
+    await loadAnimalData(...Object.values(Assets.ANIMALS));
+    await loadTileObjectData(...Object.values(Assets.OBJECTS));
+    await loadWallData(...Object.values(Assets.WALLS));
+    await loadPathData(...Object.values(Assets.PATHS));
 
     // Load game
     await Game.load(progress => {
