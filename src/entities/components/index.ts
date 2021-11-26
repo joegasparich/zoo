@@ -1,15 +1,11 @@
-import { ColliderType } from "managers";
-import Vector from "vector";
-
 import Component, { ComponentSaveData } from "./Component";
 
 import RenderComponent from "./RenderComponent";
 import AnimatedRenderComponent from "./AnimatedRenderComponent";
-import PhysicsComponent from "./PhysicsComponent";
+import SimplePhysicsComponent from "./SimplePhysicsComponent";
 import InputComponent from "./InputComponent";
 import CameraFollowComponent from "./CameraFollowComponent";
 import PathFollowComponent from "./PathFollowComponent";
-import WallAvoidanceComponent from "./WallAvoidanceComponent";
 import InputToPhysicsComponent from "./InputToPhysicsComponent";
 import SolidComponent from "./SolidComponent";
 import ActorInputComponent from "./ActorInputComponent";
@@ -19,7 +15,6 @@ import AreaPathFollowComponent from "./AreaPathFollowComponent";
 import ElevationComponent from "./ElevationComponent";
 import TileObjectComponent from "./TileObjectComponent";
 
-import { PhysicsComponentSaveData } from "./PhysicsComponent";
 
 export function createComponent(componentData: ComponentSaveData): Component {
     switch(componentData.id) {
@@ -27,18 +22,8 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "ANIMATED_RENDER_COMPONENT": return new AnimatedRenderComponent();
         case "CAMERA_FOLLOW_COMPONENT": return new CameraFollowComponent();
         case "PATH_FOLLOW_COMPONENT": return new PathFollowComponent();
-        case "PHYSICS_COMPONENT":
-            const data = componentData as PhysicsComponentSaveData;
-            return new PhysicsComponent({
-                type: data.collider.type as ColliderType,
-                height: data.collider.height,
-                width: data.collider.width,
-                radius: data.collider.radius,
-            }, data.isDynamic, data.density, data.tag, Vector.Deserialize(data.pivot));
-        case "WALL_AVOIDANCE_COMPONENT": return new WallAvoidanceComponent();
         case "INPUT_TO_PHYSICS_COMPONENT": return new InputToPhysicsComponent();
         case "SOLID_COMPONENT": return new SolidComponent();
-
         case "ACTOR_INPUT_COMPONENT": return new ActorInputComponent();
         case "AREA_PATH_FOLLOW_COMPONENT": return new AreaPathFollowComponent();
         case "FOLLOW_MOUSE_COMPONENT": return new FollowMouseComponent();
@@ -52,11 +37,10 @@ export function createComponent(componentData: ComponentSaveData): Component {
 export type COMPONENT =
       "RENDER_COMPONENT"
     | "ANIMATED_RENDER_COMPONENT"
-    | "PHYSICS_COMPONENT"
+    | "SIMPLE_PHYSICS_COMPONENT"
     | "INPUT_COMPONENT"
     | "CAMERA_FOLLOW_COMPONENT"
     | "PATH_FOLLOW_COMPONENT"
-    | "WALL_AVOIDANCE_COMPONENT"
     | "INPUT_TO_PHYSICS_COMPONENT"
     | "SOLID_COMPONENT"
     | "ACTOR_INPUT_COMPONENT"
@@ -69,11 +53,10 @@ export type COMPONENT =
 export type ComponentType<T> =
     T extends "RENDER_COMPONENT" ? RenderComponent :
     T extends "ANIMATED_RENDER_COMPONENT" ? AnimatedRenderComponent :
-    T extends "PHYSICS_COMPONENT" ? PhysicsComponent :
+    T extends "SIMPLE_PHYSICS_COMPONENT" ? SimplePhysicsComponent :
     T extends "INPUT_COMPONENT" ? InputComponent :
     T extends "CAMERA_FOLLOW_COMPONENT" ? CameraFollowComponent :
     T extends "PATH_FOLLOW_COMPONENT" ? PathFollowComponent :
-    T extends "WALL_AVOIDANCE_COMPONENT" ? WallAvoidanceComponent :
     T extends "INPUT_TO_PHYSICS_COMPONENT" ? InputToPhysicsComponent :
     T extends "SOLID_COMPONENT" ? SolidComponent :
     T extends "ACTOR_INPUT_COMPONENT" ? ActorInputComponent :
@@ -88,11 +71,10 @@ export {
     Component,
     RenderComponent,
     AnimatedRenderComponent,
-    PhysicsComponent,
+    SimplePhysicsComponent,
     InputComponent,
     CameraFollowComponent,
     PathFollowComponent,
-    WallAvoidanceComponent,
     InputToPhysicsComponent,
     SolidComponent,
     ActorInputComponent,

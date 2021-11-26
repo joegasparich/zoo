@@ -1,8 +1,7 @@
-import * as Planck from "planck-js";
 import { Sprite } from "pixi.js";
 
-import { RenderLayers, TAG } from "consts";
-import { AssetManager, ColliderType } from "managers";
+import { RenderLayers } from "consts";
+import { AssetManager } from "managers";
 
 import { WallData } from "types/AssetTypes";
 import Game from "Game";
@@ -43,7 +42,6 @@ export default class Wall {
     public data: WallData | undefined;
     public spriteSheet: SpriteSheet;
     public sprite: Sprite;
-    private body: Planck.Body;
 
     public exists: boolean;
     public indestructable: boolean;
@@ -60,20 +58,6 @@ export default class Wall {
             this.spriteSheet = Wall.wallSprites.get(this.data.spriteSheet);
             this.exists = true;
 
-            if (data.solid) {
-                this.body = Game.physicsManager.createPhysicsObject({
-                    collider: {
-                        type: ColliderType.Rect,
-                        height: orientation === Orientation.Horizontal ? 0.2 : 1,
-                        width: orientation === Orientation.Horizontal ? 1 : 0.2,
-                    },
-                    position: position,
-                    tag: TAG.Solid,
-                    pivot: new Vector(0.5, 0.5),
-                    isDynamic: false,
-                });
-            }
-
             this.updateSprite();
         } else {
             // Empty wall pos
@@ -84,7 +68,6 @@ export default class Wall {
     public remove(): void {
         if (this.exists) {
             Game.removeFromStage(this.sprite, RenderLayers.ENTITIES);
-            Game.physicsManager.removeBody(this.body);
         }
         this.data = undefined;
         this.spriteSheet = undefined;
@@ -130,11 +113,6 @@ export default class Wall {
 
         this.isDoor = isDoor;
 
-        if (isDoor) {
-            this.body.setActive(false);
-        } else {
-            this.body.setActive(true);
-        }
         this.updateSprite();
     }
 

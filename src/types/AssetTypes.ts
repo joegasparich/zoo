@@ -1,4 +1,3 @@
-import { Collider } from "managers";
 import Vector from "vector";
 
 enum Class {
@@ -43,7 +42,6 @@ export interface AnimalData {
 export interface TileObjectData {
     name: string;
     solid: boolean;
-    collider: Collider;
     pivot: Vector;
     size: Vector;
     sprite: string;

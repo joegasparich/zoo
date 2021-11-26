@@ -1,4 +1,4 @@
-import { InputComponent, PathFollowComponent, COMPONENT, WallAvoidanceComponent } from "entities/components";
+import { InputComponent, PathFollowComponent, COMPONENT } from "entities/components";
 import { Entity } from "entities";
 import Game from "Game";
 import { Inputs } from "consts";
@@ -11,13 +11,11 @@ export default class ActorInputComponent extends InputComponent {
     public requires: COMPONENT[] = ["PATH_FOLLOW_COMPONENT"];
 
     private pathfinder: PathFollowComponent;
-    private wallAvoid: WallAvoidanceComponent;
 
     public start(entity: Entity): void {
         super.start(entity);
 
         this.pathfinder = entity.getComponent("PATH_FOLLOW_COMPONENT");
-        this.wallAvoid = entity.getComponent("WALL_AVOIDANCE_COMPONENT");
     }
 
     public update(delta: number): void {
@@ -25,13 +23,8 @@ export default class ActorInputComponent extends InputComponent {
 
         this.inputVector = this.pathfinder.currentTarget?.subtract(this.entity.position).normalize() ?? Vector.Zero();
 
-        if (this.wallAvoid) {
-            if (this.pathfinder.hasPath()) {
-                this.pathfinder.followPath(50);
-                this.wallAvoid.shouldAvoid = true;
-            } else {
-                this.wallAvoid.shouldAvoid = false;
-            }
+        if (this.pathfinder.hasPath()) {
+            this.pathfinder.followPath(50);
         }
 
         // ! Temp

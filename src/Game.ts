@@ -1,7 +1,7 @@
 import { Application, Container, SCALE_MODES, settings, Ticker } from "pixi.js";
 import { Group, Layer, Stage } from "@pixi/layers";
 
-import { AssetManager, InputManager, PhysicsManager, SceneManager } from "./managers";
+import { AssetManager, InputManager, SceneManager } from "./managers";
 import Mediator from "./Mediator";
 import { registerPixiInspector } from "./helpers/util";
 import { Canvas } from "ui/components";
@@ -20,7 +20,6 @@ type DebugSettings = {
     showMapGrid: boolean;
     showPathfinding: boolean;
     showWallGrid: boolean;
-    showPhysics: boolean;
     showElevation: boolean;
     showWater: boolean;
     showPath: boolean;
@@ -30,7 +29,6 @@ const defaultSettings: DebugSettings = {
     showMapGrid: false,
     showPathfinding: false,
     showWallGrid: false,
-    showPhysics: false,
     showElevation: false,
     showWater: false,
     showPath: false,
@@ -72,7 +70,6 @@ class Game {
 
     // Managers
     public input: InputManager;
-    public physicsManager: PhysicsManager;
     public sceneManager: SceneManager;
 
     public debugSettings: DebugSettings;
@@ -121,7 +118,6 @@ class Game {
 
     protected setup(): void {
         this.input = new InputManager();
-        this.physicsManager = new PhysicsManager();
 
         this.setupStage();
 
@@ -132,7 +128,6 @@ class Game {
 
         this.map = new MapGrid();
 
-        this.physicsManager.setup();
         this.sceneManager = new SceneManager(this.map);
         this.sceneManager.loadScene(
             new ZooScene(),
@@ -215,8 +210,6 @@ class Game {
         // Game actions
         const scene = this.sceneManager.getCurrentScene();
         scene && scene.update();
-        // Do Physics
-        this.physicsManager.update(delta);
         UIManager.update(delta);
 
         this.entities.forEach(entity => {
@@ -293,7 +286,6 @@ class Game {
     private drawDebug(): void {
         if (this.debugSettings.showMapGrid) this.map.drawDebug();
         if (this.debugSettings.showPathfinding) this.map.pathfindingGrid.drawDebug();
-        if (this.debugSettings.showPhysics) this.physicsManager.drawDebug();
         if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
         if (this.debugSettings.showElevation) this.world.elevationGrid.drawDebug();
         if (this.debugSettings.showWater) this.world.waterGrid.drawDebug();

@@ -1,7 +1,7 @@
-import { Assets, TAG } from "consts";
+import { Assets } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, SolidComponent, PhysicsComponent, RenderComponent, WallAvoidanceComponent } from "entities/components";
-import { AssetManager, ColliderType } from "managers";
+import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent } from "entities/components";
+import { AssetManager } from "managers";
 import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
 import { TileObjectData } from "types/AssetTypes";
 import Game from "Game";
@@ -32,9 +32,8 @@ export function createActor(position: Vector): Entity {
         position,
     );
     actor.addComponent(new RenderComponent());
-    actor.addComponent(new PhysicsComponent({ type: ColliderType.Circle, radius: 0.15 }, true, 20));
+    actor.addComponent(new SimplePhysicsComponent());
     actor.addComponent(new ElevationComponent());
-    actor.addComponent(new WallAvoidanceComponent());
     actor.addComponent(new InputToPhysicsComponent());
 
     return actor;
@@ -55,7 +54,6 @@ export function createTileObject(assetPath: string, position: Vector, size = new
     ));
     tileObject.addComponent(new ElevationComponent());
     if (data.solid) {
-        tileObject.addComponent(new PhysicsComponent(data.collider, false, 1, TAG.Solid, data.pivot));
         tileObject.addComponent(new SolidComponent(size));
     }
     tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);

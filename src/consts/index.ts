@@ -3,7 +3,6 @@ export { default as Config } from "./config";
 export { default as Inputs } from "./inputs";
 export { GameEvent, MapEvent } from "./events";
 export { default as RenderLayers } from "./layers";
-export { TAG } from "./physicsTags";
 
 /**Frames per second */
 export const FRAME_RATE = 60; // TODO: Check this isn't changeable

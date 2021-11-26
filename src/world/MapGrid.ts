@@ -1,6 +1,5 @@
-import { MapEvent, Side, TAG } from "consts";
+import { MapEvent, Side } from "consts";
 import { Config } from "consts";
-import Game from "Game";
 import Graphics from "Graphics";
 import Mediator from "Mediator";
 import Vector from "vector";
@@ -212,10 +211,7 @@ export default class MapGrid {
      * @param b Position B
      */
     public isLineWalkable(a: Vector, b: Vector): boolean {
-        const hit = Game.physicsManager.rayCast(b, a, [TAG.Solid]);
-        if (hit) {
-            return false;
-        }
+        // TODO: required for pathfinding updates and optimisation
         return true;
     }
 

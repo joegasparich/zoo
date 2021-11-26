@@ -73,11 +73,6 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                             onClick={(): void => { Game.debugSettings.showPathfinding = !Game.debugSettings.showPathfinding; }}
                         />
                         <Button
-                            key="physicsButton"
-                            image={Assets.UI.PHYSICS_ICON}
-                            onClick={(): void => { Game.debugSettings.showPhysics = !Game.debugSettings.showPhysics; }}
-                        />
-                        <Button
                             key="wallButton"
                             image={Assets.UI.IRON_BAR_FENCE}
                             onClick={(): void => { Game.debugSettings.showWallGrid = !Game.debugSettings.showWallGrid; }}
