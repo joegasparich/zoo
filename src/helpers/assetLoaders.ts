@@ -1,7 +1,6 @@
 import { AssetManager } from "managers";
 import SpriteSheet from "SpriteSheet";
 import { AnimalData, PathData, TileObjectData, WallData } from "types/AssetTypes";
-import Vector from "vector";
 import Path from "world/Path";
 import Wall from "world/Wall";
 
@@ -15,13 +14,6 @@ export async function loadAnimalData(...paths: string[]): Promise<AnimalData[]> 
 export async function loadTileObjectData(...paths: string[]): Promise<TileObjectData[]> {
     const resources = await AssetManager.loadResources(paths);
     await AssetManager.loadResources(resources.map(resource => resource.data.sprite));
-
-    resources.forEach(resource => {
-        const data = resource.data as TileObjectData;
-
-        data.size = new Vector(data.size.x, data.size.y);
-        data.pivot = new Vector(data.pivot.x, data.pivot.y);
-    });
 
     return resources.map(resource => resource.data);
 }

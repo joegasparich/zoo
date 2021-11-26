@@ -10,11 +10,12 @@ import MapGrid from "world/MapGrid";
 import { Entity } from "entities";
 import Vector from "vector";
 import Graphics from "Graphics";
-import { Config, GameEvent, Inputs, RenderLayers } from "consts";
+import { Assets, Config, GameEvent, Inputs, RenderLayers } from "consts";
 import ZooScene from "scenes/ZooScene";
 import UIManager from "ui/UIManager";
-import { createDude } from "helpers/entityGenerators";
+import { createAnimal, createDude } from "helpers/entityGenerators";
 import World from "world/World";
+import { AnimalData } from "types/AssetTypes";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -150,7 +151,10 @@ class Game {
         // start up the game loop
         this.ticker.add(this.loop.bind(this));
 
-        createDude(); //! Temp
+        //! Temp
+        createDude();
+        const zebraData = AssetManager.getJSON(Assets.ANIMALS.PLAINS_ZEBRA) as AnimalData;
+        createAnimal(zebraData, new Vector(7));
     }
 
     private setupStage(): void {

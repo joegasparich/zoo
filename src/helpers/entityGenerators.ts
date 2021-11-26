@@ -1,12 +1,13 @@
 import { Assets } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent } from "entities/components";
+import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent, NeedsComponent } from "entities/components";
 import { AssetManager } from "managers";
 import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
-import { TileObjectData } from "types/AssetTypes";
+import { AnimalData, TileObjectData } from "types/AssetTypes";
 import Game from "Game";
 import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
+import { Need, NeedType } from "entities/components/NeedsComponent";
 
 export function createDude(): Entity {
     const spritesheet = new SpriteSheet({
@@ -19,6 +20,7 @@ export function createDude(): Entity {
 
     dude.addComponent(new AreaPathFollowComponent());
     dude.addComponent(new ActorInputComponent());
+    dude.addComponent(new InputToPhysicsComponent());
 
     const renderer = dude.getComponent("RENDER_COMPONENT");
     renderer.setSpriteSheet(spritesheet, 0);
@@ -27,19 +29,32 @@ export function createDude(): Entity {
     return dude;
 }
 
+export function createAnimal(data: AnimalData, position: Vector): Entity {
+    const animal = createActor(position);
+
+    animal.addComponent(new NeedsComponent([
+        new Need(NeedType.Hunger, 0.004, 1, true),
+        new Need(NeedType.Thirst, 0.005, 1, true),
+        new Need(NeedType.Hunger, 0.0025, 0.5, true),
+    ]));
+
+    const renderer = animal.getComponent("RENDER_COMPONENT");
+    renderer.setSprite(data.sprite);
+    renderer.scale = 0.5;
+
+    return animal;
+}
+
 export function createActor(position: Vector): Entity {
-    const actor = new Entity(
-        position,
-    );
+    const actor = new Entity(position);
+
     actor.addComponent(new RenderComponent());
     actor.addComponent(new SimplePhysicsComponent());
     actor.addComponent(new ElevationComponent());
-    actor.addComponent(new InputToPhysicsComponent());
 
     return actor;
 }
 
-// This is how we do
 export function createTileObject(assetPath: string, position: Vector, size = new Vector(1, 1)): Entity {
     if (!Game.map.isTileFree(position)) return;
 

@@ -14,6 +14,7 @@ import FollowMouseComponent from "./FollowMouseComponent";
 import AreaPathFollowComponent from "./AreaPathFollowComponent";
 import ElevationComponent from "./ElevationComponent";
 import TileObjectComponent from "./TileObjectComponent";
+import NeedsComponent from "./NeedsComponent";
 
 
 export function createComponent(componentData: ComponentSaveData): Component {
@@ -31,6 +32,7 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "SNAP_TO_GRID_COMPONENT": return new SnapToGridComponent();
         case "ELEVATION_COMPONENT": return new ElevationComponent();
         case "TILE_OBJECT_COMPONENT": return new TileObjectComponent();
+        case "NEEDS_COMPONENT": return new NeedsComponent();
         default: return undefined;
     }
 }
@@ -49,7 +51,8 @@ export type COMPONENT =
     | "FOLLOW_MOUSE_COMPONENT"
     | "AREA_PATH_FOLLOW_COMPONENT"
     | "ELEVATION_COMPONENT"
-    | "TILE_OBJECT_COMPONENT";
+    | "TILE_OBJECT_COMPONENT"
+    | "NEEDS_COMPONENT";
 
 export type ComponentType<T> =
     T extends "RENDER_COMPONENT" ? RenderComponent :
@@ -66,6 +69,7 @@ export type ComponentType<T> =
     T extends "AREA_PATH_FOLLOW_COMPONENT" ? AreaPathFollowComponent :
     T extends "ELEVATION_COMPONENT" ? ElevationComponent :
     T extends "TILE_OBJECT_COMPONENT" ? TileObjectComponent :
+    T extends "NEEDS_COMPONENT" ? NeedsComponent :
     Component;
 
 export {
@@ -84,4 +88,5 @@ export {
     AreaPathFollowComponent,
     ElevationComponent,
     TileObjectComponent,
+    NeedsComponent,
 };
