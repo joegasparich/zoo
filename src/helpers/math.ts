@@ -42,8 +42,8 @@ export function circleIntersectsRect(boxPos: Vector, boxDim: Vector, circlePos: 
 }
 
 // http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
-export function getCellsIntersectedByLine(x0: number, y0: number, x1: number, y1: number): [x: number, y: number][] {
-    const cells: [x: number, y: number][] = [];
+export function getCellsIntersectedByLine({x: x0, y: y0}: Vector, {x: x1, y: y1}: Vector): Vector[] {
+    const cells: Vector[] = [];
 
     let dx = Math.abs(x1 - x0);
     let dy = Math.abs(y1 - y0);
@@ -57,7 +57,7 @@ export function getCellsIntersectedByLine(x0: number, y0: number, x1: number, y1
     dy *= 2;
 
     for (; n > 0; --n) {
-        cells.push([x, y]);
+        cells.push(new Vector(x, y));
         if (error > 0) {
             x += x_inc;
             error -= dy;

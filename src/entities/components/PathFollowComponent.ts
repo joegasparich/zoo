@@ -23,6 +23,7 @@ export default class PathFollowComponent extends Component {
     public currentTarget: Vector;
 
     private placeSolidListener: string;
+    private checkPathDebounce: number;
 
     public start(entity: Entity): void {
         super.start(entity);
@@ -30,10 +31,15 @@ export default class PathFollowComponent extends Component {
         this.placeSolidListener = Mediator.on(MapEvent.PLACE_SOLID, () => {
             if (!this.path) return;
 
-            if (!Game.map.checkPath([this.entity.position, this.currentTarget, ...this.path])) {
-                this.pathTo(this.path.pop());
-            }
+            window.clearTimeout(this.checkPathDebounce);
+            this.checkPathDebounce = window.setTimeout(this.checkPath.bind(this), 100);
         });
+    }
+
+    private checkPath(): void {
+        if (!Game.map.checkPath([this.entity.position, this.currentTarget, ...this.path])) {
+            this.pathTo(this.path.pop());
+        }
     }
 
     public end(): void {

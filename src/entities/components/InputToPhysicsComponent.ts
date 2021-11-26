@@ -6,7 +6,7 @@ export default class InputToPhysicsComponent extends Component {
     public type: COMPONENT = "INPUT_TO_PHYSICS_COMPONENT";
     public requires: COMPONENT[] = ["INPUT_COMPONENT", "SIMPLE_PHYSICS_COMPONENT"];
 
-    public accelleration = 1;
+    public accelleration = 0.5;
 
     private input: InputComponent;
     private physics: SimplePhysicsComponent;

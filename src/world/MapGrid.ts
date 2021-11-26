@@ -1,6 +1,8 @@
 import { MapEvent, Side } from "consts";
 import { Config } from "consts";
+import Game from "Game";
 import Graphics from "Graphics";
+import { getCellsIntersectedByLine } from "helpers/math";
 import Mediator from "Mediator";
 import Vector from "vector";
 import PathfindingGrid, { NodeType } from "./PathfindingGrid";
@@ -197,6 +199,7 @@ export default class MapGrid {
         let lastNode: Vector = undefined;
         for(const node of path) {
             if (lastNode && !this.isLineWalkable(node, lastNode)) {
+                console.log("Path blocked");
                 return false;
             }
             lastNode = node;
@@ -212,6 +215,30 @@ export default class MapGrid {
      */
     public isLineWalkable(a: Vector, b: Vector): boolean {
         // TODO: required for pathfinding updates and optimisation
+        const cells = getCellsIntersectedByLine(a.floor(), b.floor());
+        let prev: Vector;
+
+        for (const cell of cells) {
+            // Check for solid tile
+            if (!this.isTileFree(cell)) return false;
+
+            if (prev) {
+                // Check for walls
+                let prevDir: Side | undefined = undefined;
+                if (prev.x > cell.x) prevDir = Side.East;
+                if (prev.x < cell.x) prevDir = Side.West;
+                if (prev.y > cell.y) prevDir = Side.South;
+                if (prev.y < cell.y) prevDir = Side.North;
+
+                if (prevDir === undefined) {
+                    console.warn("getCellsIntersectedByLine returned duplicate cells", cells.map(cell => cell.toString()));
+                }
+                if (Game.world.wallGrid.getWallAtTile(cell, prevDir)?.exists) return false;
+            }
+
+            prev = cell;
+        }
+
         return true;
     }
 

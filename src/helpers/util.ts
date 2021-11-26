@@ -19,3 +19,7 @@ export function hexToString(hex: number): string {
     const {r, g, b} = hexToRgb(hex);
     return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
+
+export function defer(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 0));
+}
