@@ -45,6 +45,8 @@ class SaveManager {
             Game.world.load(saveData.world);
 
             saveData.entities.forEach(entityData => Entity.loadEntity(entityData));
+
+            Game.world.postLoad(saveData.world);
         });
     }
 }

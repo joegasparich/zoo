@@ -88,9 +88,20 @@ export default class BiomeGrid {
         this.chunks = [];
     }
 
-    public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
+    public getBiomesInMapCell(cell: Vector): Biome[] {
+        const chunkX = Math.floor(cell.x * 2 / CHUNK_SIZE);
+        const chunkY = Math.floor(cell.y * 2 / CHUNK_SIZE);
+        return [
+            ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2) % CHUNK_SIZE, (cell.y * 2) % CHUNK_SIZE),
+            ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2 + 1) % CHUNK_SIZE, (cell.y * 2) % CHUNK_SIZE),
+            ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2) % CHUNK_SIZE, (cell.y * 2 + 1) % CHUNK_SIZE),
+            ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2 + 1) % CHUNK_SIZE, (cell.y * 2 + 1) % CHUNK_SIZE),
+        ];
+    }
+
+    public setBiomeInRadius(pos: Vector, radius: number, biome: Biome, area?: Area): void {
         this.getChunksInRadius(pos, radius).forEach(chunk => {
-            chunk.setBiome(new Vector(pos.x - chunk.pos.x, pos.y - chunk.pos.y), radius, biome, area);
+            chunk.setBiomeInRadius(new Vector(pos.x - chunk.pos.x, pos.y - chunk.pos.y), radius, biome, area);
         });
     }
 
@@ -280,7 +291,7 @@ export class BiomeChunk {
         }
     }
 
-    public setBiome(pos: Vector, radius: number, biome: Biome, area?: Area): void {
+    public setBiomeInRadius(pos: Vector, radius: number, biome: Biome, area?: Area): void {
         let changed = false;
 
         for(let i = pos.x - (radius); i <= pos.x + (radius); i++) {
@@ -306,6 +317,10 @@ export class BiomeChunk {
         if (changed) {
             this.draw();
         }
+    }
+
+    public getBiomesInCell(x: number, y: number): Biome[] {
+        return this.grid[x][y].getQuadrants()
     }
 
     public getCopy(): Biome[][][] {

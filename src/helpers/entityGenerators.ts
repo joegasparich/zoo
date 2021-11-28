@@ -37,7 +37,7 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
 
     animal.addComponent(new PathFollowComponent());
     animal.addComponent(new NeedsComponent([
-        new Need(NeedType.Hunger, 0.004, 1, true),
+        new Need(NeedType.Hunger, 0.004, 1, true), // TODO: per animal & genes
         new Need(NeedType.Thirst, 0.005, 1, true),
         new Need(NeedType.Hunger, 0.0025, 0.5, true),
     ]));

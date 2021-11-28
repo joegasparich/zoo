@@ -16,7 +16,7 @@ import { Entity } from "entities";
 import Vector from "vector";
 import { MapCell } from "./MapGrid";
 import PathGrid, { PathGridSaveData } from "./PathGrid";
-import { COMPONENT } from "entities/components";
+import Exhibit, { ExhibitSaveData } from "./Exhibit";
 
 export interface WorldSaveData {
     biomes: BiomeSaveData,
@@ -33,6 +33,7 @@ export interface WorldSaveData {
             doorGridPositions: number[][];
         }[];
     }[];
+    exhibits: ExhibitSaveData[];
 }
 
 export default class World {
@@ -45,14 +46,16 @@ export default class World {
     private tileObjects: Map<string, Entity>;
     private tileObjectMap: Map<string, Entity>;
 
-    private areas: Map<string, Area>;
-    private tileAreaMap: Map<string, Area>;
+    private areas: Map<string, Area>; // Key is area ID
+    private tileAreaMap: Map<string, Area>; // Key is stringified tile position
+    private exhibits: Map<string, Exhibit>; // Key is area ID
 
     public constructor() {
         this.tileObjects = new Map();
+        this.tileObjectMap = new Map();
         this.areas = new Map();
         this.tileAreaMap = new Map();
-        this.tileObjectMap = new Map();
+        this.exhibits = new Map();
     }
 
     public async setup(): Promise<void> {
@@ -87,6 +90,7 @@ export default class World {
     private resetAreas(): void {
         this.areas = new Map();
         this.tileAreaMap = new Map();
+        this.exhibits = new Map();
     }
 
     // TODO: Move to scene
@@ -236,6 +240,22 @@ export default class World {
         return this.areas.get(id);
     }
 
+    public createExhibit(areaId: string): Exhibit {
+        if (this.getExhibitByAreaId(areaId)) {
+            return this.getExhibitByAreaId(areaId);
+        }
+
+        const exhibit = new Exhibit(this.getAreaById(areaId));
+
+        exhibit.recalculate();
+
+        return exhibit;
+    }
+
+    public getExhibitByAreaId(areaId: string): Exhibit {
+        return this.exhibits.get(areaId);
+    }
+
     public placeDoor(wall: Wall): void {
         wall.setDoor(true);
 
@@ -307,20 +327,17 @@ export default class World {
             paths: Game.world.pathGrid.save(),
             walls: Game.world.wallGrid.save(),
             elevation: Game.world.elevationGrid.save(),
-            areas: Array.from(this.areas.values()).map(area => {
-                return {
-                    id: area.id,
-                    name: area.name,
-                    colour: area.colour,
-                    cells: area.getCells().map(cell => Vector.Serialize(cell.position)),
-                    connectedAreas: Array.from(area.connectedAreas.entries()).map(([area, doors]) => {
-                        return {
-                            areaId: area.id,
-                            doorGridPositions: doors.map(door => Vector.Serialize(door.gridPos)),
-                        };
-                    }),
-                };
-            }),
+            areas: Array.from(this.areas.values()).map(area => ({
+                id: area.id,
+                name: area.name,
+                colour: area.colour,
+                cells: area.getCells().map(cell => Vector.Serialize(cell.position)),
+                connectedAreas: Array.from(area.connectedAreas.entries()).map(([area, doors]) => ({
+                    areaId: area.id,
+                    doorGridPositions: doors.map(door => Vector.Serialize(door.gridPos)),
+                })),
+            })),
+            exhibits: Array.from(this.exhibits.values()).map(exhibit => exhibit.save()),
         };
     }
 
@@ -353,6 +370,14 @@ export default class World {
         });
 
         Mediator.fire(WorldEvents.AREAS_UPDATED);
+    }
+
+    public postLoad(data: WorldSaveData): void {
+        data.exhibits.forEach(exhibitData => {
+            const exhibit = new Exhibit();
+            exhibit.load(exhibitData);
+            this.exhibits.set(exhibitData.areaId, exhibit);
+        });
     }
 
     /**

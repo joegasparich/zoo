@@ -39,7 +39,7 @@ export default class BiomeTool extends Tool {
                         this.chunksUpdated.set(chunk, chunk.getCopy());
                     }
                 });
-                Game.world.biomeGrid.setBiome(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, Game.world.getAreaAtPosition(mouseWorldPos));
+                Game.world.biomeGrid.setBiomeInRadius(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, Game.world.getAreaAtPosition(mouseWorldPos));
             }, BIOME_UPDATE_INTERVAL);
         } else {
             window.clearInterval(this.placementIntervalRef);

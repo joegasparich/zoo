@@ -40,7 +40,7 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
         }
     }
 
-    public followPath(): Vector {
+    public followPath(): boolean {
         if (this.areaPath?.length) {
             // We still have areas left to traverse
             if (!this.currentDoor) {
@@ -81,7 +81,7 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
                     }
                 }
             }
-            return;
+            return false;
         } else {
             // We have finished traversing areas, path as normal
             this.currentArea = undefined;

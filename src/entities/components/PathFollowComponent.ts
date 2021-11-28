@@ -66,16 +66,16 @@ export default class PathFollowComponent extends Component {
         return !!this.path;
     }
 
-    public followPath(): Vector {
+    public followPath(): boolean {
         if (!this.path) {
-            return;
+            return false;
         }
 
         if (Vector.Distance(this.entity.position, this.currentTarget) < DISTANCE_TO_NODE) {
             if (this.path.length < 1) {
                 // Path complete
                 this.resetPath();
-                return;
+                return true;
             }
             this.currentTarget = this.path.shift();
         }
@@ -84,7 +84,7 @@ export default class PathFollowComponent extends Component {
             this.drawDebugPath();
         }
 
-        return this.currentTarget;
+        return false;
     }
 
     public resetPath(): void {

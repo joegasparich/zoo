@@ -10,12 +10,11 @@ import MapGrid from "world/MapGrid";
 import { Entity } from "entities";
 import Vector from "vector";
 import Graphics from "Graphics";
-import { Assets, Config, GameEvent, Inputs, RenderLayers } from "consts";
+import { Config, GameEvent, Inputs, RenderLayers } from "consts";
 import ZooScene from "scenes/ZooScene";
 import UIManager from "ui/UIManager";
-import { createAnimal, createDude } from "helpers/entityGenerators";
+import { createDude } from "helpers/entityGenerators";
 import World from "world/World";
-import { AnimalData } from "types/AssetTypes";
 
 type DebugSettings = {
     showMapGrid: boolean;
@@ -250,6 +249,10 @@ class Game {
     public getEntities(): Entity[] {
         // TODO: Find out if its cheaper to also store an array of entities instead of converting it each time
         return Array.from(this.entities.values());
+    }
+
+    public getEntityById(id: string): Entity {
+        return this.entities.get(id);
     }
 
     public registerEntity(entity: Entity): Entity {
