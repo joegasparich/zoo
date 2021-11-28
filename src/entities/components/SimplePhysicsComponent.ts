@@ -67,4 +67,10 @@ export default class SimplePhysicsComponent extends Component {
         this._velocity = Vector.Deserialize(data.velocity);
         this._force = Vector.Deserialize(data.force);
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Velocity: ${this._velocity} | Force: ${this._force}`);
+    }
 }

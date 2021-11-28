@@ -172,6 +172,13 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     />
                     <DebugControls />
                     <Button
+                        key="debugEntityButton"
+                        image={Assets.UI.DEBUG_ENTITY_ICON}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Debug);
+                        }}
+                    />
+                    <Button
                         key="saveButton"
                         image={Assets.UI.SAVE_ICON}
                         onClick={(): void => {

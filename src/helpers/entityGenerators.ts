@@ -1,6 +1,6 @@
 import { Assets } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent, NeedsComponent, PathFollowComponent } from "entities/components";
+import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent, NeedsComponent, PathFollowComponent, DebuggableComponent } from "entities/components";
 import { AssetManager } from "managers";
 import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
 import { AnimalData, TileObjectData } from "types/AssetTypes";
@@ -22,6 +22,7 @@ export function createDude(): Entity {
     dude.addComponent(new AreaPathFollowComponent());
     dude.addComponent(new ActorInputComponent());
     dude.addComponent(new InputToPhysicsComponent());
+    dude.addComponent(new DebuggableComponent());
 
     const renderer = dude.getComponent("RENDER_COMPONENT");
     renderer.setSpriteSheet(spritesheet, 0);
@@ -43,6 +44,7 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
     ]));
     animal.addComponent(new AnimalBehaviourComponent());
     animal.addComponent(new InputToPhysicsComponent());
+    animal.addComponent(new DebuggableComponent());
 
     const renderer = animal.getComponent("RENDER_COMPONENT");
     renderer.setSprite(data.sprite);

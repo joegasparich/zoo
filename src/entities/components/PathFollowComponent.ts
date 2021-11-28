@@ -131,4 +131,11 @@ export default class PathFollowComponent extends Component {
         this.path = data.path?.map(node => Vector.Deserialize(node));
         this.currentTarget = data.currentNode && Vector.Deserialize(data.currentNode);
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Path: ${this.path}`);
+        console.log(`Current Target: ${this.currentTarget}`);
+    }
 }

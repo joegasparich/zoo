@@ -23,4 +23,10 @@ export default class ElevationComponent extends Component {
 
         this.renderer.offset.y = -Game.world.elevationGrid.getElevationAtPoint(this.entity.position);
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Current Elevation: ${-Game.world.elevationGrid.getElevationAtPoint(this.entity.position)}`);
+    }
 }

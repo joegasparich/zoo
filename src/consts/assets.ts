@@ -23,6 +23,7 @@ export const UI = {
     PHYSICS_ICON: "/assets/img/physics_icon.png",
     WATER_ICON: "/assets/img/water_icon.png",
     PATH_ICON: "/assets/img/path_icon.png",
+    DEBUG_ENTITY_ICON: "/assets/img/debug_entity_icon.png",
     SAVE_ICON: "/assets/img/save_icon.png",
     LOAD_ICON: "/assets/img/load_icon.png",
 };

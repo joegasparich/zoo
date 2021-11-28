@@ -6,6 +6,7 @@ import Windows from "./components/Windows";
 import ToolManager from "./ToolManager";
 import Mediator from "Mediator";
 import { UIEvent } from "consts/events";
+import { ToolType } from "./tools";
 
 class UIManager {
     private tools: ToolManager;
@@ -47,6 +48,10 @@ class UIManager {
 
         Mediator.unsubscribe(UIEvent.FOCUS, this.focusListener);
         Mediator.unsubscribe(UIEvent.UNFOCUS, this.unfocusListener);
+    }
+
+    public getCurrentTool(): ToolType {
+        return this.tools.getActiveTool();
     }
 
     public hasFocus(): boolean {

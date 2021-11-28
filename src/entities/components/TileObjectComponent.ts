@@ -55,4 +55,10 @@ export default class TileObjectComponent extends Component {
 
         this.setAsset(data.assetPath);
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Tile Object: ${this.data}`);
+    }
 }

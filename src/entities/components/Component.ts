@@ -40,4 +40,6 @@ export default abstract class Component {
         this.id = data.id;
         this.disabled = data.disabled;
     }
+
+    public printDebug(): void {}
 }

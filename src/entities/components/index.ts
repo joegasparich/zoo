@@ -4,6 +4,7 @@ import RenderComponent from "./RenderComponent";
 import AnimatedRenderComponent from "./AnimatedRenderComponent";
 import SimplePhysicsComponent from "./SimplePhysicsComponent";
 import InputComponent from "./InputComponent";
+import DebuggableComponent from "./DebuggableComponent";
 import CameraFollowComponent from "./CameraFollowComponent";
 import PathFollowComponent from "./PathFollowComponent";
 import InputToPhysicsComponent from "./InputToPhysicsComponent";
@@ -23,6 +24,7 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "ANIMATED_RENDER_COMPONENT": return new AnimatedRenderComponent();
         case "CAMERA_FOLLOW_COMPONENT": return new CameraFollowComponent();
         case "SIMPLE_PHYSICS_COMPONENT": return new SimplePhysicsComponent();
+        case "DEBUGGABLE_COMPONENT": return new DebuggableComponent();
         case "PATH_FOLLOW_COMPONENT": return new PathFollowComponent();
         case "INPUT_TO_PHYSICS_COMPONENT": return new InputToPhysicsComponent();
         case "SOLID_COMPONENT": return new SolidComponent();
@@ -43,6 +45,7 @@ export type COMPONENT =
     | "ANIMATED_RENDER_COMPONENT"
     | "SIMPLE_PHYSICS_COMPONENT"
     | "INPUT_COMPONENT"
+    | "DEBUGGABLE_COMPONENT"
     | "CAMERA_FOLLOW_COMPONENT"
     | "PATH_FOLLOW_COMPONENT"
     | "INPUT_TO_PHYSICS_COMPONENT"
@@ -61,6 +64,7 @@ export type ComponentType<T> =
     T extends "ANIMATED_RENDER_COMPONENT" ? AnimatedRenderComponent :
     T extends "SIMPLE_PHYSICS_COMPONENT" ? SimplePhysicsComponent :
     T extends "INPUT_COMPONENT" ? InputComponent :
+    T extends "DEBUGGABLE_COMPONENT" ? DebuggableComponent :
     T extends "CAMERA_FOLLOW_COMPONENT" ? CameraFollowComponent :
     T extends "PATH_FOLLOW_COMPONENT" ? PathFollowComponent :
     T extends "INPUT_TO_PHYSICS_COMPONENT" ? InputToPhysicsComponent :
@@ -81,6 +85,7 @@ export {
     AnimatedRenderComponent,
     SimplePhysicsComponent,
     InputComponent,
+    DebuggableComponent,
     CameraFollowComponent,
     PathFollowComponent,
     InputToPhysicsComponent,

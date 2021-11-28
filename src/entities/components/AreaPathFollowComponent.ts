@@ -128,4 +128,13 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
         this.enterDoorPosition = data.enterDoorPosition && Vector.Deserialize(data.enterDoorPosition);
         this.targetPosition = data.targetPosition && Vector.Deserialize(data.targetPosition);
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Area Path: ${this.areaPath}`);
+        console.log(`Current Area: ${this.currentArea}`);
+        console.log(`Current Door: ${this.currentDoor}`);
+        console.log(`Enter Door Position: ${this.enterDoorPosition}`);
+    }
 }

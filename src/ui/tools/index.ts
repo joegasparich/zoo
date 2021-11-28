@@ -11,6 +11,7 @@ export enum ToolType {
     Biome,
     Elevation,
     Path,
+    Debug,
 }
 
 export interface Action {
@@ -50,3 +51,4 @@ export { default as WallTool } from "./WallTool";
 export { default as DoorTool } from "./DoorTool";
 export { default as DeleteTool } from "./DeleteTool";
 export { default as TileObjectTool } from "./TileObjectTool";
+export { default as DebugTool } from "./DebugTool";

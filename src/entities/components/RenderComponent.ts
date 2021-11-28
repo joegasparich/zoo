@@ -89,6 +89,10 @@ export default class RenderComponent extends Component {
         Game.removeFromStage(this.sprite, this.layer);
     }
 
+    public getSprite(): Sprite {
+        return this.sprite;
+    }
+
     public setSprite(spriteUrl: string): void {
         this.spriteUrl = spriteUrl;
         this.spriteSheet = undefined;
@@ -197,5 +201,13 @@ export default class RenderComponent extends Component {
         } else {
             this.setSprite(this.spriteUrl);
         }
+    }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Current sprite URL: ${this.spriteUrl} | spritesheet: ${this.spriteSheet?.data}, index: ${this.spriteIndex}`);
+        console.log(`Layer: ${this.layer} | Flip: ${this.flipX} ${this.flipY} | Scale ${this.scale}`);
+        console.log(`Pivot: ${this.pivot} | Offset: ${this.offset}`);
     }
 }

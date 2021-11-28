@@ -7,7 +7,7 @@ import { KEY } from "managers/InputManager";
 import Game from "Game";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool, AnimalTool } from "./tools";
+import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool, AnimalTool, DebugTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
 import Vector from "vector";
 import PathTool from "./tools/PathTool";
@@ -73,6 +73,10 @@ export default class ToolManager {
         this.ghost.destroy();
     }
 
+    public getActiveTool(): ToolType {
+        return this.activeTool.type;
+    }
+
     public setTool(tool: ToolType, data?: Record<string, any>): void {
         this.ghost.setSpriteVisible(true);
         this.ghost.setPivot(new Vector(0.5, 0.5));
@@ -87,6 +91,7 @@ export default class ToolManager {
             case ToolType.Delete: this.activeTool = new DeleteTool(this); break;
             case ToolType.Biome: this.activeTool = new BiomeTool(this); break;
             case ToolType.Elevation: this.activeTool = new ElevationTool(this); break;
+            case ToolType.Debug: this.activeTool = new DebugTool(this); break;
 
             case ToolType.None:
             default:

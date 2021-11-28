@@ -6,4 +6,10 @@ export default abstract class InputComponent extends Component {
     public type: COMPONENT = "INPUT_COMPONENT";
 
     public inputVector: Vector = new Vector(0, 0);
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Input Vector: ${this.inputVector}`);
+    }
 }

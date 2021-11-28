@@ -75,4 +75,14 @@ export default class NeedsComponent extends Component {
             this.needs.push(need);
         });
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.group("Needs:");
+        this.needs.forEach(need => {
+            console.log(need);
+        });
+        console.groupEnd();
+    }
 }

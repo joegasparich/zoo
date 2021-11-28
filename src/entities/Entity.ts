@@ -80,6 +80,10 @@ export default class Entity {
         return this.components.get(type) as ComponentType<T>;
     }
 
+    public getAllComponents(): Component[] {
+        return Array.from(this.components.values());
+    }
+
     public save(): EntitySaveData {
         return {
             id: this.id,

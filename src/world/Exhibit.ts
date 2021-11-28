@@ -15,7 +15,9 @@ export default class Exhibit {
     public size: number;
     public animals: Entity[];
 
-    public constructor(public area?: Area, public name?: string) {}
+    public constructor(public area?: Area, public name?: string) {
+        this.animals = [];
+    }
 
     public recalculate(): void {
         this.biomeDistribution = this.updateBiomes();

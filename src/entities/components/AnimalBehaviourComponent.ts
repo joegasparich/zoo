@@ -58,4 +58,11 @@ export default class AnimalBehaviourComponent extends InputComponent {
 
         this.stateMachine.setState(state);
     }
+
+    public printDebug(): void {
+        super.printDebug();
+
+        console.log(`Current state: ${this.stateMachine.getState().id}`);
+        console.log(`Exhibit: ${this.exhibit.name}`);
+    }
 }
