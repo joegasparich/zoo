@@ -5,6 +5,7 @@ export const SPRITES = {
 };
 
 export const UI = {
+    ANIMAL: "/assets/img/animals/zebra.png",
     BIOME: "/assets/img/biome.png",
     GRASS: "/assets/img/grass.png",
     SNOW: "/assets/img/snow.png",

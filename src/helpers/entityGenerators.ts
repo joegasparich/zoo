@@ -1,6 +1,6 @@
 import { Assets } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent, NeedsComponent } from "entities/components";
+import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent, NeedsComponent, PathFollowComponent } from "entities/components";
 import { AssetManager } from "managers";
 import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
 import { AnimalData, TileObjectData } from "types/AssetTypes";
@@ -8,6 +8,7 @@ import Game from "Game";
 import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
 import { Need, NeedType } from "entities/components/NeedsComponent";
+import AnimalBehaviourComponent from "entities/components/AnimalBehaviourComponent";
 
 export function createDude(): Entity {
     const spritesheet = new SpriteSheet({
@@ -29,14 +30,19 @@ export function createDude(): Entity {
     return dude;
 }
 
-export function createAnimal(data: AnimalData, position: Vector): Entity {
+export function createAnimal(assetPath: string, position: Vector): Entity {
+    const data = AssetManager.getJSON(assetPath) as AnimalData;
+
     const animal = createActor(position);
 
+    animal.addComponent(new PathFollowComponent());
     animal.addComponent(new NeedsComponent([
         new Need(NeedType.Hunger, 0.004, 1, true),
         new Need(NeedType.Thirst, 0.005, 1, true),
         new Need(NeedType.Hunger, 0.0025, 0.5, true),
     ]));
+    animal.addComponent(new AnimalBehaviourComponent());
+    animal.addComponent(new InputToPhysicsComponent());
 
     const renderer = animal.getComponent("RENDER_COMPONENT");
     renderer.setSprite(data.sprite);

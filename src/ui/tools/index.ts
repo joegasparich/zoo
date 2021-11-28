@@ -3,6 +3,7 @@ import ToolManager from "ui/ToolManager";
 
 export enum ToolType {
     None,
+    Animal,
     TileObject,
     Wall,
     Door,
@@ -42,6 +43,7 @@ export class NoTool extends Tool {
     public postUpdate(): void {}
 }
 
+export { default as AnimalTool } from "./AnimalTool";
 export { default as BiomeTool } from "./BiomeTool";
 export { default as ElevationTool } from "./ElevationTool";
 export { default as WallTool } from "./WallTool";

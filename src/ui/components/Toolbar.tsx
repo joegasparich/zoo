@@ -79,6 +79,16 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
             <React.Fragment>
                 <div className="bar">
                     <Button
+                        key="animalButton"
+                        image={Assets.UI.ANIMAL}
+                        onClick={(): void => {
+                            this.setTool(
+                                ToolType.Animal,
+                                {assetPath: Assets.ANIMALS.PLAINS_ZEBRA},
+                            );
+                        }}
+                    />
+                    <Button
                         key="treeButton"
                         image={Assets.SPRITES.TREE}
                         onClick={(): void => {

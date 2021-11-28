@@ -1,7 +1,8 @@
 import { Config } from "consts";
 import Graphics from "Graphics";
-import { rgbToHex } from "helpers/math";
+import { randomInt, rgbToHex } from "helpers/math";
 import { removeItem } from "helpers/util";
+import Vector from "vector";
 import { MapCell } from "./MapGrid";
 
 import Wall from "./Wall";
@@ -55,6 +56,10 @@ export default class Area {
         } else {
             this.connectedAreas.delete(area);
         }
+    }
+
+    public getRandomPos(): Vector {
+        return this.cells[randomInt(0, this.cells.length)].position;
     }
 
     public postUpdate(): void {

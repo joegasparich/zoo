@@ -21,10 +21,9 @@ export default class ActorInputComponent extends InputComponent {
     public update(delta: number): void {
         super.update(delta);
 
-        this.inputVector = this.pathfinder.currentTarget?.subtract(this.entity.position).normalize() ?? Vector.Zero();
-
         if (this.pathfinder.hasPath()) {
-            this.pathfinder.followPath(50);
+            const currentTarget = this.pathfinder.followPath();
+            this.inputVector = currentTarget?.subtract(this.entity.position).normalize() ?? Vector.Zero();
         }
 
         // ! Temp

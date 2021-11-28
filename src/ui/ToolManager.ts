@@ -7,7 +7,7 @@ import { KEY } from "managers/InputManager";
 import Game from "Game";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool } from "./tools";
+import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool, AnimalTool } from "./tools";
 import PlacementGhost from "./PlacementGhost";
 import Vector from "vector";
 import PathTool from "./tools/PathTool";
@@ -79,6 +79,7 @@ export default class ToolManager {
         this.ghost.setOffset(new Vector(0, 0));
 
         switch(tool) {
+            case ToolType.Animal: this.activeTool = new AnimalTool(this); break;
             case ToolType.TileObject: this.activeTool = new TileObjectTool(this); break;
             case ToolType.Wall: this.activeTool = new WallTool(this); break;
             case ToolType.Path: this.activeTool = new PathTool(this); break;

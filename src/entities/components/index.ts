@@ -15,7 +15,7 @@ import AreaPathFollowComponent from "./AreaPathFollowComponent";
 import ElevationComponent from "./ElevationComponent";
 import TileObjectComponent from "./TileObjectComponent";
 import NeedsComponent from "./NeedsComponent";
-
+import AnimalBehaviourComponent from "./AnimalBehaviourComponent";
 
 export function createComponent(componentData: ComponentSaveData): Component {
     switch(componentData.id) {
@@ -33,6 +33,7 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "ELEVATION_COMPONENT": return new ElevationComponent();
         case "TILE_OBJECT_COMPONENT": return new TileObjectComponent();
         case "NEEDS_COMPONENT": return new NeedsComponent();
+        case "ANIMAL_BEHAVIOUR_COMPONENT": return new AnimalBehaviourComponent();
         default: return undefined;
     }
 }
@@ -52,7 +53,8 @@ export type COMPONENT =
     | "AREA_PATH_FOLLOW_COMPONENT"
     | "ELEVATION_COMPONENT"
     | "TILE_OBJECT_COMPONENT"
-    | "NEEDS_COMPONENT";
+    | "NEEDS_COMPONENT"
+    | "ANIMAL_BEHAVIOUR_COMPONENT";
 
 export type ComponentType<T> =
     T extends "RENDER_COMPONENT" ? RenderComponent :
@@ -70,6 +72,7 @@ export type ComponentType<T> =
     T extends "ELEVATION_COMPONENT" ? ElevationComponent :
     T extends "TILE_OBJECT_COMPONENT" ? TileObjectComponent :
     T extends "NEEDS_COMPONENT" ? NeedsComponent :
+    T extends "ANIMAL_BEHAVIOUR_COMPONENT" ? AnimalBehaviourComponent :
     Component;
 
 export {
@@ -89,4 +92,5 @@ export {
     ElevationComponent,
     TileObjectComponent,
     NeedsComponent,
+    AnimalBehaviourComponent,
 };

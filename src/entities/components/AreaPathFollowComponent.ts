@@ -40,7 +40,7 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
         }
     }
 
-    public followPath(speed: number): boolean {
+    public followPath(): Vector {
         if (this.areaPath?.length) {
             // We still have areas left to traverse
             if (!this.currentDoor) {
@@ -60,7 +60,7 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
                 super.pathTo(targetTile);
             }
             // Head to door
-            if (super.followPath(speed)) {
+            if (super.followPath()) {
                 // We've made it to the door
                 // Get path through door
                 this.enterDoorPosition = Game.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => Game.world.getAreaAtPosition(tile) !== this.currentArea).add(new Vector(0.5));
@@ -81,12 +81,12 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
                     }
                 }
             }
-            return false;
+            return;
         } else {
             // We have finished traversing areas, path as normal
             this.currentArea = undefined;
             this.currentDoor = undefined;
-            return super.followPath(speed);
+            return super.followPath();
         }
     }
 

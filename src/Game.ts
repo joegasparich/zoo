@@ -153,8 +153,6 @@ class Game {
 
         //! Temp
         createDude();
-        const zebraData = AssetManager.getJSON(Assets.ANIMALS.PLAINS_ZEBRA) as AnimalData;
-        createAnimal(zebraData, new Vector(7));
     }
 
     private setupStage(): void {
