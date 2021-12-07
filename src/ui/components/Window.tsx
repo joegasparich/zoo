@@ -12,7 +12,7 @@ interface WindowProps extends UIComponentProps {
     position: Vector;
 }
 
-export default class Window extends UIComponent<WindowProps, {}> {
+export default class Window extends UIComponent<WindowProps, undefined> {
 
     protected draggableClassName = "header";
 

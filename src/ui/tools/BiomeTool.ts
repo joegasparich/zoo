@@ -5,6 +5,8 @@ import Vector from "vector";
 import { Biome, BiomeChunk } from "world/BiomeGrid";
 import Game from "Game";
 import { Tool, ToolType } from ".";
+import Mediator from "Mediator";
+import { WorldEvent } from "consts/events";
 
 const BIOME_UPDATE_INTERVAL = 50;
 
@@ -51,6 +53,8 @@ export default class BiomeTool extends Tool {
             this.chunksUpdated.forEach((data, chunk)  => {
                 chunkData.push([chunk, data]);
             });
+
+            Mediator.fire(WorldEvent.BIOMES_UPDATED);
 
             this.toolManager.pushAction({
                 name: "Biome Brush",

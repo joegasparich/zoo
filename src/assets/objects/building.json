@@ -16,5 +16,6 @@
     },
     "sprite": "/assets/img/building.png",
     "canPlaceOnSlopes": false,
-    "canPlaceInWater": false
+    "canPlaceInWater": false,
+    "isFoliage": false
 }

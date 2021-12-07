@@ -55,7 +55,7 @@ export default class BiomeControls extends UIComponent<BiomeControlsProps, Biome
                 <div className="panel-button">
                     <Button
                         key="biomeButton"
-                        image={Assets.UI.BIOME}
+                        image={Assets.UI.BIOME_ICON}
                         onClick={this.handlePanelButtonClick.bind(this)}
                     />
                     <FloatingPanel

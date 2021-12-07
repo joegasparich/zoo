@@ -16,5 +16,6 @@
     },
     "sprite": "/assets/img/tree.png",
     "canPlaceOnSlopes": true,
-    "canPlaceInWater": false
+    "canPlaceInWater": false,
+    "isFoliage": true
 }

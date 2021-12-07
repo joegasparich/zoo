@@ -47,6 +47,7 @@ export interface TileObjectData {
     sprite: string;
     canPlaceOnSlopes: boolean;
     canPlaceInWater: boolean;
+    isFoliage: boolean;
 }
 
 export interface GroundTileData {

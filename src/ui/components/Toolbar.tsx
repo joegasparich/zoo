@@ -7,9 +7,9 @@ import { Button, DebugControls, FloatingPanel, BiomeControls, UIComponent, UICom
 import ToolManager from "ui/ToolManager";
 import { ToolType } from "ui/tools";
 import UIManager from "ui/UIManager";
-import AreaList from "./AreaList";
 import SaveManager from "managers/SaveManager";
 import Vector from "vector";
+import ExhibitList from "./ExhibitList";
 
 interface ToolbarProps extends UIComponentProps {
     toolManager: ToolManager;
@@ -80,7 +80,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                 <div className="bar">
                     <Button
                         key="animalButton"
-                        image={Assets.UI.ANIMAL}
+                        image={Assets.UI.ANIMAL_ICON}
                         onClick={(): void => {
                             this.setTool(
                                 ToolType.Animal,
@@ -90,7 +90,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     />
                     <Button
                         key="treeButton"
-                        image={Assets.SPRITES.TREE}
+                        image={Assets.UI.FOLIAGE_ICON}
                         onClick={(): void => {
                             this.setTool(
                                 ToolType.TileObject,
@@ -100,7 +100,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     />
                     <Button
                         key="buildingButton"
-                        image={Assets.SPRITES.BUILDING}
+                        image={Assets.UI.BUILDING_ICON}
                         onClick={(): void => {
                             this.setTool(
                                 ToolType.TileObject,
@@ -140,10 +140,10 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         }}
                     />
                     <Button
-                        key="areasButton"
-                        image={Assets.UI.AREAS_ICON}
+                        key="exhibitButton"
+                        image={Assets.UI.EXHIBIT_ICON}
                         onClick={(): void => {
-                            UIManager.openWindow("areaList", "Areas", new Vector(0, 400), <AreaList />);
+                            UIManager.openWindow("exhibitList", "Exhibits", new Vector(0, 400), <ExhibitList />);
                         }}
                     />
                     <BiomeControls

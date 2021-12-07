@@ -42,7 +42,7 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
         new Need(NeedType.Thirst, 0.005, 1, true),
         new Need(NeedType.Hunger, 0.0025, 0.5, true),
     ]));
-    animal.addComponent(new AnimalBehaviourComponent());
+    animal.addComponent(new AnimalBehaviourComponent()).setAsset(assetPath);
     animal.addComponent(new InputToPhysicsComponent());
     animal.addComponent(new DebuggableComponent());
 

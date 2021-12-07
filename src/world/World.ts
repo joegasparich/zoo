@@ -4,7 +4,7 @@ import uuid = require("uuid");
 import { randomInt } from "helpers/math";
 import Mediator from "Mediator";
 import { Assets, Config, Side } from "consts";
-import { WorldEvents } from "consts/events";
+import { WorldEvent } from "consts/events";
 import Game from "Game";
 import Area from "./Area";
 import BiomeGrid, { BiomeSaveData } from "./BiomeGrid";
@@ -17,6 +17,8 @@ import Vector from "vector";
 import { MapCell } from "./MapGrid";
 import PathGrid, { PathGridSaveData } from "./PathGrid";
 import Exhibit, { ExhibitSaveData } from "./Exhibit";
+
+export const ZOO_AREA = "ZOO";
 
 export interface WorldSaveData {
     biomes: BiomeSaveData,
@@ -103,9 +105,9 @@ export default class World {
             this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West, true);
             this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(Game.map.cols - 1, i), Side.East, true);
         }
-        const zooArea = new Area("0", "zoo");
+        const zooArea = new Area(ZOO_AREA, "zoo");
         this.areas.set(zooArea.id, zooArea);
-        Mediator.fire(WorldEvents.AREAS_UPDATED);
+        Mediator.fire(WorldEvent.AREAS_UPDATED);
         const zooCells = this.floodFill(Game.map.getCell(new Vector(1)));
         zooArea.setCells(zooCells);
         zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
@@ -115,6 +117,9 @@ export default class World {
         this.biomeGrid.postUpdate();
         // this.pathGrid.postUpdate();
 
+        this.exhibits.forEach(exhibit => {
+            exhibit.postUpdate();
+        });
         this.areas.forEach(area => {
             area.postUpdate();
         });
@@ -130,6 +135,8 @@ export default class World {
                 this.tileObjectMap.set(tileObject.position.floor().add(new Vector(i, j)).toString(), tileObject);
             }
         }
+
+        Mediator.fire(WorldEvent.PLACE_TILE_OBJECT, tileObject);
     }
 
     public unregisterTileObject(tileObject: Entity): void {
@@ -137,9 +144,11 @@ export default class World {
 
         this.tileObjects.delete(tileObject.id);
         this.tileObjectMap.delete(tileObject.position.floor().toString());
+
+        Mediator.fire(WorldEvent.DELETE_TILE_OBJECT, tileObject);
     }
 
-    public getTileObjectAtPos(pos: Vector): Entity {
+    public getTileObjectAtPos(pos: Vector): Entity | undefined {
         if (!Game.map.isPositionInMap(pos)) return undefined;
 
         return this.tileObjectMap.get(pos.floor().toString());
@@ -187,9 +196,8 @@ export default class World {
         if (areasCells[0].length + areasCells[1].length > oldArea.getCells().length) return;
 
         const newArea = new Area(uuid(), "New Area");
-        // TODO: Autogenerate a good name
+        // TODO: Autogenerate a good name (ADJECTIVE + LOCATION) - Smelly glade
         this.areas.set(newArea.id, newArea);
-
 
         const larger = areasCells[0].length >= areasCells[1].length ? areasCells[0] : areasCells[1];
         const smaller = areasCells[0].length < areasCells[1].length ? areasCells[0] : areasCells[1];
@@ -199,7 +207,7 @@ export default class World {
         newArea.setCells(smaller);
         smaller.forEach(cell => this.tileAreaMap.set(cell.position.toString(), newArea));
 
-        Mediator.fire(WorldEvents.AREAS_UPDATED);
+        Mediator.fire(WorldEvent.AREAS_UPDATED);
 
         return [oldArea, newArea];
     }
@@ -210,7 +218,7 @@ export default class World {
         let area2 = this.getAreaAtPosition(tile2);
 
         // If one of the areas is the main zoo area then ensure we keep it
-        if (area2.id === "0") {
+        if (area2.id === ZOO_AREA) {
             const swap = area1;
             area1 = area2;
             area2 = swap;
@@ -226,9 +234,10 @@ export default class World {
             });
         });
 
+        this.getExhibitByAreaId(area2.id)?.delete();
         this.areas.delete(area2.id);
 
-        Mediator.fire(WorldEvents.AREAS_UPDATED);
+        Mediator.fire(WorldEvent.AREAS_UPDATED);
         return area1;
     }
 
@@ -246,10 +255,23 @@ export default class World {
         }
 
         const exhibit = new Exhibit(this.getAreaById(areaId));
+        this.exhibits.set(areaId, exhibit);
 
         exhibit.recalculate();
 
+        Mediator.fire(WorldEvent.EXHIBITS_UPDATED);
+
         return exhibit;
+    }
+
+    public deleteExhibitByAreaId(areaId: string): void {
+        this.exhibits.delete(areaId);
+
+        Mediator.fire(WorldEvent.EXHIBITS_UPDATED);
+    }
+
+    public getExhibits(): Exhibit[] {
+        return Array.from(this.exhibits.values());
     }
 
     public getExhibitByAreaId(areaId: string): Exhibit {
@@ -369,7 +391,7 @@ export default class World {
             });
         });
 
-        Mediator.fire(WorldEvents.AREAS_UPDATED);
+        Mediator.fire(WorldEvent.AREAS_UPDATED);
     }
 
     public postLoad(data: WorldSaveData): void {

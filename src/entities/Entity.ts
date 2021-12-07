@@ -14,13 +14,15 @@ export interface EntitySaveData {
 export default class Entity {
     public id: string;
 
-    private components: Map<string, Component>;
+    private componentIdMap: Map<string, Component>; // This is a map to id
+    private componentTypeMap: Map<string, Component>; // This is a map to type
 
     private hasStarted: boolean;
 
     public constructor(public position: Vector, public saveable = true) {
         this.id = uuid();
-        this.components = new Map();
+        this.componentIdMap = new Map();
+        this.componentTypeMap = new Map();
 
         Game.registerEntity(this);
     }
@@ -28,40 +30,41 @@ export default class Entity {
     public start(): void {
         this.hasStarted = true;
 
-        this.components.forEach(component => component.start(this));
+        this.componentTypeMap.forEach(component => component.start(this));
     }
 
     public preUpdate(delta: number): void {
-        this.components.forEach(component => {
+        this.componentTypeMap.forEach(component => {
             if(!component.disabled) component.preUpdate(delta);
         });
     }
 
     public update(delta: number): void {
-        this.components.forEach(component => {
+        this.componentTypeMap.forEach(component => {
             if(!component.disabled) component.update(delta);
         });
     }
 
     public postUpdate(delta: number): void {
-        this.components.forEach(component => {
+        this.componentTypeMap.forEach(component => {
             if(!component.disabled) component.postUpdate(delta);
         });
     }
 
     public remove(): void {
-        this.components.forEach(component => {
+        this.componentTypeMap.forEach(component => {
             component.end();
         });
         Game.unregisterEntity(this.id);
     }
 
     public addComponent<T extends Component>(component: T): T {
-        if (this.components.has(component.type)) {
+        if (this.componentTypeMap.has(component.type)) {
             return component;
         }
 
-        this.components.set(component.type, component);
+        this.componentTypeMap.set(component.type, component);
+        this.componentIdMap.set(component.id, component);
 
         if (this.hasStarted) {
             component.start(this);
@@ -70,31 +73,29 @@ export default class Entity {
     }
 
     public removeComponent(componentId: COMPONENT): void {
-        if (this.components.has(componentId)) {
-            this.components.get(componentId).end();
-            this.components.delete(componentId);
+        if (this.componentIdMap.has(componentId)) {
+            const component = this.componentIdMap.get(componentId);
+            component.end();
+            this.componentIdMap.delete(componentId);
+            this.componentTypeMap.delete(component.type);
         }
     }
 
     public getComponent<T extends COMPONENT>(type: T) : ComponentType<T> {
-        return this.components.get(type) as ComponentType<T>;
+        return this.componentIdMap.get(type) as ComponentType<T>
+         ?? this.componentTypeMap.get(type) as ComponentType<T>;
     }
 
     public getAllComponents(): Component[] {
-        return Array.from(this.components.values());
+        return Array.from(this.componentTypeMap.values());
     }
 
     public save(): EntitySaveData {
         return {
             id: this.id,
             position: Vector.Serialize(this.position),
-            componentData: Array.from(this.components.values()).map(component => component.save()),
+            componentData: Array.from(this.componentTypeMap.values()).map(component => component.save()),
         };
-    }
-
-    public load(data: EntitySaveData, components: Component[]): void {
-        this.id = data.id;
-        this.position = Vector.Deserialize(data.position);
     }
 
     public static loadEntity(data: EntitySaveData): Entity {

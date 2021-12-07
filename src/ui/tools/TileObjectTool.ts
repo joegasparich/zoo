@@ -1,4 +1,4 @@
-import { Inputs } from "consts";
+import { Inputs, WorldEvent } from "consts";
 import { TileObjectData } from "types/AssetTypes";
 import PlacementGhost from "ui/PlacementGhost";
 import { Tool, ToolType } from ".";
@@ -6,6 +6,7 @@ import Game from "Game";
 import { AssetManager } from "managers";
 import { createTileObject } from "helpers/entityGenerators";
 import Vector from "vector";
+import Mediator from "Mediator";
 
 export default class TileObjectTool extends Tool {
     public type = ToolType.TileObject;

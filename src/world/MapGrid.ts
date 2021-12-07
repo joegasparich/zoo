@@ -1,4 +1,4 @@
-import { MapEvent, Side } from "consts";
+import { WorldEvent, Side } from "consts";
 import { Config } from "consts";
 import Game from "Game";
 import Graphics from "Graphics";
@@ -68,7 +68,7 @@ export default class MapGrid {
         this.grid[position.x][position.y].isSolid = solid;
         this.setTilePathable(position, solid ? NodeType.CLOSED : NodeType.OPEN);
 
-        Mediator.fire(MapEvent.PLACE_SOLID, { position });
+        Mediator.fire(WorldEvent.PLACE_SOLID, { position });
     }
 
     /**

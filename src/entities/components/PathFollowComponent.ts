@@ -2,7 +2,7 @@ import { COMPONENT, Component } from ".";
 import { Entity } from "..";
 import Graphics from "Graphics";
 import Mediator from "Mediator";
-import { MapEvent } from "consts";
+import { WorldEvent } from "consts";
 import { ComponentSaveData } from "./Component";
 import Vector from "vector";
 import Game from "Game";
@@ -28,7 +28,7 @@ export default class PathFollowComponent extends Component {
     public start(entity: Entity): void {
         super.start(entity);
 
-        this.placeSolidListener = Mediator.on(MapEvent.PLACE_SOLID, () => {
+        this.placeSolidListener = Mediator.on(WorldEvent.PLACE_SOLID, () => {
             if (!this.path) return;
 
             window.clearTimeout(this.checkPathDebounce);
@@ -43,7 +43,7 @@ export default class PathFollowComponent extends Component {
     }
 
     public end(): void {
-        Mediator.unsubscribe(MapEvent.PLACE_SOLID, this.placeSolidListener);
+        Mediator.unsubscribe(WorldEvent.PLACE_SOLID, this.placeSolidListener);
     }
 
     public async pathTo(location: Vector): Promise<boolean> {

@@ -1,4 +1,4 @@
-import { MapEvent, Side } from "consts";
+import { Side } from "consts";
 import Mediator from "Mediator";
 
 import Wall, { Orientation } from "./Wall";
@@ -7,6 +7,7 @@ import Game from "Game";
 import Camera from "Camera";
 import Vector from "vector";
 import Graphics from "Graphics";
+import { WorldEvent } from "consts/events";
 
 export interface WallGridSaveData {
     walls: ({
@@ -101,7 +102,7 @@ export default class WallGrid {
 
         this.updatePathfindingAtWall(tilePos, side);
 
-        Mediator.fire(MapEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
+        Mediator.fire(WorldEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
 
         if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
             Game.world.formAreas(wall);

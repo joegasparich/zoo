@@ -1,10 +1,11 @@
 import Game from "Game";
-import { Config, Inputs } from "consts";
+import { Config, Inputs, WorldEvent } from "consts";
 import PlacementGhost from "ui/PlacementGhost";
 import { Elevation, ElevationSaveData } from "world/ElevationGrid";
 import { Tool, ToolType } from ".";
 import Vector from "vector";
 import Graphics from "Graphics";
+import Mediator from "Mediator";
 
 const ELEVATION_UPDATE_INTERVAL = 100;
 
@@ -43,6 +44,8 @@ export default class ElevationTool extends Tool {
         }
 
         if (Game.input.isInputReleased(Inputs.LeftMouse)) {
+            Mediator.fire(WorldEvent.ELEVATION_UPDATED);
+
             this.toolManager.pushAction({
                 name: "Adjust Elevation",
                 data: JSON.stringify(this.prevElevation),
