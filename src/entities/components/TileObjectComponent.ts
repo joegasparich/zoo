@@ -32,9 +32,9 @@ export default class TileObjectComponent extends Component {
 
         return [
             tile,
-            tile.add(new Vector(1, 0)),
-            tile.add(new Vector(0, 1)),
-            tile.add(new Vector(1, 1)),
+            tile.add(new Vector(this.data.size.x, 0)),
+            tile.add(new Vector(0, this.data.size.y)),
+            tile.add(new Vector(this.data.size.x, this.data.size.y)),
         ];
     }
 

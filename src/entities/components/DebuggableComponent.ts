@@ -27,7 +27,7 @@ export default class DebuggableComponent extends Component {
         console.group(`%cEntity ID: ${this.entity.id}`, "background-color: #ebdb9d; color: black");
         console.log("Components:");
         this.entity.getAllComponents().forEach(component => {
-            console.group(`Component ID: ${component.type}`);
+            console.group(`Component ID: ${component.id}`);
             component.printDebug();
             console.groupEnd();
         });
