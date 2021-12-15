@@ -23,3 +23,15 @@ export function hexToString(hex: number): string {
 export function defer(): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, 0));
 }
+
+const StringIsNumber = (value: string) => isNaN(Number(value)) === false;
+
+export function EnumValues(enumme: any): any[] {
+    return Object.keys(enumme)
+        .filter(StringIsNumber);
+}
+
+export function EnumKeys(enumme: any): any[] {
+    return EnumValues(enumme)
+        .map(key => enumme[key]);
+}

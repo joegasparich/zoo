@@ -1,0 +1,19 @@
+{
+    "name": "Water Bowl",
+    "solid": false,
+    "pivot": {
+        "x": 0.5,
+        "y": 0.5
+    },
+    "scale": 0.3,
+    "size": {
+        "x": 1,
+        "y": 1
+    },
+    "sprite": "/assets/img/water_bowl.png",
+    "canPlaceOnSlopes": true,
+    "canPlaceInWater": false,
+    "type": "consumable",
+    "consumableType": "thirst",
+    "consumer": "animal"
+}

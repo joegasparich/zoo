@@ -1,7 +1,7 @@
 import { Graphics } from "pixi.js";
 
 import Camera from "Camera";
-import { RenderLayers, Side } from "consts";
+import { Assets, RenderLayers, Side } from "consts";
 import { circleIntersectsRect, clamp, hexToHsl, hslToHex, pointInCircle } from "helpers/math";
 import Vector from "vector";
 import Game from "Game";
@@ -15,10 +15,16 @@ export enum Biome {
     Snow = 0xdff6f5,
 }
 
+export const BiomeIconMap: Record<Biome, string> = {
+    [Biome.Grass]: Assets.UI.GRASS,
+    [Biome.Sand]: Assets.UI.SAND,
+    [Biome.Snow]: Assets.UI.SNOW,
+};
+
 const CHUNK_SIZE = 5;
 
 export interface BiomeSaveData {
-    chunks: Biome[][][][][];
+    chunks: Biome[][][][][]; //! 5D !
 }
 
 class Square {

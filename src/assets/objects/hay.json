@@ -1,0 +1,19 @@
+{
+    "name": "Hay",
+    "solid": false,
+    "pivot": {
+        "x": 0.5,
+        "y": 0.5
+    },
+    "scale": 0.5,
+    "size": {
+        "x": 1,
+        "y": 1
+    },
+    "sprite": "/assets/img/hay.png",
+    "canPlaceOnSlopes": true,
+    "canPlaceInWater": false,
+    "type": "consumable",
+    "consumableType": "hunger",
+    "consumer": "animal"
+}

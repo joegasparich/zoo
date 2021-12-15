@@ -1,14 +1,14 @@
 import Vector from "vector";
 
-enum Class {
+export enum Class {
     Mammal = "Mammal"
 }
 
-enum ConservationStatus {
+export enum ConservationStatus {
     NearThreatened = "Near Threatened"
 }
 
-enum Location {
+export enum Location {
     Africa = "Africa"
 }
 
@@ -39,15 +39,39 @@ export interface AnimalData {
     pubertyLength: number; // Time till adulthood in months
 }
 
+export enum TileObjectType {
+    Foliage = "foliage",
+    Building = "building",
+    Consumable = "consumable"
+}
+
 export interface TileObjectData {
     name: string;
     solid: boolean;
     pivot: Vector;
+    scale?: number;
     size: Vector;
     sprite: string;
     canPlaceOnSlopes: boolean;
     canPlaceInWater: boolean;
-    isFoliage: boolean;
+    type: TileObjectType;
+}
+
+export enum ConsumableType {
+    Thirst = "thirst",
+    Hunger = "hunger",
+    Energy = "energy"
+}
+
+export enum ConsumerType {
+    Animal = "animal",
+    Guest = "guest",
+    Staff = "staff",
+}
+
+export interface ConsumableData extends TileObjectData {
+    consumableType: ConsumableType,
+    consumer: ConsumerType
 }
 
 export interface GroundTileData {

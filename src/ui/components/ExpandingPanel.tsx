@@ -2,37 +2,38 @@
 import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
-import { Button, FloatingPanel, UIComponent, UIComponentProps } from ".";
-import { ToolType } from "ui/tools";
+import { UIEvent } from "consts";
 import Mediator from "Mediator";
-import { UIEvent } from "consts/events";
-import { Assets } from "consts";
-import { Biome } from "world/BiomeGrid";
+import { Button, FloatingPanel, UIComponent, UIComponentProps } from ".";
 
-interface BiomeControlsProps extends UIComponentProps {
-    setTool: (tool: ToolType, data?: Object) => void;
-};
-interface BiomeControlsState {
+interface PanelItem {
+    image: string;
+    onClick: () => void;
+}
+
+interface ExpandingPanelProps extends UIComponentProps {
+    focusId: string;
+    buttonIcon: string;
+    items: PanelItem[];
+}
+interface ExpandingPanelState {
     panelOpen: boolean;
-};
-const defaultState: BiomeControlsState = {
+}
+const defaultState: ExpandingPanelState = {
     panelOpen: false,
 };
 
-export default class BiomeControls extends UIComponent<BiomeControlsProps, BiomeControlsState> {
-
-    public focusID = "BIOME_TOOLS";
-
+export default class ExpandingPanel extends UIComponent<ExpandingPanelProps, ExpandingPanelState> {
     private focusListener: string;
     private unfocusListener: string;
 
-    public constructor(props: BiomeControlsProps) {
+    public constructor(props: ExpandingPanelProps) {
         super(props);
 
         this.state = defaultState;
 
         this.focusListener = Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
-            if (id !== this.focusID) {
+            if (id !== this.props.focusId) {
                 this.setState({panelOpen: false});
             }
         });
@@ -54,8 +55,8 @@ export default class BiomeControls extends UIComponent<BiomeControlsProps, Biome
             <React.Fragment>
                 <div className="panel-button">
                     <Button
-                        key="biomeButton"
-                        image={Assets.UI.BIOME_ICON}
+                        key={this.props.focusId}
+                        image={this.props.buttonIcon}
                         onClick={this.handlePanelButtonClick.bind(this)}
                     />
                     <FloatingPanel
@@ -64,21 +65,13 @@ export default class BiomeControls extends UIComponent<BiomeControlsProps, Biome
                         layout="horizontal"
                         showTriangle={true}
                     >
-                        <Button
-                            key="grassButton"
-                            image={Assets.UI.GRASS}
-                            onClick={(): void => { this.props.setTool(ToolType.Biome, {biome: Biome.Grass} ); }}
-                        />
-                        <Button
-                            key="snowButton"
-                            image={Assets.UI.SNOW}
-                            onClick={(): void => { this.props.setTool(ToolType.Biome, {biome: Biome.Snow} ); }}
-                        />
-                        <Button
-                            key="sandButton"
-                            image={Assets.UI.SAND}
-                            onClick={(): void => { this.props.setTool(ToolType.Biome, {biome: Biome.Sand} ); }}
-                        />
+                        {this.props.items.map((item, index) => (
+                            <Button
+                                key={index}
+                                image={item.image}
+                                onClick={item.onClick}
+                            />
+                        ))}
                     </FloatingPanel>
                 </div>
             </React.Fragment>
@@ -89,7 +82,7 @@ export default class BiomeControls extends UIComponent<BiomeControlsProps, Biome
         if (this.state.panelOpen) {
             Mediator.fire(UIEvent.UNFOCUS);
         } else {
-            Mediator.fire(UIEvent.FOCUS, {id: this.focusID});
+            Mediator.fire(UIEvent.FOCUS, {id: this.props.focusId});
         }
 
         this.setState({panelOpen: !this.state.panelOpen});

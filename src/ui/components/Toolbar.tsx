@@ -3,13 +3,18 @@ import * as React from "react";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 
 import { Assets } from "consts";
-import { Button, DebugControls, FloatingPanel, BiomeControls, UIComponent, UIComponentProps } from "ui/components";
+import { Button, DebugControls, FloatingPanel, UIComponent, UIComponentProps } from "ui/components";
 import ToolManager from "ui/ToolManager";
 import { ToolType } from "ui/tools";
 import UIManager from "ui/UIManager";
 import SaveManager from "managers/SaveManager";
 import Vector from "vector";
 import ExhibitList from "./ExhibitList";
+import ExpandingPanel from "./ExpandingPanel";
+import { Biome, BiomeIconMap } from "world/BiomeGrid";
+import { EnumValues } from "helpers/util";
+import { AssetManager } from "managers";
+import { TileObjectData } from "types/AssetTypes";
 
 interface ToolbarProps extends UIComponentProps {
     toolManager: ToolManager;
@@ -94,7 +99,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         onClick={(): void => {
                             this.setTool(
                                 ToolType.TileObject,
-                                {assetPath: Assets.OBJECTS.TREE},
+                                {assetPath: Assets.FOLIAGE.TREE},
                             );
                         }}
                     />
@@ -104,9 +109,20 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         onClick={(): void => {
                             this.setTool(
                                 ToolType.TileObject,
-                                {assetPath: Assets.OBJECTS.BUILDING},
+                                {assetPath: Assets.BUILDING.BUILDING},
                             );
                         }}
+                    />
+                    <ExpandingPanel
+                        buttonIcon={Assets.UI.CONSUMABLE_ICON}
+                        focusId="CONSUMABLES"
+                        items={Object.values(Assets.CONSUMABLE).map((asset: string) => {
+                            const data = AssetManager.getJSON(asset) as TileObjectData;
+                            return {
+                                image: data.sprite,
+                                onClick: (): void => { this.setTool(ToolType.TileObject, { assetPath: asset }); },
+                            };
+                        })}
                     />
                     <Button
                         key="pathButton"
@@ -146,8 +162,13 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                             UIManager.openWindow("exhibitList", "Exhibits", new Vector(0, 400), <ExhibitList />);
                         }}
                     />
-                    <BiomeControls
-                        setTool={this.setTool.bind(this)}
+                    <ExpandingPanel
+                        buttonIcon={Assets.UI.BIOME_ICON}
+                        focusId="BIOME_TOOLS"
+                        items={EnumValues(Biome).map((biome: Biome) => ({
+                            image: BiomeIconMap[biome],
+                            onClick: (): void => { this.setTool(ToolType.Biome, { biome }); },
+                        }))}
                     />
                     <Button
                         key="hillButton"

@@ -1,4 +1,4 @@
-import { Inputs, WorldEvent } from "consts";
+import { Inputs } from "consts";
 import { TileObjectData } from "types/AssetTypes";
 import PlacementGhost from "ui/PlacementGhost";
 import { Tool, ToolType } from ".";
@@ -6,7 +6,6 @@ import Game from "Game";
 import { AssetManager } from "managers";
 import { createTileObject } from "helpers/entityGenerators";
 import Vector from "vector";
-import Mediator from "Mediator";
 
 export default class TileObjectTool extends Tool {
     public type = ToolType.TileObject;
@@ -24,6 +23,7 @@ export default class TileObjectTool extends Tool {
             1/this.currentObject.size.x * this.currentObject.pivot.x,
             1/this.currentObject.size.y * this.currentObject.pivot.y,
         ));
+        ghost.setScale(this.currentObject.scale || 1);
         ghost.setSnap(true);
         ghost.applyElevation();
         ghost.canPlaceFunction = this.canPlace.bind(this);

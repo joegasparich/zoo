@@ -1,11 +1,6 @@
 {
     "name": "tree",
     "solid": true,
-    "collider": {
-        "type": "RECTANGLE",
-        "height": 0.6,
-        "width": 0.6
-    },
     "pivot": {
         "x": 0.5,
         "y": 0.7
@@ -17,5 +12,5 @@
     "sprite": "/assets/img/tree.png",
     "canPlaceOnSlopes": true,
     "canPlaceInWater": false,
-    "isFoliage": true
+    "type": "foliage"
 }

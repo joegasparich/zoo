@@ -5,7 +5,7 @@ import Game from "Game";
 import Graphics from "Graphics";
 import { removeItem } from "helpers/util";
 import Mediator from "Mediator";
-import { TileObjectData } from "types/AssetTypes";
+import { TileObjectData, TileObjectType } from "types/AssetTypes";
 import Vector from "vector";
 import Area from "./Area";
 import { Biome } from "./BiomeGrid";
@@ -20,11 +20,12 @@ export default class Exhibit {
     public biomeDistribution: Partial<Record<Biome, number>>;
     public size: number;
     public animals: Entity[];
-    public foliage: TileObjectData[];
     public hilliness: number;
     public waterness: number;
     public viewingArea: Vector[];
     public viewingAreaHighlighted = false;
+    public foliage: TileObjectData[];
+    public consumables: TileObjectData[];
 
     private biomeListener: string;
     private placeTileObjectListener: string;
@@ -39,10 +40,10 @@ export default class Exhibit {
             this.biomeDistribution = this.updateBiomes();
         });
         this.placeTileObjectListener = Mediator.on(WorldEvent.PLACE_TILE_OBJECT, () => {
-            this.foliage = this.updateFoliage();
+            [this.foliage, this.consumables] = this.updateTileObjects();
         });
         this.deleteTileObjectListener = Mediator.on(WorldEvent.DELETE_TILE_OBJECT, () => {
-            this.foliage = this.updateFoliage();
+            [this.foliage, this.consumables]  = this.updateTileObjects();
         });
         this.elevationListener = Mediator.on(WorldEvent.ELEVATION_UPDATED, () => {
             [this.hilliness, this.waterness] = this.updateElevation();
@@ -59,7 +60,7 @@ export default class Exhibit {
     public recalculate(): void {
         this.biomeDistribution = this.updateBiomes();
         this.size = this.area.getCells().length;
-        this.foliage = this.updateFoliage();
+        [this.foliage, this.consumables]  = this.updateTileObjects();
         [this.hilliness, this.waterness] = this.updateElevation();
         this.viewingArea = this.updateViewingArea();
     }
@@ -103,17 +104,20 @@ export default class Exhibit {
         return [hilliness / this.size, waterness / this.size];
     }
 
-    public updateFoliage(): TileObjectData[] {
+    public updateTileObjects(): [foliage: TileObjectData[], consumables: TileObjectData[]] {
         const foliage: TileObjectData[] = [];
+        const consumables: TileObjectData[] = [];
 
         this.area.getCells().forEach(cell => {
             const tileObj = Game.world.getTileObjectAtPos(cell.position)?.getComponent("TILE_OBJECT_COMPONENT");
-            if (tileObj?.data?.isFoliage) {
+            if (tileObj?.data?.type === TileObjectType.Foliage) {
                 foliage.push(tileObj.data);
+            } else if (tileObj?.data?.type === TileObjectType.Consumable) {
+                consumables.push(tileObj.data);
             }
         });
 
-        return foliage;
+        return [foliage, consumables];
     }
 
     public updateViewingArea(): Vector[] {

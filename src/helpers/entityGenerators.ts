@@ -69,12 +69,13 @@ export function createTileObject(assetPath: string, position: Vector, size = new
     const data = AssetManager.getJSON(assetPath) as TileObjectData;
 
     const tileObject = new Entity(position.floor().add(new Vector(0.5)));
-    tileObject.addComponent(new RenderComponent(data.sprite, undefined,
+    const renderer = tileObject.addComponent(new RenderComponent(data.sprite, undefined,
         new Vector(
             1/size.x * data.pivot.x,
             1/size.y * data.pivot.y,
         ),
     ));
+    renderer.scale = data.scale || 1;
     tileObject.addComponent(new ElevationComponent());
     if (data.solid) {
         tileObject.addComponent(new SolidComponent(size));

@@ -16,6 +16,7 @@ export const UI = {
     IRON_BAR_GATE: "/assets/img/ui/iron_bar_gate_icon.png",
     DEBUG_ICON: "/assets/img/ui/debug_icon.png",
     EXHIBIT_ICON: "/assets/img/ui/exhibit_icon.png",
+    CONSUMABLE_ICON: "/assets/img/ui/consumable_icon.png",
     BIN_ICON: "/assets/img/ui/bin_icon.png",
     ELEVATE_ICON: "/assets/img/ui/elevate_icon.png",
     FLATTEN_ICON: "/assets/img/ui/flatten_icon.png",
@@ -38,10 +39,17 @@ export const ANIMALS = {
     PLAINS_ZEBRA: "/assets/animals/plains_zebra.json",
 };
 
-
-export const OBJECTS = {
+export const FOLIAGE = {
     TREE: "/assets/objects/tree.json",
+};
+
+export const BUILDING = {
     BUILDING: "/assets/objects/building.json",
+};
+
+export const CONSUMABLE = {
+    WATER_BOWL: "/assets/objects/water_bowl.json",
+    HAY: "/assets/objects/hay.json",
 };
 
 export const WALLS = {

@@ -1,11 +1,6 @@
 {
     "name": "building",
     "solid": true,
-    "collider": {
-        "type": "RECTANGLE",
-        "height": 2,
-        "width": 2
-    },
     "pivot": {
         "x": 0.5,
         "y": 0.5
@@ -17,5 +12,5 @@
     "sprite": "/assets/img/building.png",
     "canPlaceOnSlopes": false,
     "canPlaceInWater": false,
-    "isFoliage": false
+    "type": "building"
 }

@@ -15,7 +15,9 @@ async function run(): Promise<void> {
     AssetManager.preLoadAssets(Object.values(Assets.UI));
     // TODO: get progress for these
     await loadAnimalData(...Object.values(Assets.ANIMALS));
-    await loadTileObjectData(...Object.values(Assets.OBJECTS));
+    await loadTileObjectData(...Object.values(Assets.FOLIAGE));
+    await loadTileObjectData(...Object.values(Assets.BUILDING));
+    await loadTileObjectData(...Object.values(Assets.CONSUMABLE));
     await loadWallData(...Object.values(Assets.WALLS));
     await loadPathData(...Object.values(Assets.PATHS));
 
