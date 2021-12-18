@@ -17,7 +17,9 @@ import ElevationComponent from "./ElevationComponent";
 import TileObjectComponent from "./TileObjectComponent";
 import NeedsComponent from "./NeedsComponent";
 import AnimalBehaviourComponent from "./AnimalBehaviourComponent";
+import ConsumableComponent from "./ConsumableComponent";
 
+// prettier-ignore
 export function createComponent(componentData: ComponentSaveData): Component {
     switch(componentData.id) {
         case "RENDER_COMPONENT": return new RenderComponent();
@@ -36,12 +38,13 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "TILE_OBJECT_COMPONENT": return new TileObjectComponent();
         case "NEEDS_COMPONENT": return new NeedsComponent();
         case "ANIMAL_BEHAVIOUR_COMPONENT": return new AnimalBehaviourComponent();
+        case "CONSUMABLE_COMPONENT": return new ConsumableComponent();
         default: return undefined;
     }
 }
 
 export type COMPONENT =
-      "RENDER_COMPONENT"
+    | "RENDER_COMPONENT"
     | "ANIMATED_RENDER_COMPONENT"
     | "SIMPLE_PHYSICS_COMPONENT"
     | "INPUT_COMPONENT"
@@ -57,8 +60,10 @@ export type COMPONENT =
     | "ELEVATION_COMPONENT"
     | "TILE_OBJECT_COMPONENT"
     | "NEEDS_COMPONENT"
-    | "ANIMAL_BEHAVIOUR_COMPONENT";
+    | "ANIMAL_BEHAVIOUR_COMPONENT"
+    | "CONSUMABLE_COMPONENT";
 
+// prettier-ignore
 export type ComponentType<T> =
     T extends "RENDER_COMPONENT" ? RenderComponent :
     T extends "ANIMATED_RENDER_COMPONENT" ? AnimatedRenderComponent :
@@ -77,6 +82,7 @@ export type ComponentType<T> =
     T extends "TILE_OBJECT_COMPONENT" ? TileObjectComponent :
     T extends "NEEDS_COMPONENT" ? NeedsComponent :
     T extends "ANIMAL_BEHAVIOUR_COMPONENT" ? AnimalBehaviourComponent :
+    T extends "CONSUMABLE_COMPONENT" ? ConsumableComponent :
     Component;
 
 export {
@@ -98,4 +104,5 @@ export {
     TileObjectComponent,
     NeedsComponent,
     AnimalBehaviourComponent,
+    ConsumableComponent,
 };

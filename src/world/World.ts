@@ -299,6 +299,11 @@ export default class World {
     }
 
     public findAreaPath(startArea: Area, endArea: Area): Area[] {
+        if (!startArea || !endArea) {
+            console.warn("Could not find area path, one or more areas didn't exist");
+            return undefined;
+        }
+
         const areaGraph: any = {};
         this.areas.forEach(area => {
             const connections: any = {};

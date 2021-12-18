@@ -1,15 +1,19 @@
 import Vector from "vector";
 
 export enum Class {
-    Mammal = "Mammal"
+    Mammal = "Mammal",
 }
 
 export enum ConservationStatus {
-    NearThreatened = "Near Threatened"
+    NearThreatened = "Near Threatened",
 }
 
 export enum Location {
-    Africa = "Africa"
+    Africa = "Africa",
+}
+
+export enum FoodType {
+    Grass = "Grass",
 }
 
 type Range = [min: number, max: number];
@@ -23,14 +27,15 @@ export interface AnimalData {
     class: Class;
     conservationStatus: ConservationStatus;
     location: Location[];
-    weight: { // in kg
+    weight: {
+        // in kg
         male: Range;
         female: Range;
         newborn: Range;
-    }
+    };
     habitat: string[]; // TODO: Define better
     foliage: Range; // Percentage of tiles to have foliage on
-    diet: string[]; // TODO: Define better
+    diet: FoodType[];
     sociability: Range; // Preferred herd size
     space: number; // Number of tiles needed per animal
     lifespan: number; // Lifespan in years
@@ -42,7 +47,7 @@ export interface AnimalData {
 export enum TileObjectType {
     Foliage = "foliage",
     Building = "building",
-    Consumable = "consumable"
+    Consumable = "consumable",
 }
 
 export interface TileObjectData {
@@ -57,10 +62,10 @@ export interface TileObjectData {
     type: TileObjectType;
 }
 
-export enum ConsumableType {
+export enum NeedType {
     Thirst = "thirst",
     Hunger = "hunger",
-    Energy = "energy"
+    Energy = "energy",
 }
 
 export enum ConsumerType {
@@ -70,8 +75,13 @@ export enum ConsumerType {
 }
 
 export interface ConsumableData extends TileObjectData {
-    consumableType: ConsumableType,
-    consumer: ConsumerType
+    needType: NeedType;
+    consumer: ConsumerType;
+    quantity: number;
+}
+
+export interface FoodData extends ConsumableData {
+    foodType: FoodType;
 }
 
 export interface GroundTileData {

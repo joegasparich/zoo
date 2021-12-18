@@ -167,6 +167,8 @@ export default class MapGrid {
      * @param opts Optional arguments
      */
     public async getPath(start: Vector, end: Vector, opts?: {optimise?: boolean, allowedNodes?: NodeType[]}): Promise<Vector[]> {
+        if (this.isLineWalkable(start, end)) return [start, end];
+
         let path = await this.pathfindingGrid?.getPath(start, end, opts?.allowedNodes);
         if (!path) return;
 

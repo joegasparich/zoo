@@ -1,13 +1,27 @@
 import { Assets } from "consts";
 import { Entity } from "entities";
-import { InputToPhysicsComponent, SolidComponent, RenderComponent, SimplePhysicsComponent, NeedsComponent, PathFollowComponent, DebuggableComponent } from "entities/components";
+import {
+    InputToPhysicsComponent,
+    SolidComponent,
+    RenderComponent,
+    SimplePhysicsComponent,
+    NeedsComponent,
+    PathFollowComponent,
+    DebuggableComponent,
+    ConsumableComponent,
+} from "entities/components";
 import { AssetManager } from "managers";
-import { ActorInputComponent, AreaPathFollowComponent, ElevationComponent, TileObjectComponent } from "entities/components";
-import { AnimalData, TileObjectData } from "types/AssetTypes";
+import {
+    ActorInputComponent,
+    AreaPathFollowComponent,
+    ElevationComponent,
+    TileObjectComponent,
+} from "entities/components";
+import { AnimalData, NeedType, TileObjectData, TileObjectType } from "types/AssetTypes";
 import Game from "Game";
 import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
-import { Need, NeedType } from "entities/components/NeedsComponent";
+import { Need } from "entities/components/NeedsComponent";
 import AnimalBehaviourComponent from "entities/components/AnimalBehaviourComponent";
 
 export function createDude(): Entity {
@@ -37,11 +51,13 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
     const animal = createActor(position);
 
     animal.addComponent(new PathFollowComponent());
-    animal.addComponent(new NeedsComponent([
-        new Need(NeedType.Hunger, 0.004, 1, true), // TODO: per animal & genes
-        new Need(NeedType.Thirst, 0.005, 1, true),
-        new Need(NeedType.Hunger, 0.0025, 0.5, true),
-    ]));
+    animal.addComponent(
+        new NeedsComponent([
+            new Need(NeedType.Hunger, 0.004, 1, true), // TODO: per animal & genes
+            new Need(NeedType.Thirst, 0.005, 1, true),
+            new Need(NeedType.Energy, 0.0025, 0.5, true),
+        ]),
+    );
     animal.addComponent(new AnimalBehaviourComponent()).setAsset(assetPath);
     animal.addComponent(new InputToPhysicsComponent());
     animal.addComponent(new DebuggableComponent());
@@ -69,18 +85,27 @@ export function createTileObject(assetPath: string, position: Vector, size = new
     const data = AssetManager.getJSON(assetPath) as TileObjectData;
 
     const tileObject = new Entity(position.floor().add(new Vector(0.5)));
-    const renderer = tileObject.addComponent(new RenderComponent(data.sprite, undefined,
-        new Vector(
-            1/size.x * data.pivot.x,
-            1/size.y * data.pivot.y,
+    const renderer = tileObject.addComponent(
+        new RenderComponent(
+            data.sprite,
+            undefined,
+            new Vector((1 / size.x) * data.pivot.x, (1 / size.y) * data.pivot.y),
         ),
-    ));
+    );
     renderer.scale = data.scale || 1;
     tileObject.addComponent(new ElevationComponent());
     if (data.solid) {
         tileObject.addComponent(new SolidComponent(size));
     }
-    tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);
+    switch (data.type) {
+        case TileObjectType.Consumable:
+            tileObject.addComponent(new ConsumableComponent()).setAsset(assetPath);
+            break;
+        default:
+            tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);
+            break;
+    }
+    tileObject.addComponent(new DebuggableComponent());
 
     return tileObject;
 }

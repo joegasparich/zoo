@@ -1,4 +1,4 @@
-import {  COMPONENT, Component } from "entities/components";
+import { COMPONENT, Component } from "entities/components";
 import { TileObjectData } from "types/AssetTypes";
 import { AssetManager } from "managers";
 import { ComponentSaveData } from "entities/components/Component";
@@ -6,7 +6,7 @@ import { Entity } from "entities";
 import Game from "Game";
 import Vector from "vector";
 
-interface TileObjectComponentSaveData extends ComponentSaveData {
+export interface TileObjectComponentSaveData extends ComponentSaveData {
     assetPath: string;
 }
 
@@ -59,6 +59,7 @@ export default class TileObjectComponent extends Component {
     public printDebug(): void {
         super.printDebug();
 
-        console.log(`Tile Object: ${this.data}`);
+        console.log("Tile Object Data:");
+        console.log(this.data);
     }
 }

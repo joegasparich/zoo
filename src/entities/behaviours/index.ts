@@ -1,12 +1,12 @@
 import { State } from "state";
 
-import IdleBehaviour from "./Idle";
+import IdleBehaviour from "./IdleBehaviour";
+import ConsumeBehaviour from "./ConsumeBehaviour";
 
-export type BEHAVIOUR_STATE =
-      "IDLE";
+export type BEHAVIOUR_STATE = "IDLE" | "CONSUME";
 
 export interface BehaviourData {
-    id: BEHAVIOUR_STATE
+    id: BEHAVIOUR_STATE;
 }
 
 export interface Behaviour extends State {
@@ -14,12 +14,14 @@ export interface Behaviour extends State {
 }
 
 export function createBehaviour(behaviour: BehaviourData): Behaviour {
-    switch(behaviour.id) {
-        case "IDLE": return new IdleBehaviour();
-        default: return undefined;
+    switch (behaviour.id) {
+        case "IDLE":
+            return new IdleBehaviour();
+        case "CONSUME":
+            return new ConsumeBehaviour();
+        default:
+            return undefined;
     }
 }
 
-export {
-    IdleBehaviour,
-};
+export { IdleBehaviour, ConsumeBehaviour };

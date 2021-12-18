@@ -5,7 +5,7 @@ import Game from "Game";
 import Graphics from "Graphics";
 import { removeItem } from "helpers/util";
 import Mediator from "Mediator";
-import { TileObjectData, TileObjectType } from "types/AssetTypes";
+import { FoodData, FoodType, NeedType, TileObjectType } from "types/AssetTypes";
 import Vector from "vector";
 import Area from "./Area";
 import { Biome } from "./BiomeGrid";
@@ -24,8 +24,8 @@ export default class Exhibit {
     public waterness: number;
     public viewingArea: Vector[];
     public viewingAreaHighlighted = false;
-    public foliage: TileObjectData[];
-    public consumables: TileObjectData[];
+    public foliage: Entity[];
+    public consumables: Entity[];
 
     private biomeListener: string;
     private placeTileObjectListener: string;
@@ -43,7 +43,7 @@ export default class Exhibit {
             [this.foliage, this.consumables] = this.updateTileObjects();
         });
         this.deleteTileObjectListener = Mediator.on(WorldEvent.DELETE_TILE_OBJECT, () => {
-            [this.foliage, this.consumables]  = this.updateTileObjects();
+            [this.foliage, this.consumables] = this.updateTileObjects();
         });
         this.elevationListener = Mediator.on(WorldEvent.ELEVATION_UPDATED, () => {
             [this.hilliness, this.waterness] = this.updateElevation();
@@ -60,7 +60,7 @@ export default class Exhibit {
     public recalculate(): void {
         this.biomeDistribution = this.updateBiomes();
         this.size = this.area.getCells().length;
-        [this.foliage, this.consumables]  = this.updateTileObjects();
+        [this.foliage, this.consumables] = this.updateTileObjects();
         [this.hilliness, this.waterness] = this.updateElevation();
         this.viewingArea = this.updateViewingArea();
     }
@@ -81,7 +81,7 @@ export default class Exhibit {
             });
         });
 
-        Object.keys(count).forEach((key) => {
+        Object.keys(count).forEach(key => {
             const biome = +key as Biome;
             count[biome] = count[biome] / totalBiomes;
         });
@@ -104,16 +104,16 @@ export default class Exhibit {
         return [hilliness / this.size, waterness / this.size];
     }
 
-    public updateTileObjects(): [foliage: TileObjectData[], consumables: TileObjectData[]] {
-        const foliage: TileObjectData[] = [];
-        const consumables: TileObjectData[] = [];
+    public updateTileObjects(): [foliage: Entity[], consumables: Entity[]] {
+        const foliage: Entity[] = [];
+        const consumables: Entity[] = [];
 
         this.area.getCells().forEach(cell => {
             const tileObj = Game.world.getTileObjectAtPos(cell.position)?.getComponent("TILE_OBJECT_COMPONENT");
             if (tileObj?.data?.type === TileObjectType.Foliage) {
-                foliage.push(tileObj.data);
+                foliage.push(tileObj.entity);
             } else if (tileObj?.data?.type === TileObjectType.Consumable) {
-                consumables.push(tileObj.data);
+                consumables.push(tileObj.entity);
             }
         });
 
@@ -125,8 +125,10 @@ export default class Exhibit {
 
         this.area.getCells().forEach(cell => {
             Game.map.getAdjacentCells(cell.position).forEach(adjCell => {
-                if (Game.map.isPositionInMap(adjCell.position)
-                 && Game.world.getAreaAtPosition(adjCell.position).id === ZOO_AREA) {
+                if (
+                    Game.map.isPositionInMap(adjCell.position) &&
+                    Game.world.getAreaAtPosition(adjCell.position).id === ZOO_AREA
+                ) {
                     if (!viewingArea.find(i => i.toString() === cell.position.toString())) {
                         viewingArea.push(adjCell.position);
                     }
@@ -147,6 +149,20 @@ export default class Exhibit {
         if (this.animals.length === 0) {
             this.delete();
         }
+    }
+
+    public findConsumables(needType: NeedType): Entity[] {
+        const consumablesOfType = this.consumables.filter(
+            consumable => consumable.getComponent("CONSUMABLE_COMPONENT").data.needType === needType,
+        );
+        return consumablesOfType;
+    }
+
+    public findFoodOfType(foodTypes: FoodType[]): Entity[] {
+        const foods = this.findConsumables(NeedType.Hunger);
+        return foods.filter(food =>
+            foodTypes.includes((food.getComponent("CONSUMABLE_COMPONENT").data as FoodData).foodType),
+        );
     }
 
     public delete(): void {
@@ -181,7 +197,14 @@ export default class Exhibit {
         this.viewingArea?.forEach(cell => {
             const worldCellPos = cell.multiply(Config.WORLD_SCALE);
             Graphics.setLineStyle(0);
-            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, this.area.colour, 0.5);
+            Graphics.drawRect(
+                worldCellPos.x,
+                worldCellPos.y,
+                Config.WORLD_SCALE,
+                Config.WORLD_SCALE,
+                this.area.colour,
+                0.5,
+            );
         });
     }
 }

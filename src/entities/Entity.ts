@@ -13,6 +13,7 @@ export interface EntitySaveData {
 
 export default class Entity {
     public id: string;
+    public exists: boolean;
 
     private componentIdMap: Map<string, Component>; // This is a map to id
     private componentTypeMap: Map<string, Component>; // This is a map to type
@@ -25,6 +26,7 @@ export default class Entity {
         this.componentTypeMap = new Map();
 
         Game.registerEntity(this);
+        this.exists = true;
     }
 
     public start(): void {
@@ -35,19 +37,19 @@ export default class Entity {
 
     public preUpdate(delta: number): void {
         this.componentTypeMap.forEach(component => {
-            if(!component.disabled) component.preUpdate(delta);
+            if (!component.disabled) component.preUpdate(delta);
         });
     }
 
     public update(delta: number): void {
         this.componentTypeMap.forEach(component => {
-            if(!component.disabled) component.update(delta);
+            if (!component.disabled) component.update(delta);
         });
     }
 
     public postUpdate(delta: number): void {
         this.componentTypeMap.forEach(component => {
-            if(!component.disabled) component.postUpdate(delta);
+            if (!component.disabled) component.postUpdate(delta);
         });
     }
 
@@ -56,6 +58,7 @@ export default class Entity {
             component.end();
         });
         Game.unregisterEntity(this.id);
+        this.exists = false;
     }
 
     public addComponent<T extends Component>(component: T): T {
@@ -81,9 +84,10 @@ export default class Entity {
         }
     }
 
-    public getComponent<T extends COMPONENT>(type: T) : ComponentType<T> {
-        return this.componentIdMap.get(type) as ComponentType<T>
-         ?? this.componentTypeMap.get(type) as ComponentType<T>;
+    public getComponent<T extends COMPONENT>(type: T): ComponentType<T> {
+        return (
+            (this.componentIdMap.get(type) as ComponentType<T>) ?? (this.componentTypeMap.get(type) as ComponentType<T>)
+        );
     }
 
     public getAllComponents(): Component[] {

@@ -1,15 +1,18 @@
 import { WorldEvent } from "consts";
 import { Entity } from "entities";
-import { BehaviourData, createBehaviour, IdleBehaviour } from "entities/behaviours";
+import { Behaviour, BehaviourData, createBehaviour, IdleBehaviour } from "entities/behaviours";
+import ConsumeBehaviour from "entities/behaviours/ConsumeBehaviour";
 import Game from "Game";
 import { AssetManager } from "managers";
 import Mediator from "Mediator";
 import { StateMachine } from "state";
-import { AnimalData } from "types/AssetTypes";
+import { AnimalData, NeedType } from "types/AssetTypes";
 import Exhibit from "world/Exhibit";
 import { ZOO_AREA } from "world/World";
 import { COMPONENT, InputComponent, NeedsComponent, PathFollowComponent } from ".";
 import { ComponentSaveData } from "./Component";
+
+const NEED_THRESHOLD = 50; // TODO: flesh this out
 
 interface AnimalBehaviourComponentSaveData extends ComponentSaveData {
     assetPath: string;
@@ -26,7 +29,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
     public data: AnimalData;
     public pathfinder: PathFollowComponent;
     public needs: NeedsComponent;
-    public stateMachine = new StateMachine(new IdleBehaviour());
+    public stateMachine = new StateMachine<Behaviour>(new IdleBehaviour());
     public exhibit?: Exhibit;
 
     private areaListener: string;
@@ -45,6 +48,30 @@ export default class AnimalBehaviourComponent extends InputComponent {
 
     public update(delta: number): void {
         this.stateMachine.update(delta, this);
+
+        // TODO: Only do this every so often
+        this.checkForStateChange();
+    }
+
+    private checkForStateChange(): void {
+        // TODO: Make this more dynamic to account for different animals having different available behaviours
+        const priorityNeeds = this.needs.getNeedsByPriority();
+        // TODO: Behaviour priorities?: this.stateMachine.getState().priority < Consume.priority
+        if (priorityNeeds.length && this.stateMachine.getState().id !== "CONSUME") {
+            for (let i = 0; i < priorityNeeds.length; i++) {
+                const need = priorityNeeds[i];
+                if (need.value < NEED_THRESHOLD && this.stateMachine.getState().id !== "CONSUME") {
+                    if (
+                        need.type === NeedType.Hunger
+                            ? this.exhibit.findFoodOfType(this.data.diet).length
+                            : this.exhibit.findConsumables(need.type).length
+                    ) {
+                        this.stateMachine.setState(new ConsumeBehaviour(need.type));
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public end(): void {
@@ -69,6 +96,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
             }
             this.exhibit.addAnimal(this.entity);
         } else {
+            // TODO: Handle escaped animals
             this.exhibit = undefined;
         }
     }

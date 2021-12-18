@@ -1,11 +1,6 @@
+import { NeedType } from "types/AssetTypes";
 import { COMPONENT, Component } from ".";
 import { ComponentSaveData } from "./Component";
-
-export enum NeedType {
-    Hunger,
-    Thirst,
-    Energy
-}
 
 export class Need {
     public static MAX_NEED = 100;
@@ -29,7 +24,7 @@ export class Need {
 
 interface NeedsComponentSaveData extends ComponentSaveData {
     needs: {
-        type: number;
+        type: string;
         value: number;
         change: number;
         happinessMod: number;
@@ -49,8 +44,13 @@ export default class NeedsComponent extends Component {
         this.needs.forEach(need => need.update());
     }
 
-    public getPriorityNeed(): Need {
-        return this.needs.reduce((prev, curr) => prev.value < curr.value ? prev : curr);
+    public getNeedByType(type: NeedType): Need {
+        return this.needs.find(need => need.type === type);
+    }
+
+    public getNeedsByPriority(): Need[] {
+        // TODO: Certain needs have higher priority? e.g. thirst over sleep
+        return this.needs.sort((a, b) => a.value - b.value);
     }
 
     public save(): NeedsComponentSaveData {
@@ -65,12 +65,7 @@ export default class NeedsComponent extends Component {
 
         this.needs = [];
         data.needs.forEach(needData => {
-            const need = new Need(
-                needData.type,
-                needData.change,
-                needData.happinessMod,
-                needData.canDie,
-            );
+            const need = new Need(needData.type as NeedType, needData.change, needData.happinessMod, needData.canDie);
             need.value = needData.value;
             this.needs.push(need);
         });

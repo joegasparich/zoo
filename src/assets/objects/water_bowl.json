@@ -14,6 +14,7 @@
     "canPlaceOnSlopes": true,
     "canPlaceInWater": false,
     "type": "consumable",
-    "consumableType": "thirst",
-    "consumer": "animal"
+    "needType": "thirst",
+    "consumer": "animal",
+    "quantity": 200
 }

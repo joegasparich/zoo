@@ -18,7 +18,7 @@ export default class IdleBehaviour implements Behaviour {
         const currentTime = new Date().getTime();
         if (currentTime > this.timer) {
             if (randomBool()) {
-                animal.pathfinder.pathTo(animal.exhibit.area.getRandomPos());
+                animal.pathfinder.pathTo(animal.exhibit?.area.getRandomPos());
             } else {
                 animal.pathfinder.resetPath();
                 animal.inputVector = Vector.Zero();
@@ -28,7 +28,8 @@ export default class IdleBehaviour implements Behaviour {
 
         if (animal.pathfinder.hasPath()) {
             animal.pathfinder.followPath();
-            animal.inputVector = animal.pathfinder.currentTarget?.subtract(animal.entity.position).normalize() ?? Vector.Zero();
+            animal.inputVector =
+                animal.pathfinder.currentTarget?.subtract(animal.entity.position).normalize() ?? Vector.Zero();
         }
     }
 

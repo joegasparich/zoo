@@ -12,15 +12,9 @@
         "female": [175, 250],
         "newborn": [30, 35]
     },
-    "habitat": [
-        "grassland",
-        "savannah"
-    ],
+    "habitat": ["grassland", "savannah"],
     "foliage": [10, 20],
-    "diet": [
-        "grass",
-        "hay"
-    ],
+    "diet": ["Grass"],
     "sociability": [4, 25],
     "space": 5,
     "lifespan": 25,
