@@ -4,6 +4,7 @@ import RenderComponent from "./RenderComponent";
 import AnimatedRenderComponent from "./AnimatedRenderComponent";
 import SimplePhysicsComponent from "./SimplePhysicsComponent";
 import InputComponent from "./InputComponent";
+import InteractableComponent from "./InteractableComponent";
 import DebuggableComponent from "./DebuggableComponent";
 import CameraFollowComponent from "./CameraFollowComponent";
 import PathFollowComponent from "./PathFollowComponent";
@@ -19,6 +20,27 @@ import NeedsComponent from "./NeedsComponent";
 import AnimalBehaviourComponent from "./AnimalBehaviourComponent";
 import ConsumableComponent from "./ConsumableComponent";
 
+export type COMPONENT =
+    | "RENDER_COMPONENT"
+    | "ANIMATED_RENDER_COMPONENT"
+    | "SIMPLE_PHYSICS_COMPONENT"
+    | "INPUT_COMPONENT"
+    | "INTERACTABLE_COMPONENT"
+    | "DEBUGGABLE_COMPONENT"
+    | "CAMERA_FOLLOW_COMPONENT"
+    | "PATH_FOLLOW_COMPONENT"
+    | "INPUT_TO_PHYSICS_COMPONENT"
+    | "SOLID_COMPONENT"
+    | "ACTOR_INPUT_COMPONENT"
+    | "SNAP_TO_GRID_COMPONENT"
+    | "FOLLOW_MOUSE_COMPONENT"
+    | "AREA_PATH_FOLLOW_COMPONENT"
+    | "ELEVATION_COMPONENT"
+    | "TILE_OBJECT_COMPONENT"
+    | "NEEDS_COMPONENT"
+    | "ANIMAL_BEHAVIOUR_COMPONENT"
+    | "CONSUMABLE_COMPONENT";
+
 // prettier-ignore
 export function createComponent(componentData: ComponentSaveData): Component {
     switch(componentData.id) {
@@ -26,6 +48,7 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "ANIMATED_RENDER_COMPONENT": return new AnimatedRenderComponent();
         case "CAMERA_FOLLOW_COMPONENT": return new CameraFollowComponent();
         case "SIMPLE_PHYSICS_COMPONENT": return new SimplePhysicsComponent();
+        case "INTERACTABLE_COMPONENT": return new InteractableComponent();
         case "DEBUGGABLE_COMPONENT": return new DebuggableComponent();
         case "PATH_FOLLOW_COMPONENT": return new PathFollowComponent();
         case "INPUT_TO_PHYSICS_COMPONENT": return new InputToPhysicsComponent();
@@ -43,32 +66,13 @@ export function createComponent(componentData: ComponentSaveData): Component {
     }
 }
 
-export type COMPONENT =
-    | "RENDER_COMPONENT"
-    | "ANIMATED_RENDER_COMPONENT"
-    | "SIMPLE_PHYSICS_COMPONENT"
-    | "INPUT_COMPONENT"
-    | "DEBUGGABLE_COMPONENT"
-    | "CAMERA_FOLLOW_COMPONENT"
-    | "PATH_FOLLOW_COMPONENT"
-    | "INPUT_TO_PHYSICS_COMPONENT"
-    | "SOLID_COMPONENT"
-    | "ACTOR_INPUT_COMPONENT"
-    | "SNAP_TO_GRID_COMPONENT"
-    | "FOLLOW_MOUSE_COMPONENT"
-    | "AREA_PATH_FOLLOW_COMPONENT"
-    | "ELEVATION_COMPONENT"
-    | "TILE_OBJECT_COMPONENT"
-    | "NEEDS_COMPONENT"
-    | "ANIMAL_BEHAVIOUR_COMPONENT"
-    | "CONSUMABLE_COMPONENT";
-
 // prettier-ignore
 export type ComponentType<T> =
     T extends "RENDER_COMPONENT" ? RenderComponent :
     T extends "ANIMATED_RENDER_COMPONENT" ? AnimatedRenderComponent :
     T extends "SIMPLE_PHYSICS_COMPONENT" ? SimplePhysicsComponent :
     T extends "INPUT_COMPONENT" ? InputComponent :
+    T extends "INTERACTABLE_COMPONENT" ? InteractableComponent :
     T extends "DEBUGGABLE_COMPONENT" ? DebuggableComponent :
     T extends "CAMERA_FOLLOW_COMPONENT" ? CameraFollowComponent :
     T extends "PATH_FOLLOW_COMPONENT" ? PathFollowComponent :
@@ -91,6 +95,7 @@ export {
     AnimatedRenderComponent,
     SimplePhysicsComponent,
     InputComponent,
+    InteractableComponent,
     DebuggableComponent,
     CameraFollowComponent,
     PathFollowComponent,

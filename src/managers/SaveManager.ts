@@ -13,6 +13,12 @@ interface SaveData {
 }
 
 class SaveManager {
+    public newGame(): void {
+        Game.sceneManager.loadScene(new ZooScene(), (progress: number) => {
+            console.log(`Map Load Progress: ${progress}%`);
+        });
+    }
+
     public saveGame(): void {
         const entities = Game.getEntities();
         // Get a bunch of save data

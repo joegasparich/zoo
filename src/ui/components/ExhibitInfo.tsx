@@ -64,7 +64,7 @@ export default class ExhibitInfo extends UIComponent<ExhibitInfoProps, ExhibitIn
 
         return (
             <div className="exhibit">
-                <p>Exhibit Name: {exhibit.area.name ?? ""}</p>
+                <p>Exhibit Name: {exhibit.name ?? ""}</p>
                 <p>Animals</p>
                 <ul>
                     {exhibit.animals.map(animal => (

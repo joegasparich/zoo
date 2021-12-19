@@ -208,6 +208,13 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         }}
                     />
                     <Button
+                        key="newButton"
+                        image={Assets.UI.NEW_ICON}
+                        onClick={(): void => {
+                            SaveManager.newGame();
+                        }}
+                    />
+                    <Button
                         key="saveButton"
                         image={Assets.UI.SAVE_ICON}
                         onClick={(): void => {

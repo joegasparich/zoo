@@ -9,6 +9,7 @@ import {
     PathFollowComponent,
     DebuggableComponent,
     ConsumableComponent,
+    InteractableComponent,
 } from "entities/components";
 import { AssetManager } from "managers";
 import {
@@ -36,7 +37,6 @@ export function createDude(): Entity {
     dude.addComponent(new AreaPathFollowComponent());
     dude.addComponent(new ActorInputComponent());
     dude.addComponent(new InputToPhysicsComponent());
-    dude.addComponent(new DebuggableComponent());
 
     const renderer = dude.getComponent("RENDER_COMPONENT");
     renderer.setSpriteSheet(spritesheet, 0);
@@ -60,7 +60,6 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
     );
     animal.addComponent(new AnimalBehaviourComponent()).setAsset(assetPath);
     animal.addComponent(new InputToPhysicsComponent());
-    animal.addComponent(new DebuggableComponent());
 
     const renderer = animal.getComponent("RENDER_COMPONENT");
     renderer.setSprite(data.sprite);
@@ -75,6 +74,8 @@ export function createActor(position: Vector): Entity {
     actor.addComponent(new RenderComponent());
     actor.addComponent(new SimplePhysicsComponent());
     actor.addComponent(new ElevationComponent());
+    actor.addComponent(new InteractableComponent());
+    actor.addComponent(new DebuggableComponent());
 
     return actor;
 }
@@ -105,6 +106,7 @@ export function createTileObject(assetPath: string, position: Vector, size = new
             tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);
             break;
     }
+    tileObject.addComponent(new InteractableComponent());
     tileObject.addComponent(new DebuggableComponent());
 
     return tileObject;

@@ -1,19 +1,20 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": false,
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "target": "es5",
-    "jsx": "react",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2020", "dom"],
-    "noImplicitAny": true,
-    "baseUrl": "./src/",
-    "paths": {
-      "mini-signals": ["node_modules/mini-signals/typings/mini-signals.d.ts"]
-    },
-  }
+    "compileOnSave": false,
+    "compilerOptions": {
+        "outDir": "./dist/out-tsc",
+        "sourceMap": true,
+        "declaration": false,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "target": "es5",
+        "jsx": "react",
+        "resolveJsonModule": true,
+        "typeRoots": ["node_modules/@types"],
+        "lib": ["es2020", "dom"],
+        "noImplicitAny": true,
+        "baseUrl": "./src/",
+        "paths": {
+            "mini-signals": ["node_modules/mini-signals/typings/mini-signals.d.ts"]
+        }
+    }
 }

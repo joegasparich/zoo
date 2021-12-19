@@ -11,7 +11,6 @@ export interface UIComponentProps {
 export default abstract class UIComponent<P extends UIComponentProps, S> extends React.Component<P, S> {
     private baseStyles = css`
         pointer-events: all;
-        background: #aaaaaa;
 
         .hidden {
             display: none;

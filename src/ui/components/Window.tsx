@@ -46,6 +46,7 @@ export default class Window extends UIComponent<WindowProps, undefined> {
                 }
 
                 .content {
+                    position: relative;
                 }
             }
         `;
@@ -65,7 +66,11 @@ export default class Window extends UIComponent<WindowProps, undefined> {
                                 X
                             </div>
                         </div>
-                        <div className="content">{this.props.content}</div>
+                        <div className="content">
+                            {React.cloneElement(this.props.content, {
+                                closeWindow: () => this.props.handleClose(this.props.windowId),
+                            })}
+                        </div>
                     </div>
                 </Draggable>
             </React.Fragment>

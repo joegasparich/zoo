@@ -1,7 +1,8 @@
 import { Entity } from "entities";
 import { ToolType } from "ui/tools";
 import UIManager from "ui/UIManager";
-import { COMPONENT, Component, RenderComponent } from ".";
+import { COMPONENT, Component, InteractableComponent, RenderComponent } from ".";
+import { InteractableEvents } from "./InteractableComponent";
 
 const HOVER_OUTLINE_COLOUR = 0xff0000;
 
@@ -9,33 +10,30 @@ export default class DebuggableComponent extends Component {
     public id: COMPONENT = "DEBUGGABLE_COMPONENT";
     public type: COMPONENT = "DEBUGGABLE_COMPONENT";
 
-    public requires: COMPONENT[] = ["RENDER_COMPONENT"];
+    public requires: COMPONENT[] = ["INTERACTABLE_COMPONENT", "RENDER_COMPONENT"];
 
     public renderer: RenderComponent;
+    public interactable: InteractableComponent;
 
-    private boundMouseDownListener = this.printDebugInfo.bind(this);
-    private boundMouseOverListener = this.onMouseOver.bind(this);
-    private boundMouseOutListener = this.onMouseOut.bind(this);
+    private mouseDownHandle: string;
+    private mouseEnterHandle: string;
+    private mouseExitHandle: string;
 
     public start(entity: Entity): void {
         super.start(entity);
 
         this.renderer = entity.getComponent("RENDER_COMPONENT");
+        this.interactable = entity.getComponent("INTERACTABLE_COMPONENT");
 
-        const sprite = this.renderer.getSprite();
-        sprite.interactive = true;
-        sprite.on("mousedown", this.boundMouseDownListener);
-        sprite.on("mouseover", this.boundMouseOverListener);
-        sprite.on("mouseout", this.boundMouseOutListener);
+        this.mouseDownHandle = this.interactable.on(InteractableEvents.MouseDown, this.onMouseOver.bind(this));
+        this.mouseEnterHandle = this.interactable.on(InteractableEvents.MouseEnter, this.onMouseOut.bind(this));
+        this.mouseExitHandle = this.interactable.on(InteractableEvents.MouseExit, this.printDebugInfo.bind(this));
     }
 
     public end(): void {
-        const sprite = this.renderer.getSprite();
-
-        sprite.interactive = false;
-        sprite.off("mousedown", this.boundMouseDownListener);
-        sprite.off("mouseover", this.boundMouseOverListener);
-        sprite.off("mouseout", this.boundMouseOutListener);
+        this.interactable.unsubscribe(InteractableEvents.MouseDown, this.mouseDownHandle);
+        this.interactable.unsubscribe(InteractableEvents.MouseEnter, this.mouseEnterHandle);
+        this.interactable.unsubscribe(InteractableEvents.MouseExit, this.mouseExitHandle);
     }
 
     private onMouseOver(): void {

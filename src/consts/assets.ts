@@ -27,6 +27,7 @@ export const UI = {
     WATER_ICON: "/assets/img/ui/water_icon.png",
     PATH_ICON: "/assets/img/ui/path_icon.png",
     DEBUG_ENTITY_ICON: "/assets/img/ui/debug_entity_icon.png",
+    NEW_ICON: "/assets/img/ui/new_icon.png",
     SAVE_ICON: "/assets/img/ui/save_icon.png",
     LOAD_ICON: "/assets/img/ui/load_icon.png",
 };

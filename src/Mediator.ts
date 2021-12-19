@@ -1,19 +1,19 @@
 import uuid = require("uuid");
 
 class Mediator {
-    private listeners: Map<string, { context: string; callback: Function }[]>;
+    private listeners: Map<string, { handle: string; callback: (data: any) => void }[]>;
 
     public constructor() {
         this.listeners = new Map();
     }
 
-    public on(event: string, callback: Function): string {
+    public on(event: string, callback: (data: any) => void): string {
         const context = uuid();
 
         if (!this.listeners.has(event)) {
             this.listeners.set(event, []);
         }
-        this.listeners.get(event).push({ context, callback });
+        this.listeners.get(event).push({ handle: context, callback });
 
         return context;
     }
@@ -25,7 +25,7 @@ class Mediator {
     public unsubscribe(event: string, context: string): void {
         this.listeners.set(
             event,
-            this.listeners.get(event).filter(listener => listener.context !== context),
+            this.listeners.get(event).filter(listener => listener.handle !== context),
         );
     }
 }

@@ -13,7 +13,6 @@ import Graphics from "Graphics";
 import { Config, GameEvent, Inputs, RenderLayers } from "consts";
 import ZooScene from "scenes/ZooScene";
 import UIManager from "ui/UIManager";
-import { createDude } from "helpers/entityGenerators";
 import World from "world/World";
 
 type DebugSettings = {
@@ -148,9 +147,6 @@ class Game {
 
         // start up the game loop
         this.ticker.add(this.loop.bind(this));
-
-        //! Temp
-        createDude();
     }
 
     private setupStage(): void {

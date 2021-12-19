@@ -4,6 +4,8 @@ import UIManager from "ui/UIManager";
 import { Scene } from "./Scene";
 import { MapCell } from "world/MapGrid";
 import Vector from "vector";
+import { createDude } from "helpers/entityGenerators";
+import { Assets, Side } from "consts";
 
 const MAP_SIZE = 20;
 
@@ -16,6 +18,8 @@ export default class ZooScene extends Scene {
 
     public start(): void {
         this.generateMap();
+
+        createDude();
     }
 
     public stop(): void {
@@ -43,6 +47,31 @@ export default class ZooScene extends Scene {
         Game.map.setupGrid(cells);
 
         Game.world = new World();
-        await Game.world.setup();
+        Game.world.setup();
+
+        this.generateFence();
+
+        Game.world.postSetup();
+    }
+
+    private generateFence(): void {
+        for (let i = 0; i < Game.map.cols; i++) {
+            Game.world.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, 0), Side.North, true);
+            Game.world.wallGrid.placeWallAtTile(
+                Assets.WALLS.IRON_BAR,
+                new Vector(i, Game.map.rows - 1),
+                Side.South,
+                true,
+            );
+        }
+        for (let i = 0; i < Game.map.rows; i++) {
+            Game.world.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West, true);
+            Game.world.wallGrid.placeWallAtTile(
+                Assets.WALLS.IRON_BAR,
+                new Vector(Game.map.cols - 1, i),
+                Side.East,
+                true,
+            );
+        }
     }
 }

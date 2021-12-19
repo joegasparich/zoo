@@ -3,7 +3,7 @@ import uuid = require("uuid");
 
 import { randomInt } from "helpers/math";
 import Mediator from "Mediator";
-import { Assets, Config, Side } from "consts";
+import { Config, Side } from "consts";
 import { WorldEvent } from "consts/events";
 import Game from "Game";
 import Area from "./Area";
@@ -17,6 +17,9 @@ import Vector from "vector";
 import { MapCell } from "./MapGrid";
 import PathGrid, { PathGridSaveData } from "./PathGrid";
 import Exhibit, { ExhibitSaveData } from "./Exhibit";
+import { capitalize, randomItem } from "helpers/util";
+
+import { adjectives, places } from "../consts/words.json";
 
 export const ZOO_AREA = "ZOO";
 
@@ -27,7 +30,6 @@ export interface WorldSaveData {
     elevation: ElevationSaveData;
     areas: {
         id: string;
-        name: string;
         colour: number;
         cells: number[][];
         connectedAreas: {
@@ -60,7 +62,7 @@ export default class World {
         this.exhibits = new Map();
     }
 
-    public async setup(): Promise<void> {
+    public setup(): void {
         this.elevationGrid = new ElevationGrid();
         this.biomeGrid = new BiomeGrid(Game.map.cols * 2, Game.map.rows * 2, Config.BIOME_SCALE);
         this.wallGrid = new WallGrid();
@@ -72,9 +74,15 @@ export default class World {
         this.wallGrid.setup();
         this.waterGrid.setup();
         this.pathGrid.setup();
+    }
 
-        // TODO: Store outer fence information in scene & then generate area based on that
-        this.generateFence();
+    public postSetup(): void {
+        const zooArea = new Area(ZOO_AREA);
+        Game.world.areas.set(zooArea.id, zooArea);
+        Mediator.fire(WorldEvent.AREAS_UPDATED);
+        const zooCells = Game.world.floodFill(Game.map.getCell(new Vector(1)));
+        zooArea.setCells(zooCells);
+        zooCells.forEach(cell => Game.world.tileAreaMap.set(cell.position.toString(), zooArea));
     }
 
     public reset(): void {
@@ -93,24 +101,6 @@ export default class World {
         this.areas = new Map();
         this.tileAreaMap = new Map();
         this.exhibits = new Map();
-    }
-
-    // TODO: Move to scene
-    private generateFence(): void {
-        for (let i = 0; i < Game.map.cols; i++) {
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, 0), Side.North, true);
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(i, Game.map.rows - 1), Side.South, true);
-        }
-        for (let i = 0; i < Game.map.rows; i++) {
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(0, i), Side.West, true);
-            this.wallGrid.placeWallAtTile(Assets.WALLS.IRON_BAR, new Vector(Game.map.cols - 1, i), Side.East, true);
-        }
-        const zooArea = new Area(ZOO_AREA, "zoo");
-        this.areas.set(zooArea.id, zooArea);
-        Mediator.fire(WorldEvent.AREAS_UPDATED);
-        const zooCells = this.floodFill(Game.map.getCell(new Vector(1)));
-        zooArea.setCells(zooCells);
-        zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
     }
 
     public postUpdate(delta: number): void {
@@ -195,8 +185,7 @@ export default class World {
         // Return if areas weren't formed properly (false positive in loop check)
         if (areasCells[0].length + areasCells[1].length > oldArea.getCells().length) return;
 
-        const newArea = new Area(uuid(), "New Area");
-        // TODO: Autogenerate a good name (ADJECTIVE + LOCATION) - Smelly glade
+        const newArea = new Area(uuid());
         this.areas.set(newArea.id, newArea);
 
         const larger = areasCells[0].length >= areasCells[1].length ? areasCells[0] : areasCells[1];
@@ -254,7 +243,8 @@ export default class World {
             return this.getExhibitByAreaId(areaId);
         }
 
-        const exhibit = new Exhibit(this.getAreaById(areaId));
+        const name = capitalize(`${randomItem(adjectives)} ${randomItem(places)}`);
+        const exhibit = new Exhibit(this.getAreaById(areaId), name);
         this.exhibits.set(areaId, exhibit);
 
         exhibit.recalculate();
@@ -356,7 +346,6 @@ export default class World {
             elevation: Game.world.elevationGrid.save(),
             areas: Array.from(this.areas.values()).map(area => ({
                 id: area.id,
-                name: area.name,
                 colour: area.colour,
                 cells: area.getCells().map(cell => Vector.Serialize(cell.position)),
                 connectedAreas: Array.from(area.connectedAreas.entries()).map(([area, doors]) => ({
@@ -376,7 +365,7 @@ export default class World {
 
         // Create areas
         data.areas.forEach(area => {
-            const newArea = new Area(area.id, area.name);
+            const newArea = new Area(area.id);
             newArea.colour = area.colour;
             newArea.setCells(area.cells.map(pos => Game.map.getCell(Vector.Deserialize(pos))));
             newArea.getCells().forEach(cell => this.tileAreaMap.set(cell.position.toString(), newArea));

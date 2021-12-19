@@ -13,6 +13,7 @@ import { ZOO_AREA } from "./World";
 
 export interface ExhibitSaveData {
     areaId: string;
+    name: string;
     animals: string[];
 }
 
@@ -33,7 +34,7 @@ export default class Exhibit {
     private elevationListener: string;
     private areaListener: string;
 
-    public constructor(public area?: Area) {
+    public constructor(public area?: Area, public name?: string) {
         this.animals = [];
 
         this.biomeListener = Mediator.on(WorldEvent.BIOMES_UPDATED, () => {
@@ -182,12 +183,14 @@ export default class Exhibit {
     public save(): ExhibitSaveData {
         return {
             areaId: this.area.id,
+            name: this.name,
             animals: this.animals.map(animal => animal.id),
         };
     }
 
     public load(data: ExhibitSaveData): void {
         this.area = Game.world.getAreaById(data.areaId);
+        this.name = data.name;
         this.animals = data.animals.map(animalId => Game.getEntityById(animalId));
 
         this.recalculate();

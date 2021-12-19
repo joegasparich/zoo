@@ -12,7 +12,7 @@ export default class Area {
     public connectedAreas: Map<Area, Wall[]>;
     public highlighted: boolean;
 
-    public constructor(public id: string, public name: string, private cells?: MapCell[]) {
+    public constructor(public id: string, private cells?: MapCell[]) {
         this.colour = rgbToHex(Math.random() * 255, Math.random() * 255, Math.random() * 255);
 
         this.connectedAreas = new Map();

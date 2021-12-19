@@ -78,7 +78,7 @@ export default class ExhibitList extends UIComponent<UIComponentProps, ExhibitLi
                     onClick={(): void => this.handleClick(exhibit)}
                 >
                     <span className="square" style={{ background: hexToString(exhibit.area.colour) }} />
-                    {exhibit.area.name}
+                    {exhibit.name}
                 </div>
             );
         });
@@ -95,7 +95,7 @@ export default class ExhibitList extends UIComponent<UIComponentProps, ExhibitLi
     private handleClick(exhibit: Exhibit): void {
         UIManager.openWindow(
             `exhibit-${exhibit.area.id}`,
-            exhibit.area.name,
+            exhibit.name,
             new Vector(200, 200),
             <ExhibitInfo areaId={exhibit.area.id} />,
         );

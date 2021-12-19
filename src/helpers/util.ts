@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 
-import { hexToRgb } from "./math";
+import { hexToRgb, randomInt } from "./math";
 
 export function removeItem<T>(array: T[], item: T): void {
     const index = array.indexOf(item);
@@ -33,4 +33,12 @@ export function EnumValues(enumme: any): any[] {
 
 export function EnumKeys(enumme: any): any[] {
     return EnumValues(enumme).map(key => enumme[key]);
+}
+
+export function randomItem<T>(array: T[]): T {
+    return array[randomInt(0, array.length)];
+}
+
+export function capitalize(string: string): string {
+    return string.replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase());
 }
