@@ -54,12 +54,11 @@ class Square {
 }
 
 export default class BiomeGrid {
-
     private chunks: BiomeChunk[][];
 
     public constructor(public width: number, public height: number, private cellSize: number) {}
 
-    public setup(data?: BiomeSaveData): void  {
+    public setup(data?: BiomeSaveData): void {
         const chunkCols = Math.ceil(this.width / CHUNK_SIZE);
         const chunkRows = Math.ceil(this.height / CHUNK_SIZE);
         this.chunks = [];
@@ -95,13 +94,16 @@ export default class BiomeGrid {
     }
 
     public getBiomesInMapCell(cell: Vector): Biome[] {
-        const chunkX = Math.floor(cell.x * 2 / CHUNK_SIZE);
-        const chunkY = Math.floor(cell.y * 2 / CHUNK_SIZE);
+        const chunkX = Math.floor((cell.x * 2) / CHUNK_SIZE);
+        const chunkY = Math.floor((cell.y * 2) / CHUNK_SIZE);
         return [
             ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2) % CHUNK_SIZE, (cell.y * 2) % CHUNK_SIZE),
             ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2 + 1) % CHUNK_SIZE, (cell.y * 2) % CHUNK_SIZE),
             ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2) % CHUNK_SIZE, (cell.y * 2 + 1) % CHUNK_SIZE),
-            ...this.chunks[chunkX][chunkY].getBiomesInCell((cell.x * 2 + 1) % CHUNK_SIZE, (cell.y * 2 + 1) % CHUNK_SIZE),
+            ...this.chunks[chunkX][chunkY].getBiomesInCell(
+                (cell.x * 2 + 1) % CHUNK_SIZE,
+                (cell.y * 2 + 1) % CHUNK_SIZE,
+            ),
         ];
     }
 
@@ -179,7 +181,7 @@ export class BiomeChunk {
         this.camera = Game.camera;
     }
 
-    public setup(data?: Biome[][][]): void  {
+    public setup(data?: Biome[][][]): void {
         // Generate grid
         this.grid = [];
         for (let i = 0; i < this.width; i++) {
@@ -207,20 +209,22 @@ export class BiomeChunk {
                 for (let q = 0; q < 4; q++) {
                     // this.graphics.lineStyle(0.2, 0xFFFFFF); // White borders on biome grid
                     let colour = this.grid[i][j].getQuadrants()[q];
-                    const {h,s,l} = hexToHsl(colour);
+                    const { h, s, l } = hexToHsl(colour);
                     const slopeColour = this.getQuadrantSlopeColour(i + this.pos.x, j + this.pos.y, q) * 0.1;
                     colour = hslToHex(h, s, clamp(l + slopeColour, 0, 1));
                     this.graphics
                         .beginFill(colour)
-                        .drawPolygon(this.getQuadrantVertices(i, j, q).map(vertex => {
-                            let vec = vertex.add(new Vector(this.pos.x, this.pos.y));
-                            // Add elevation
-                            const elevation = Game.world.elevationGrid.getElevationAtPoint(vec.divide(2));
-                            vec = vec.add(new Vector(0, -(elevation * 2)));
+                        .drawPolygon(
+                            this.getQuadrantVertices(i, j, q).map(vertex => {
+                                let vec = vertex.add(new Vector(this.pos.x, this.pos.y));
+                                // Add elevation
+                                const elevation = Game.world.elevationGrid.getElevationAtPoint(vec.divide(2));
+                                vec = vec.add(new Vector(0, -(elevation * 2)));
 
-                            // Convert to screen space
-                            return toObservablePoint(vec.multiply(this.cellSize));
-                        }))
+                                // Convert to screen space
+                                return toObservablePoint(vec.multiply(this.cellSize));
+                            }),
+                        )
                         .endFill();
                 }
             }
@@ -243,54 +247,80 @@ export class BiomeChunk {
     private getQuadrantVertices(x: number, y: number, quadrant: Side): Vector[] {
         switch (quadrant) {
             case Side.North:
-                return [
-                    new Vector(x, y),
-                    new Vector((x+1), y),
-                    new Vector(x + 0.5, y + 0.5),
-                ];
+                return [new Vector(x, y), new Vector(x + 1, y), new Vector(x + 0.5, y + 0.5)];
             case Side.West:
-                return [
-                    new Vector(x, y),
-                    new Vector(x, (y+1)),
-                    new Vector(x + 0.5, y + 0.5),
-                ];
+                return [new Vector(x, y), new Vector(x, y + 1), new Vector(x + 0.5, y + 0.5)];
             case Side.South:
-                return [
-                    new Vector(x, (y+1)),
-                    new Vector((x+1), (y+1)),
-                    new Vector(x + 0.5, y + 0.5),
-                ];
+                return [new Vector(x, y + 1), new Vector(x + 1, y + 1), new Vector(x + 0.5, y + 0.5)];
             case Side.East:
-                return [
-                    new Vector((x+1), y),
-                    new Vector((x+1), (y+1)),
-                    new Vector(x + 0.5, y + 0.5),
-                ];
+                return [new Vector(x + 1, y), new Vector(x + 1, y + 1), new Vector(x + 0.5, y + 0.5)];
         }
     }
 
     private getQuadrantSlopeColour(x: number, y: number, quadrant: Side): number {
         const slopeVariant = Game.world.elevationGrid.getSlopeVariant(new Vector(x, y).divide(2).floor());
 
-        const NW = 1, N = 0.75, W = 0.5, NE = 0.25, F = 0, SW = -0.25, E = -0.5, S = -0.75, SE = -1;
-        const xRel = x/2 % 1;
-        const yRel = y/2 % 1;
+        const NW = 1,
+            N = 0.75,
+            W = 0.5,
+            NE = 0.25,
+            F = 0,
+            SW = -0.25,
+            E = -0.5,
+            S = -0.75,
+            SE = -1;
+        const xRel = (x / 2) % 1;
+        const yRel = (y / 2) % 1;
 
-        switch(slopeVariant) {
-            case SlopeVariant.N: return N;
-            case SlopeVariant.S: return S;
-            case SlopeVariant.W: return W;
-            case SlopeVariant.E: return E;
-            case SlopeVariant.NW: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? NW : F;
-            case SlopeVariant.NE: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? NE : F;
-            case SlopeVariant.SW: return (yRel - xRel) < 0 || ((yRel - xRel) === 0 && (quadrant === Side.North || quadrant === Side.East)) ? SW : F;
-            case SlopeVariant.SE: return (xRel + yRel) < 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.North || quadrant === Side.West)) ? SE : F;
-            case SlopeVariant.INW: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? N : W;
-            case SlopeVariant.INE: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? N : E;
-            case SlopeVariant.ISW: return (xRel + yRel) < 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.North || quadrant === Side.West)) ? S : W;
-            case SlopeVariant.ISE: return (yRel - xRel) < 0 || ((yRel - xRel) === 0 && (quadrant === Side.North || quadrant === Side.East)) ? S : E;
-            case SlopeVariant.I1: return (xRel + yRel) > 0.5 || ((xRel + yRel) === 0.5 && (quadrant === Side.South || quadrant === Side.East)) ? NW : SE;
-            case SlopeVariant.I2: return (xRel - yRel) < 0 || ((xRel - yRel) === 0 && (quadrant === Side.South || quadrant === Side.West)) ? NE : SW;
+        switch (slopeVariant) {
+            case SlopeVariant.N:
+                return N;
+            case SlopeVariant.S:
+                return S;
+            case SlopeVariant.W:
+                return W;
+            case SlopeVariant.E:
+                return E;
+            case SlopeVariant.NW:
+                return xRel + yRel > 0.5 || (xRel + yRel === 0.5 && (quadrant === Side.South || quadrant === Side.East))
+                    ? NW
+                    : F;
+            case SlopeVariant.NE:
+                return xRel - yRel < 0 || (xRel - yRel === 0 && (quadrant === Side.South || quadrant === Side.West))
+                    ? NE
+                    : F;
+            case SlopeVariant.SW:
+                return yRel - xRel < 0 || (yRel - xRel === 0 && (quadrant === Side.North || quadrant === Side.East))
+                    ? SW
+                    : F;
+            case SlopeVariant.SE:
+                return xRel + yRel < 0.5 || (xRel + yRel === 0.5 && (quadrant === Side.North || quadrant === Side.West))
+                    ? SE
+                    : F;
+            case SlopeVariant.INW:
+                return xRel - yRel < 0 || (xRel - yRel === 0 && (quadrant === Side.South || quadrant === Side.West))
+                    ? N
+                    : W;
+            case SlopeVariant.INE:
+                return xRel + yRel > 0.5 || (xRel + yRel === 0.5 && (quadrant === Side.South || quadrant === Side.East))
+                    ? N
+                    : E;
+            case SlopeVariant.ISW:
+                return xRel + yRel < 0.5 || (xRel + yRel === 0.5 && (quadrant === Side.North || quadrant === Side.West))
+                    ? S
+                    : W;
+            case SlopeVariant.ISE:
+                return yRel - xRel < 0 || (yRel - xRel === 0 && (quadrant === Side.North || quadrant === Side.East))
+                    ? S
+                    : E;
+            case SlopeVariant.I1:
+                return xRel + yRel > 0.5 || (xRel + yRel === 0.5 && (quadrant === Side.South || quadrant === Side.East))
+                    ? NW
+                    : SE;
+            case SlopeVariant.I2:
+                return xRel - yRel < 0 || (xRel - yRel === 0 && (quadrant === Side.South || quadrant === Side.West))
+                    ? NE
+                    : SW;
             case SlopeVariant.Flat:
             default:
                 return F;
@@ -300,8 +330,8 @@ export class BiomeChunk {
     public setBiomeInRadius(pos: Vector, radius: number, biome: Biome, area?: Area): void {
         let changed = false;
 
-        for(let i = pos.x - (radius); i <= pos.x + (radius); i++) {
-            for(let j = pos.y - (radius); j <= pos.y + (radius); j++) {
+        for (let i = pos.x - radius; i <= pos.x + radius; i++) {
+            for (let j = pos.y - radius; j <= pos.y + radius; j++) {
                 const cellPos = new Vector(i, j).floor();
                 if (!this.isPositionInGrid(cellPos)) continue;
                 if (area && area !== Game.world.getAreaAtPosition(cellPos.add(this.pos).multiply(0.5))) continue;
@@ -326,7 +356,7 @@ export class BiomeChunk {
     }
 
     public getBiomesInCell(x: number, y: number): Biome[] {
-        return this.grid[x][y].getQuadrants()
+        return this.grid[x][y].getQuadrants();
     }
 
     public getCopy(): Biome[][][] {

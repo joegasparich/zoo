@@ -13,12 +13,10 @@ interface WindowProps extends UIComponentProps {
 }
 
 export default class Window extends UIComponent<WindowProps, undefined> {
-
     protected draggableClassName = "header";
 
     protected getStyles(): SerializedStyles {
         return css`
-
             .window {
                 position: absolute;
                 border-radius: 5px;
@@ -28,7 +26,7 @@ export default class Window extends UIComponent<WindowProps, undefined> {
                     display: flex;
                     justify-content: flex-end;
                     cursor: pointer;
-                    background: #AAAAAA;
+                    background: #aaaaaa;
 
                     .title {
                         width: 100%;
@@ -48,7 +46,6 @@ export default class Window extends UIComponent<WindowProps, undefined> {
                 }
 
                 .content {
-
                 }
             }
         `;
@@ -61,11 +58,14 @@ export default class Window extends UIComponent<WindowProps, undefined> {
                     <div className="window">
                         <div className={this.draggableClassName}>
                             <div className="title">{this.props.title}</div>
-                            <div className="exit-button" onClick={(): void => this.props.handleClose(this.props.windowId)}>X</div>
+                            <div
+                                className="exit-button"
+                                onClick={(): void => this.props.handleClose(this.props.windowId)}
+                            >
+                                X
+                            </div>
                         </div>
-                        <div className="content">
-                            {this.props.content}
-                        </div>
+                        <div className="content">{this.props.content}</div>
                     </div>
                 </Draggable>
             </React.Fragment>

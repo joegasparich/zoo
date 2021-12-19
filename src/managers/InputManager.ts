@@ -33,7 +33,6 @@ export type Input = {
 };
 
 export default class InputManager {
-
     // smh no enum class members
     public static readonly KEY = KEY;
     public static readonly MOUSE_BUTTON = MOUSE_BUTTON;

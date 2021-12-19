@@ -23,15 +23,17 @@ class UIManager {
         this.tools = new ToolManager();
         this.tools.setup();
 
-        Game.canvas.addChild(React.createElement(Windows, {
-            key: "windows",
-            ref: this.windowsRef,
-        }));
+        Game.canvas.addChild(
+            React.createElement(Windows, {
+                key: "windows",
+                ref: this.windowsRef,
+            }),
+        );
 
-        this.focusListener = Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
+        this.focusListener = Mediator.on(UIEvent.FOCUS, ({ id }: { id: string }) => {
             this.currentFocus = id;
         });
-        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.currentFocus = "");
+        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => (this.currentFocus = ""));
     }
 
     public update(delta: number): void {

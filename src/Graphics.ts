@@ -7,7 +7,7 @@ import Vector from "vector";
 import { RenderLayers } from "consts";
 
 enum Colour {
-    White = 0xFFFFFF,
+    White = 0xffffff,
     Black = 0x000000,
 }
 
@@ -57,20 +57,10 @@ class Graphics {
                 return;
             }
 
-            this.drawLine(
-                lastVertex.x,
-                lastVertex.y,
-                vertex.x,
-                vertex.y,
-            );
+            this.drawLine(lastVertex.x, lastVertex.y, vertex.x, vertex.y);
             lastVertex = vertex;
         });
-        this.drawLine(
-            lastVertex.x,
-            lastVertex.y,
-            vertices[0].x,
-            vertices[0].y,
-        );
+        this.drawLine(lastVertex.x, lastVertex.y, vertices[0].x, vertices[0].y);
     }
 
     public drawCircle(pos: Vector, radius: number, fill?: number, fillAlpha = 1): void {

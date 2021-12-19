@@ -14,7 +14,7 @@ export default class AnimalTool extends Tool {
     private currentAnimal: AnimalData;
 
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
-        this.assetPath =  data.assetPath;
+        this.assetPath = data.assetPath;
         this.currentAnimal = AssetManager.getJSON(this.assetPath) as AnimalData;
 
         ghost.reset();

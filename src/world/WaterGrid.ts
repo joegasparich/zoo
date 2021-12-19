@@ -4,12 +4,11 @@ import { Config, RenderLayers } from "consts";
 import Graphics from "Graphics";
 import Vector from "vector";
 
-
 import Game from "Game";
 import { SlopeVariant, ELEVATION_HEIGHT } from "./ElevationGrid";
 import { toObservablePoint } from "helpers/vectorHelper";
 
-const WATER_COLOUR = 0x4499FF;
+const WATER_COLOUR = 0x4499ff;
 const WATER_LEVEL = 0.2;
 
 export default class WaterGrid {
@@ -63,27 +62,137 @@ export default class WaterGrid {
         let polygon: Vector[] = [];
 
         switch (slopeVariant) {
-            case SlopeVariant.N: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1 - WATER_LEVEL)), tile.add(new Vector(0, 1 - WATER_LEVEL))]; break;
-            case SlopeVariant.S: polygon = [tile.add(new Vector(0, WATER_LEVEL)), tile.add(new Vector(1, WATER_LEVEL)), tile.add(new Vector(1, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.W: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1 - WATER_LEVEL, 0)), tile.add(new Vector(1 - WATER_LEVEL, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.E: polygon = [tile.add(new Vector(WATER_LEVEL, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1)), tile.add(new Vector(WATER_LEVEL, 1))]; break;
-            case SlopeVariant.NW: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1 - WATER_LEVEL)), tile.add(new Vector(1- WATER_LEVEL, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.NE: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1)), tile.add(new Vector(WATER_LEVEL, 1)), tile.add(new Vector(0, 1- WATER_LEVEL))]; break;
-            case SlopeVariant.SW: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1 - WATER_LEVEL, 0)), tile.add(new Vector(1, WATER_LEVEL)), tile.add(new Vector(1, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.SE: polygon = [tile.add(new Vector(0, WATER_LEVEL)), tile.add(new Vector(WATER_LEVEL, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.INW: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1 - WATER_LEVEL, 0)), tile.add(new Vector(1 - WATER_LEVEL, 1 - WATER_LEVEL)), tile.add(new Vector(0, 1 - WATER_LEVEL))]; break;
-            case SlopeVariant.INE: polygon = [tile.add(new Vector(WATER_LEVEL, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1 - WATER_LEVEL)), tile.add(new Vector(WATER_LEVEL, 1 - WATER_LEVEL))]; break;
-            case SlopeVariant.ISW: polygon = [tile.add(new Vector(0, WATER_LEVEL)), tile.add(new Vector(1 - WATER_LEVEL, WATER_LEVEL)), tile.add(new Vector(1 - WATER_LEVEL, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.ISE: polygon = [tile.add(new Vector(WATER_LEVEL, WATER_LEVEL)), tile.add(new Vector(1, WATER_LEVEL)), tile.add(new Vector(1, 1)), tile.add(new Vector(WATER_LEVEL, 1))]; break;
-            case SlopeVariant.I1: polygon = [tile.add(new Vector(0, WATER_LEVEL)), tile.add(new Vector(WATER_LEVEL, 0)), tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1 - WATER_LEVEL)), tile.add(new Vector(1- WATER_LEVEL, 1)), tile.add(new Vector(0, 1))]; break;
-            case SlopeVariant.I2: polygon = [tile.add(new Vector(0, 0)), tile.add(new Vector(1 - WATER_LEVEL, 0)), tile.add(new Vector(1, WATER_LEVEL)), tile.add(new Vector(1, 1)), tile.add(new Vector(WATER_LEVEL, 1)), tile.add(new Vector(0, 1- WATER_LEVEL))]; break;
+            case SlopeVariant.N:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1 - WATER_LEVEL)),
+                    tile.add(new Vector(0, 1 - WATER_LEVEL)),
+                ];
+                break;
+            case SlopeVariant.S:
+                polygon = [
+                    tile.add(new Vector(0, WATER_LEVEL)),
+                    tile.add(new Vector(1, WATER_LEVEL)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.W:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 0)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.E:
+                polygon = [
+                    tile.add(new Vector(WATER_LEVEL, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(WATER_LEVEL, 1)),
+                ];
+                break;
+            case SlopeVariant.NW:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1 - WATER_LEVEL)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.NE:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(WATER_LEVEL, 1)),
+                    tile.add(new Vector(0, 1 - WATER_LEVEL)),
+                ];
+                break;
+            case SlopeVariant.SW:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 0)),
+                    tile.add(new Vector(1, WATER_LEVEL)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.SE:
+                polygon = [
+                    tile.add(new Vector(0, WATER_LEVEL)),
+                    tile.add(new Vector(WATER_LEVEL, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.INW:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 0)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 1 - WATER_LEVEL)),
+                    tile.add(new Vector(0, 1 - WATER_LEVEL)),
+                ];
+                break;
+            case SlopeVariant.INE:
+                polygon = [
+                    tile.add(new Vector(WATER_LEVEL, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1 - WATER_LEVEL)),
+                    tile.add(new Vector(WATER_LEVEL, 1 - WATER_LEVEL)),
+                ];
+                break;
+            case SlopeVariant.ISW:
+                polygon = [
+                    tile.add(new Vector(0, WATER_LEVEL)),
+                    tile.add(new Vector(1 - WATER_LEVEL, WATER_LEVEL)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.ISE:
+                polygon = [
+                    tile.add(new Vector(WATER_LEVEL, WATER_LEVEL)),
+                    tile.add(new Vector(1, WATER_LEVEL)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(WATER_LEVEL, 1)),
+                ];
+                break;
+            case SlopeVariant.I1:
+                polygon = [
+                    tile.add(new Vector(0, WATER_LEVEL)),
+                    tile.add(new Vector(WATER_LEVEL, 0)),
+                    tile.add(new Vector(1, 0)),
+                    tile.add(new Vector(1, 1 - WATER_LEVEL)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 1)),
+                    tile.add(new Vector(0, 1)),
+                ];
+                break;
+            case SlopeVariant.I2:
+                polygon = [
+                    tile.add(new Vector(0, 0)),
+                    tile.add(new Vector(1 - WATER_LEVEL, 0)),
+                    tile.add(new Vector(1, WATER_LEVEL)),
+                    tile.add(new Vector(1, 1)),
+                    tile.add(new Vector(WATER_LEVEL, 1)),
+                    tile.add(new Vector(0, 1 - WATER_LEVEL)),
+                ];
+                break;
             case SlopeVariant.Flat:
-                polygon = [tile, tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1)), tile.add(new Vector(0, 1))]; break;
+                polygon = [tile, tile.add(new Vector(1, 0)), tile.add(new Vector(1, 1)), tile.add(new Vector(0, 1))];
+                break;
             default:
-                polygon = []; break;
+                polygon = [];
+                break;
         }
 
-        return polygon.map(point => toObservablePoint(point.add(new Vector(0, WATER_LEVEL * ELEVATION_HEIGHT)).multiply(Config.WORLD_SCALE)));
+        return polygon.map(point =>
+            toObservablePoint(point.add(new Vector(0, WATER_LEVEL * ELEVATION_HEIGHT)).multiply(Config.WORLD_SCALE)),
+        );
     }
 
     public getGridCopy(): boolean[][] {
@@ -149,7 +258,7 @@ export default class WaterGrid {
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[i].length; j++) {
                 if (this.grid[i][j]) {
-                    Graphics.setLineStyle(0.5, 0x0000FF);
+                    Graphics.setLineStyle(0.5, 0x0000ff);
                     Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
                 } else {
                     Graphics.setLineStyle(0.5, 0x000000);

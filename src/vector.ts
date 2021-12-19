@@ -22,11 +22,11 @@ export default class Vector {
     public multiply(amount: number): Vector {
         return new Vector(this.x * amount, this.y * amount);
     }
-    public divide(amount: number): Vector{
+    public divide(amount: number): Vector {
         if (amount === 0) {
             try {
                 throw "Can't divide by zero";
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
                 return this;
             }
@@ -67,24 +67,21 @@ export default class Vector {
     public toPolar(): [angle: number, magnitude: number] {
         if (this.x === 0 && this.y === 0) return [0, 0]; // Avoid dividing by zero
 
-        return [Math.atan2(this.y, this.x) + Math.PI/2, this.magnitude()];
+        return [Math.atan2(this.y, this.x) + Math.PI / 2, this.magnitude()];
     }
 
     public static Distance(vectorA: Vector, vectorB: Vector): number {
         return vectorA.subtract(vectorB).magnitude();
     }
     public static Dot(vectorA: Vector, vectorB: Vector): number {
-        return (vectorA.x * vectorB.x) + (vectorA.y * vectorB.y);
+        return vectorA.x * vectorB.x + vectorA.y * vectorB.y;
     }
 
     public static Lerp(startPos: Vector, endPos: Vector, amount: number): Vector {
-        return new Vector(
-            lerp(startPos.x, endPos.x, amount),
-            lerp(startPos.y, endPos.y, amount),
-        );
+        return new Vector(lerp(startPos.x, endPos.x, amount), lerp(startPos.y, endPos.y, amount));
     }
     public static FromPolar(angle: number, magnitude: number) {
-        angle -= Math.PI/2; //Add 90 degrees to normalise to up
+        angle -= Math.PI / 2; //Add 90 degrees to normalise to up
         return new Vector(Math.cos(angle), Math.sin(angle)).multiply(magnitude);
     }
 

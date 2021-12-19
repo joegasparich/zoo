@@ -8,7 +8,6 @@ import Vector from "vector";
 const MAP_SIZE = 20;
 
 export default class ZooScene extends Scene {
-
     public name = "Zoo Scene";
 
     public constructor() {

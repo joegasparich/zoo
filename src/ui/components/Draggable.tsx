@@ -14,7 +14,6 @@ export interface DraggableState {
 }
 
 export default class Draggable extends UIComponent<DraggableProps, DraggableState> {
-
     public constructor(props: DraggableProps) {
         super(props);
 
@@ -47,8 +46,8 @@ export default class Draggable extends UIComponent<DraggableProps, DraggableStat
             pos3 = event.clientX;
             pos4 = event.clientY;
             // set the element's new position:
-            element.style.top = (element.offsetTop - pos2) + "px";
-            element.style.left = (element.offsetLeft - pos1) + "px";
+            element.style.top = element.offsetTop - pos2 + "px";
+            element.style.left = element.offsetLeft - pos1 + "px";
             this.setState({
                 position: new Vector(element.offsetTop - pos2, element.offsetLeft - pos1),
             });
@@ -60,10 +59,14 @@ export default class Draggable extends UIComponent<DraggableProps, DraggableStat
             document.onmousemove = null;
         };
 
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        let pos1 = 0,
+            pos2 = 0,
+            pos3 = 0,
+            pos4 = 0;
         if (element.getElementsByClassName(this.props.draggableClassName)) {
             // if present, the header is where you move the DIV from:
-            (element.getElementsByClassName(this.props.draggableClassName)[0] as HTMLElement).onmousedown = dragMouseDown;
+            (element.getElementsByClassName(this.props.draggableClassName)[0] as HTMLElement).onmousedown =
+                dragMouseDown;
         } else {
             // otherwise, move the DIV from anywhere inside the DIV:
             element.onmousedown = dragMouseDown;
@@ -79,10 +82,6 @@ export default class Draggable extends UIComponent<DraggableProps, DraggableStat
     }
 
     protected getContent(): JSX.Element {
-        return (
-            <div>
-                {this.props.children}
-            </div>
-        );
+        return <div>{this.props.children}</div>;
     }
 }

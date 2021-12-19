@@ -27,7 +27,6 @@ export enum Orientation {
 }
 
 export default class Wall {
-
     public static wallSprites = new Map<string, SpriteSheet>();
 
     public static wallToWorldPos(wallPos: Vector, orientation: Orientation): Vector {
@@ -49,7 +48,12 @@ export default class Wall {
     private currentSpriteIndex: WallSpriteIndex;
     private currentElevation: number;
 
-    public constructor(public orientation: Orientation, public position: Vector, public gridPos: Vector, public assetPath?: string) {
+    public constructor(
+        public orientation: Orientation,
+        public position: Vector,
+        public gridPos: Vector,
+        public assetPath?: string,
+    ) {
         if (assetPath) {
             this.exists = true;
             const data = AssetManager.getJSON(assetPath) as WallData;
@@ -94,12 +98,12 @@ export default class Wall {
         this.sprite.anchor.set(0.5, 1 + elevation * 0.5);
 
         // Update position
-        const {x, y} = this.gridPos;
+        const { x, y } = this.gridPos;
         let wallPos;
         if (this.orientation === Orientation.Vertical) {
-            wallPos = new Vector((x/2), y+1);
+            wallPos = new Vector(x / 2, y + 1);
         } else {
-            wallPos = new Vector((x/2), y);
+            wallPos = new Vector(x / 2, y);
         }
         this.sprite.position = toObservablePoint(wallPos.multiply(Game.opts.worldScale));
     }
@@ -118,13 +122,21 @@ export default class Wall {
 
     public isSloped(): boolean {
         if (this.orientation === Orientation.Horizontal) {
-            const left = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
-            const right = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
+            const left = !!Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x - 0.5, this.position.y),
+            );
+            const right = !!Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x + 0.5, this.position.y),
+            );
 
             return left !== right;
         } else {
-            const up = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
-            const down = !!Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
+            const up = !!Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x, this.position.y - 0.5),
+            );
+            const down = !!Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x, this.position.y + 0.5),
+            );
 
             return up !== down;
         }
@@ -132,28 +144,39 @@ export default class Wall {
 
     public getCorners(): Vector[] {
         const tile = this.position.floor();
-        return this.orientation === Orientation.Horizontal ?
-            [tile, tile.add(new Vector(1, 0))] :
-            [tile, tile.add(new Vector(0, 1))];
+        return this.orientation === Orientation.Horizontal
+            ? [tile, tile.add(new Vector(1, 0))]
+            : [tile, tile.add(new Vector(0, 1))];
     }
 
     public getSpriteIndex(isDoor = this.isDoor): [index: WallSpriteIndex, elevation: number] {
         if (this.orientation === Orientation.Horizontal) {
-            const left = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x - 0.5, this.position.y));
-            const right = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x + 0.5, this.position.y));
+            const left = Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x - 0.5, this.position.y),
+            );
+            const right = Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x + 0.5, this.position.y),
+            );
             const elevation = Math.min(left, right);
 
-            if (left === right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, elevation];
+            if (left === right)
+                return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.Horizontal, elevation];
             if (left > right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillWest, elevation];
             if (left < right) return [isDoor ? WallSpriteIndex.DoorHorizontal : WallSpriteIndex.HillEast, elevation];
         } else {
             const up = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y - 0.5));
-            const down = Game.world.elevationGrid.getElevationAtPoint(new Vector(this.position.x, this.position.y + 0.5));
+            const down = Game.world.elevationGrid.getElevationAtPoint(
+                new Vector(this.position.x, this.position.y + 0.5),
+            );
             const elevation = Math.min(up, down);
 
             if (up === down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.Vertical, elevation];
             if (up > down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillNorth, elevation];
-            if (up < down) return [isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillSouth, elevation + ELEVATION_HEIGHT];
+            if (up < down)
+                return [
+                    isDoor ? WallSpriteIndex.DoorVertical : WallSpriteIndex.HillSouth,
+                    elevation + ELEVATION_HEIGHT,
+                ];
         }
     }
 }

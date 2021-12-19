@@ -12,8 +12,8 @@ export default class Button extends UIComponent<ButtonProps, {}> {
     protected getContent(): JSX.Element {
         return (
             <div className="button" onClick={this.props.onClick}>
-                { this.props.image && <img src={this.props.image} /> }
-                { this.props.children }
+                {this.props.image && <img src={this.props.image} />}
+                {this.props.children}
             </div>
         );
     }
@@ -26,14 +26,14 @@ export default class Button extends UIComponent<ButtonProps, {}> {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                background-color: #DDDDDD;
+                background-color: #dddddd;
                 width: 30px;
                 height: 30px;
                 cursor: pointer;
                 margin: 2.5px;
 
                 &:hover {
-                    background-color: #FFFFFF;
+                    background-color: #ffffff;
                 }
 
                 img {

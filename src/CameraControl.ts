@@ -10,8 +10,8 @@ const moveSpeed = 5;
 
 Mediator.on(GameEvent.UPDATE, update);
 
-function update(opts: {delta: number}): void {
-    const {delta} = opts;
+function update(opts: { delta: number }): void {
+    const { delta } = opts;
 
     if (Game.input.isInputHeld(Inputs.ZoomIn)) {
         // zoom in

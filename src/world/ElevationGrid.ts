@@ -1,7 +1,6 @@
 import { Config } from "consts";
 import { Side } from "consts";
 import { pointInCircle } from "helpers/math";
-import { TileObjectComponent, COMPONENT } from "entities/components";
 
 import Game from "Game";
 import Wall from "./Wall";
@@ -16,6 +15,7 @@ export enum Elevation {
     Hill = 1,
 }
 
+// prettier-ignore
 export enum SlopeVariant {
     Flat,
     S, E, W, N,
@@ -56,8 +56,8 @@ export default class ElevationGrid {
 
         const points: Vector[] = [];
 
-        for(let i = centre.x - radius; i <= centre.x + radius; i++) {
-            for(let j = centre.y - radius; j <= centre.y + radius; j++) {
+        for (let i = centre.x - radius; i <= centre.x + radius; i++) {
+            for (let j = centre.y - radius; j <= centre.y + radius; j++) {
                 const gridPos = new Vector(i, j).floor();
                 if (!this.isPositionInGrid(gridPos)) continue;
 
@@ -160,21 +160,36 @@ export default class ElevationGrid {
 
         // Tried to come up with a formula instead of using enums but I'm too dumb
         switch (slopeVariant) {
-            case SlopeVariant.Flat: return baseElevation;
-            case SlopeVariant.N: return baseElevation + ELEVATION_HEIGHT * relY;
-            case SlopeVariant.S: return baseElevation + ELEVATION_HEIGHT * (1 - relY);
-            case SlopeVariant.W: return baseElevation + ELEVATION_HEIGHT * relX;
-            case SlopeVariant.E: return baseElevation + ELEVATION_HEIGHT * (1 - relX);
-            case SlopeVariant.SE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX - relY), 0);
-            case SlopeVariant.SW: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - relY), 0);
-            case SlopeVariant.NE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX - (1 - relY)), 0);
-            case SlopeVariant.NW: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - (1 - relY)), 0);
-            case SlopeVariant.ISE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX), (1 - relY));
-            case SlopeVariant.ISW: return baseElevation + ELEVATION_HEIGHT * Math.max(relX, (1 - relY));
-            case SlopeVariant.INE: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX), relY);
-            case SlopeVariant.INW: return baseElevation + ELEVATION_HEIGHT * Math.max(relX, relY);
-            case SlopeVariant.I1: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - relX - relY), (1 - (1 - relX) - (1 - relY)));
-            case SlopeVariant.I2: return baseElevation + ELEVATION_HEIGHT * Math.max((1 - (1 - relX) - relY), (1 - relX - (1 - relY)));
+            case SlopeVariant.Flat:
+                return baseElevation;
+            case SlopeVariant.N:
+                return baseElevation + ELEVATION_HEIGHT * relY;
+            case SlopeVariant.S:
+                return baseElevation + ELEVATION_HEIGHT * (1 - relY);
+            case SlopeVariant.W:
+                return baseElevation + ELEVATION_HEIGHT * relX;
+            case SlopeVariant.E:
+                return baseElevation + ELEVATION_HEIGHT * (1 - relX);
+            case SlopeVariant.SE:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - relX - relY, 0);
+            case SlopeVariant.SW:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - (1 - relX) - relY, 0);
+            case SlopeVariant.NE:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - relX - (1 - relY), 0);
+            case SlopeVariant.NW:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - (1 - relX) - (1 - relY), 0);
+            case SlopeVariant.ISE:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - relX, 1 - relY);
+            case SlopeVariant.ISW:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(relX, 1 - relY);
+            case SlopeVariant.INE:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - relX, relY);
+            case SlopeVariant.INW:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(relX, relY);
+            case SlopeVariant.I1:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - relX - relY, 1 - (1 - relX) - (1 - relY));
+            case SlopeVariant.I2:
+                return baseElevation + ELEVATION_HEIGHT * Math.max(1 - (1 - relX) - relY, 1 - relX - (1 - relY));
             default:
                 console.error("You shouldn't be here");
                 return 0;
@@ -182,10 +197,10 @@ export default class ElevationGrid {
     }
 
     public getSlopeVariant(tile: Vector): SlopeVariant {
-        const {x, y} = tile;
-        const nw = this.getElevationAtGridPoint(new Vector(x, y));         // Top Left
-        const ne = this.getElevationAtGridPoint(new Vector(x + 1, y));     // Top Right
-        const sw = this.getElevationAtGridPoint(new Vector(x, y + 1));     // Bottom Left
+        const { x, y } = tile;
+        const nw = this.getElevationAtGridPoint(new Vector(x, y)); // Top Left
+        const ne = this.getElevationAtGridPoint(new Vector(x + 1, y)); // Top Right
+        const sw = this.getElevationAtGridPoint(new Vector(x, y + 1)); // Bottom Left
         const se = this.getElevationAtGridPoint(new Vector(x + 1, y + 1)); // Bottom Right
 
         if (nw === ne && nw === sw && nw === se) return SlopeVariant.Flat;
@@ -212,11 +227,13 @@ export default class ElevationGrid {
         return this.getSlopeVariant(position.floor()) !== SlopeVariant.Flat;
     }
     public isPositionSlopeCorner(position: Vector): boolean {
-        return this.getSlopeVariant(position.floor()) !== SlopeVariant.Flat
-            && this.getSlopeVariant(position.floor()) !== SlopeVariant.N
-            && this.getSlopeVariant(position.floor()) !== SlopeVariant.S
-            && this.getSlopeVariant(position.floor()) !== SlopeVariant.E
-            && this.getSlopeVariant(position.floor()) !== SlopeVariant.W;
+        return (
+            this.getSlopeVariant(position.floor()) !== SlopeVariant.Flat &&
+            this.getSlopeVariant(position.floor()) !== SlopeVariant.N &&
+            this.getSlopeVariant(position.floor()) !== SlopeVariant.S &&
+            this.getSlopeVariant(position.floor()) !== SlopeVariant.E &&
+            this.getSlopeVariant(position.floor()) !== SlopeVariant.W
+        );
     }
 
     private isPositionInGrid(pos: Vector): boolean {
@@ -224,12 +241,14 @@ export default class ElevationGrid {
     }
 
     public getBaseElevation(tile: Vector): number {
-        return Math.min(
-            this.getElevationAtGridPoint(tile),
-            this.getElevationAtGridPoint(tile.add(new Vector(0, 1))),
-            this.getElevationAtGridPoint(tile.add(new Vector(1, 0))),
-            this.getElevationAtGridPoint(tile.add(new Vector(1, 1))),
-        ) * ELEVATION_HEIGHT;
+        return (
+            Math.min(
+                this.getElevationAtGridPoint(tile),
+                this.getElevationAtGridPoint(tile.add(new Vector(0, 1))),
+                this.getElevationAtGridPoint(tile.add(new Vector(1, 0))),
+                this.getElevationAtGridPoint(tile.add(new Vector(1, 1))),
+            ) * ELEVATION_HEIGHT
+        );
     }
 
     private getElevationAtGridPoint(gridPos: Vector): number {
@@ -296,7 +315,7 @@ export default class ElevationGrid {
 
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[i].length; j++) {
-                Graphics.setLineStyle(1, 0xFF0000);
+                Graphics.setLineStyle(1, 0xff0000);
                 if (i < this.grid.length - 1) {
                     Graphics.drawLine(
                         i * cellSize,

@@ -15,7 +15,6 @@ const defaultState: WindowsState = {
 };
 
 export default class Windows extends UIComponent<UIComponentProps, WindowsState> {
-
     public constructor(props: UIComponentProps) {
         super(props);
 
@@ -23,11 +22,7 @@ export default class Windows extends UIComponent<UIComponentProps, WindowsState>
     }
 
     protected getContent(): JSX.Element {
-        return (
-            <React.Fragment>
-                {this.state?.windows}
-            </React.Fragment>
-        );
+        return <React.Fragment>{this.state?.windows}</React.Fragment>;
     }
 
     public openWindow(id: string, title: string, position: Vector, content: JSX.Element): void {

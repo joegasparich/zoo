@@ -24,8 +24,13 @@ export default class BiomeTool extends Tool {
         this.currentBiome = data.biome;
         ghost.reset();
         ghost.drawFunction = (pos: Vector): void => {
-            Graphics.setLineStyle(1, 0xFFFFFF);
-            Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, this.currentBiome, 0.5);
+            Graphics.setLineStyle(1, 0xffffff);
+            Graphics.drawCircle(
+                pos.multiply(Config.WORLD_SCALE),
+                this.toolManager.radius * Config.WORLD_SCALE,
+                this.currentBiome,
+                0.5,
+            );
         };
         ghost.setSpriteVisible(false);
     }
@@ -35,13 +40,20 @@ export default class BiomeTool extends Tool {
             if (this.placementIntervalRef) return;
             this.placementIntervalRef = window.setInterval(() => {
                 const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
-                Game.world.biomeGrid.getChunksInRadius(mouseWorldPos.multiply(2), this.toolManager.radius * 2).forEach(chunk => {
-                    // Make backup of chunks
-                    if (!this.chunksUpdated.has(chunk)) {
-                        this.chunksUpdated.set(chunk, chunk.getCopy());
-                    }
-                });
-                Game.world.biomeGrid.setBiomeInRadius(mouseWorldPos.multiply(2), this.toolManager.radius * 2, this.currentBiome, Game.world.getAreaAtPosition(mouseWorldPos));
+                Game.world.biomeGrid
+                    .getChunksInRadius(mouseWorldPos.multiply(2), this.toolManager.radius * 2)
+                    .forEach(chunk => {
+                        // Make backup of chunks
+                        if (!this.chunksUpdated.has(chunk)) {
+                            this.chunksUpdated.set(chunk, chunk.getCopy());
+                        }
+                    });
+                Game.world.biomeGrid.setBiomeInRadius(
+                    mouseWorldPos.multiply(2),
+                    this.toolManager.radius * 2,
+                    this.currentBiome,
+                    Game.world.getAreaAtPosition(mouseWorldPos),
+                );
             }, BIOME_UPDATE_INTERVAL);
         } else {
             window.clearInterval(this.placementIntervalRef);
@@ -50,7 +62,7 @@ export default class BiomeTool extends Tool {
 
         if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             const chunkData: any[] = [];
-            this.chunksUpdated.forEach((data, chunk)  => {
+            this.chunksUpdated.forEach((data, chunk) => {
                 chunkData.push([chunk, data]);
             });
 

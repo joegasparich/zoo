@@ -11,7 +11,7 @@ export interface UIComponentProps {
 export default abstract class UIComponent<P extends UIComponentProps, S> extends React.Component<P, S> {
     private baseStyles = css`
         pointer-events: all;
-        background: #AAAAAA;
+        background: #aaaaaa;
 
         .hidden {
             display: none;
@@ -19,7 +19,7 @@ export default abstract class UIComponent<P extends UIComponentProps, S> extends
     `;
     private componentRef = React.createRef<HTMLDivElement>();
 
-    protected getStyles(): SerializedStyles | void {};
+    protected getStyles(): SerializedStyles | void {}
     protected abstract getContent(): JSX.Element;
 
     protected getRootElement(): HTMLDivElement {

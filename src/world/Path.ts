@@ -17,16 +17,19 @@ export enum PathSpriteIndex {
 }
 
 export default class Path {
-
     public static pathSprites = new Map<string, SpriteSheet>();
 
     public static getSpriteIndex(pos: Vector): [index: PathSpriteIndex, elevation: number] {
         pos = pos.floor();
-        switch(Game.world.elevationGrid.getSlopeVariant(pos)) {
-            case SlopeVariant.N: return [PathSpriteIndex.N, Game.world.elevationGrid.getBaseElevation(pos)];
-            case SlopeVariant.W: return [PathSpriteIndex.W, Game.world.elevationGrid.getBaseElevation(pos)];
-            case SlopeVariant.E: return [PathSpriteIndex.E, Game.world.elevationGrid.getBaseElevation(pos)];
-            case SlopeVariant.S: return [PathSpriteIndex.S, Game.world.elevationGrid.getBaseElevation(pos)];
+        switch (Game.world.elevationGrid.getSlopeVariant(pos)) {
+            case SlopeVariant.N:
+                return [PathSpriteIndex.N, Game.world.elevationGrid.getBaseElevation(pos)];
+            case SlopeVariant.W:
+                return [PathSpriteIndex.W, Game.world.elevationGrid.getBaseElevation(pos)];
+            case SlopeVariant.E:
+                return [PathSpriteIndex.E, Game.world.elevationGrid.getBaseElevation(pos)];
+            case SlopeVariant.S:
+                return [PathSpriteIndex.S, Game.world.elevationGrid.getBaseElevation(pos)];
             case SlopeVariant.Flat:
             default:
                 return [PathSpriteIndex.Flat, Game.world.elevationGrid.getBaseElevation(pos)];

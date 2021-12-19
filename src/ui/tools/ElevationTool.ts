@@ -23,7 +23,12 @@ export default class ElevationTool extends Tool {
         ghost.reset();
         ghost.drawFunction = (pos: Vector): void => {
             Graphics.setLineStyle(1, data.colour);
-            Graphics.drawCircle(pos.multiply(Config.WORLD_SCALE), this.toolManager.radius * Config.WORLD_SCALE, data.colour, 0.5);
+            Graphics.drawCircle(
+                pos.multiply(Config.WORLD_SCALE),
+                this.toolManager.radius * Config.WORLD_SCALE,
+                data.colour,
+                0.5,
+            );
         };
         ghost.setSpriteVisible(false);
 
@@ -36,7 +41,11 @@ export default class ElevationTool extends Tool {
             this.placementIntervalRef = window.setInterval(() => {
                 const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
-                Game.world.elevationGrid.setElevationInCircle(mouseWorldPos, this.toolManager.radius, this.targetElevation);
+                Game.world.elevationGrid.setElevationInCircle(
+                    mouseWorldPos,
+                    this.toolManager.radius,
+                    this.targetElevation,
+                );
             }, ELEVATION_UPDATE_INTERVAL);
         } else {
             window.clearInterval(this.placementIntervalRef);

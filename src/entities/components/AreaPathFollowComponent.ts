@@ -56,14 +56,19 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
                     }
                 });
                 // Go to tile just before door
-                const targetTile = Game.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => Game.world.getAreaAtPosition(tile) === this.currentArea);
+                const targetTile = Game.world.wallGrid
+                    .getAdjacentTiles(this.currentDoor)
+                    .find(tile => Game.world.getAreaAtPosition(tile) === this.currentArea);
                 super.pathTo(targetTile);
             }
             // Head to door
             if (super.followPath()) {
                 // We've made it to the door
                 // Get path through door
-                this.enterDoorPosition = Game.world.wallGrid.getAdjacentTiles(this.currentDoor).find(tile => Game.world.getAreaAtPosition(tile) !== this.currentArea).add(new Vector(0.5));
+                this.enterDoorPosition = Game.world.wallGrid
+                    .getAdjacentTiles(this.currentDoor)
+                    .find(tile => Game.world.getAreaAtPosition(tile) !== this.currentArea)
+                    .add(new Vector(0.5));
             }
             if (this.enterDoorPosition) {
                 // We are going through the door
@@ -122,7 +127,7 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
         this.areaPath = data.areaPath?.map(areaId => Game.world.getAreaById(areaId));
         this.currentArea = data.currentArea && Game.world.getAreaById(data.currentArea);
         if (data.currentDoor) {
-            const {x, y} = Vector.Deserialize(data.currentDoor);
+            const { x, y } = Vector.Deserialize(data.currentDoor);
             this.currentDoor = Game.world.wallGrid.getWallByGridPos(x, y);
         }
         this.enterDoorPosition = data.enterDoorPosition && Vector.Deserialize(data.enterDoorPosition);

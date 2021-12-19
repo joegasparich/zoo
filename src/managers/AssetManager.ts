@@ -45,7 +45,7 @@ class AssetManager {
         const progressListener: (loader: Loader) => void = loader => onProgress && onProgress(loader.progress);
         const progressListenerRef = this.loader.onProgress.add(progressListener);
 
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             this.loader.load((loader, resources) => {
                 this.loader.onProgress.detach(progressListenerRef);
                 const res = assets.map(asset => resources[asset]).concat(existingAssets.map(asset => resources[asset]));

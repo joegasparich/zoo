@@ -10,7 +10,7 @@ export type Rectangle = {
 export function pointInCircle(circlePos: Vector, radius: number, point: Vector): boolean {
     const dx = circlePos.x - point.x;
     const dy = circlePos.y - point.y;
-    return (dx*dx + dy*dy) < radius*radius;
+    return dx * dx + dy * dy < radius * radius;
 }
 
 export function lineIntesectsCircle(lineStart: Vector, lineEnd: Vector, circlePos: Vector, circleRad: number): boolean {
@@ -19,30 +19,38 @@ export function lineIntesectsCircle(lineStart: Vector, lineEnd: Vector, circlePo
     const ab2 = Vector.Dot(ab, ab);
     const acab = Vector.Dot(ac, ab);
     let t = acab / ab2;
-    t = (t < 0) ? 0 : t;
-    t = (t > 1) ? 1 : t;
-    const h = new Vector((ab.x * t + lineStart.x) - circlePos.x, (ab.y * t + lineStart.y) - circlePos.y);
+    t = t < 0 ? 0 : t;
+    t = t > 1 ? 1 : t;
+    const h = new Vector(ab.x * t + lineStart.x - circlePos.x, ab.y * t + lineStart.y - circlePos.y);
     const h2 = Vector.Dot(h, h);
     return h2 <= circleRad * circleRad;
 }
 
 export function circleIntersectsRect(boxPos: Vector, boxDim: Vector, circlePos: Vector, circleRad: number): boolean {
-    const distX = Math.abs(circlePos.x - boxPos.x-boxDim.x/2);
-    const distY = Math.abs(circlePos.y - boxPos.y-boxDim.y/2);
+    const distX = Math.abs(circlePos.x - boxPos.x - boxDim.x / 2);
+    const distY = Math.abs(circlePos.y - boxPos.y - boxDim.y / 2);
 
-    if (distX > (boxDim.x/2 + circleRad)) { return false; }
-    if (distY > (boxDim.y/2 + circleRad)) { return false; }
+    if (distX > boxDim.x / 2 + circleRad) {
+        return false;
+    }
+    if (distY > boxDim.y / 2 + circleRad) {
+        return false;
+    }
 
-    if (distX <= (boxDim.x/2)) { return true; }
-    if (distY <= (boxDim.y/2)) { return true; }
+    if (distX <= boxDim.x / 2) {
+        return true;
+    }
+    if (distY <= boxDim.y / 2) {
+        return true;
+    }
 
-    const dx=distX-boxDim.x/2;
-    const dy=distY-boxDim.y/2;
-    return (dx*dx+dy*dy<=(circleRad*circleRad));
+    const dx = distX - boxDim.x / 2;
+    const dy = distY - boxDim.y / 2;
+    return dx * dx + dy * dy <= circleRad * circleRad;
 }
 
 // http://playtechs.blogspot.com/2007/03/raytracing-on-grid.html
-export function getCellsIntersectedByLine({x: x0, y: y0}: Vector, {x: x1, y: y1}: Vector): Vector[] {
+export function getCellsIntersectedByLine({ x: x0, y: y0 }: Vector, { x: x1, y: y1 }: Vector): Vector[] {
     const cells: Vector[] = [];
 
     let dx = Math.abs(x1 - x0);
@@ -50,8 +58,8 @@ export function getCellsIntersectedByLine({x: x0, y: y0}: Vector, {x: x1, y: y1}
     let x = x0;
     let y = y0;
     let n = 1 + dx + dy;
-    const x_inc = (x1 > x0) ? 1 : -1;
-    const y_inc = (y1 > y0) ? 1 : -1;
+    const x_inc = x1 > x0 ? 1 : -1;
+    const y_inc = y1 > y0 ? 1 : -1;
     let error = dx - dy;
     dx *= 2;
     dy *= 2;
@@ -70,7 +78,7 @@ export function getCellsIntersectedByLine({x: x0, y: y0}: Vector, {x: x1, y: y1}
     return cells;
 }
 
-export function clamp (val: number, min: number, max: number): number {
+export function clamp(val: number, min: number, max: number): number {
     return Math.min(Math.max(val, min), max);
 }
 
@@ -87,11 +95,11 @@ export function rgbToHex(r: number, g: number, b: number): number {
  * Returns and object containing the RGB values
  * @param hex The hex number to convert to RGB
  */
-export function hexToRgb(hex: number): {r: number; g: number; b: number} {
-    const r = (hex >> 16) & 0xFF;
-    const g = (hex >> 8) & 0xFF;
-    const b = hex & 0xFF;
-    return {r, g, b};
+export function hexToRgb(hex: number): { r: number; g: number; b: number } {
+    const r = (hex >> 16) & 0xff;
+    const g = (hex >> 8) & 0xff;
+    const b = hex & 0xff;
+    return { r, g, b };
 }
 
 /**
@@ -105,10 +113,11 @@ export function hexToRgb(hex: number): {r: number; g: number; b: number} {
  * @param   Number  b       The blue color value
  * @return  Array           The HSL representation
  */
-export function rgbToHsl(r: number, g: number, b: number): {h: number; s: number; l: number} {
-    r /= 255, g /= 255, b /= 255;
+export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+    (r /= 255), (g /= 255), (b /= 255);
 
-    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    const max = Math.max(r, g, b),
+        min = Math.min(r, g, b);
     let h, s;
     const l = (max + min) / 2;
 
@@ -119,9 +128,15 @@ export function rgbToHsl(r: number, g: number, b: number): {h: number; s: number
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 
         switch (max) {
-            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-            case g: h = (b - r) / d + 2; break;
-            case b: h = (r - g) / d + 4; break;
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+            case g:
+                h = (b - r) / d + 2;
+                break;
+            case b:
+                h = (r - g) / d + 4;
+                break;
         }
 
         h /= 6;
@@ -141,7 +156,7 @@ export function rgbToHsl(r: number, g: number, b: number): {h: number; s: number
  * @param   Number  l       The lightness
  * @return  Array           The RGB representation
  */
-export function hslToRgb(h: number, s: number, l: number): {r: number; g: number; b: number} {
+export function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
     let r, g, b;
 
     if (s == 0) {
@@ -150,69 +165,69 @@ export function hslToRgb(h: number, s: number, l: number): {r: number; g: number
         const hue2rgb = (p: number, q: number, t: number): number => {
             if (t < 0) t += 1;
             if (t > 1) t -= 1;
-            if (t < 1/6) return p + (q - p) * 6 * t;
-            if (t < 1/2) return q;
-            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
             return p;
         };
 
         const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
         const p = 2 * l - q;
 
-        r = hue2rgb(p, q, h + 1/3) * 255;
+        r = hue2rgb(p, q, h + 1 / 3) * 255;
         g = hue2rgb(p, q, h) * 255;
-        b = hue2rgb(p, q, h - 1/3) * 255;
+        b = hue2rgb(p, q, h - 1 / 3) * 255;
     }
 
-    return { r, g, b};
+    return { r, g, b };
 }
 
 export function hslToHex(h: number, s: number, l: number): number {
-    const {r, g, b} = hslToRgb(h, s, l);
+    const { r, g, b } = hslToRgb(h, s, l);
     return rgbToHex(r, g, b);
 }
-export function hexToHsl(hex: number): {h: number; s: number; l: number} {
-    const {r, g, b} = hexToRgb(hex);
+export function hexToHsl(hex: number): { h: number; s: number; l: number } {
+    const { r, g, b } = hexToRgb(hex);
     return rgbToHsl(r, g, b);
 }
 
-export function lerp (start: number, end: number, percent: number): number {
+export function lerp(start: number, end: number, percent: number): number {
     return start + (end - start) * percent;
-};
+}
 
-export function flip (t: number): number {
+export function flip(t: number): number {
     return 1 - t;
 }
 
-export function square (t: number): number {
+export function square(t: number): number {
     return t * t;
 }
 
-export function easeIn (t: number): number {
+export function easeIn(t: number): number {
     return square(t);
-};
+}
 
-export function easeOut (t: number): number {
+export function easeOut(t: number): number {
     return flip(square(flip(t)));
-};
+}
 
-export function easeInOut (t: number): number {
+export function easeInOut(t: number): number {
     return lerp(easeIn(t), easeOut(t), t);
-};
+}
 
 /**
  * Returns a random whole number between the two values
  * @param min The min number (inclusive)
  * @param max Ths max number (exclusive)
  */
-export function randomInt (min: number, max: number): number {
+export function randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-export function randomFloat (min: number, max: number): number {
+export function randomFloat(min: number, max: number): number {
     return Math.random() * (max - min) + min;
 }
 
-export function randomBool (): boolean {
+export function randomBool(): boolean {
     return !!randomInt(0, 2);
 }

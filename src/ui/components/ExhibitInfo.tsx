@@ -20,7 +20,6 @@ const defaultState: ExhibitInfoState = {
 };
 
 export default class ExhibitInfo extends UIComponent<ExhibitInfoProps, ExhibitInfoState> {
-
     private updateIntervalHandle: number;
 
     public constructor(props: ExhibitInfoProps) {
@@ -51,7 +50,8 @@ export default class ExhibitInfo extends UIComponent<ExhibitInfoProps, ExhibitIn
             padding: 0 20px;
             overflow: auto;
 
-            p, ul {
+            p,
+            ul {
                 margin: 0;
             }
         `;
@@ -67,27 +67,29 @@ export default class ExhibitInfo extends UIComponent<ExhibitInfoProps, ExhibitIn
                 <p>Exhibit Name: {exhibit.area.name ?? ""}</p>
                 <p>Animals</p>
                 <ul>
-                    {exhibit.animals.map(animal =>
-                        <li key={animal?.id}>
-                            {animal?.getComponent("ANIMAL_BEHAVIOUR_COMPONENT")?.data?.name}
-                        </li>,
-                    )}
+                    {exhibit.animals.map(animal => (
+                        <li key={animal?.id}>{animal?.getComponent("ANIMAL_BEHAVIOUR_COMPONENT")?.data?.name}</li>
+                    ))}
                 </ul>
                 <p>{`Size: ${exhibit.size ?? "???"} Tiles`}</p>
                 <p>Biomes:</p>
                 <ul>
-                    {Object.keys(exhibit.biomeDistribution).map(biome =>
+                    {Object.keys(exhibit.biomeDistribution).map(biome => (
                         <li key={biome}>
-                            {Biome[+biome]}: {(exhibit.biomeDistribution[(+biome as Biome)] * 100).toFixed(2)}%
-                        </li>,
-                    )}
+                            {Biome[+biome]}: {(exhibit.biomeDistribution[+biome as Biome] * 100).toFixed(2)}%
+                        </li>
+                    ))}
                 </ul>
-                <p>Foliage coverage: {(exhibit.foliage.length / exhibit.size * 100).toFixed(2)}%</p>
+                <p>Foliage coverage: {((exhibit.foliage.length / exhibit.size) * 100).toFixed(2)}%</p>
                 <p>Hilliness: {(exhibit.hilliness * 100).toFixed(2)}%</p>
                 <p>Water: {(exhibit.waterness * 100).toFixed(2)}%</p>
                 <p
-                    onMouseEnter={() => { exhibit.viewingAreaHighlighted = true; }}
-                    onMouseLeave={() => { exhibit.viewingAreaHighlighted = false; }}
+                    onMouseEnter={() => {
+                        exhibit.viewingAreaHighlighted = true;
+                    }}
+                    onMouseLeave={() => {
+                        exhibit.viewingAreaHighlighted = false;
+                    }}
                 >
                     Viewing Area
                 </p>

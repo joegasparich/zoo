@@ -20,7 +20,7 @@ export default class PathTool extends Tool {
 
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
         this.ghost = ghost;
-        this.assetPath =  data.assetPath;
+        this.assetPath = data.assetPath;
         this.pathData = AssetManager.getJSON(this.assetPath) as PathData;
         const spriteSheet = Path.pathSprites.get(this.pathData.spriteSheet);
 

@@ -32,12 +32,12 @@ export default class ExpandingPanel extends UIComponent<ExpandingPanelProps, Exp
 
         this.state = defaultState;
 
-        this.focusListener = Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
+        this.focusListener = Mediator.on(UIEvent.FOCUS, ({ id }: { id: string }) => {
             if (id !== this.props.focusId) {
-                this.setState({panelOpen: false});
+                this.setState({ panelOpen: false });
             }
         });
-        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.setState({panelOpen: false}));
+        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.setState({ panelOpen: false }));
     }
 
     public componentWillUnmount(): void {
@@ -46,8 +46,7 @@ export default class ExpandingPanel extends UIComponent<ExpandingPanelProps, Exp
     }
 
     protected getStyles(): SerializedStyles {
-        return css`
-        `;
+        return css``;
     }
 
     protected getContent(): JSX.Element {
@@ -59,18 +58,9 @@ export default class ExpandingPanel extends UIComponent<ExpandingPanelProps, Exp
                         image={this.props.buttonIcon}
                         onClick={this.handlePanelButtonClick.bind(this)}
                     />
-                    <FloatingPanel
-                        key="panel"
-                        hidden={!this.state.panelOpen}
-                        layout="horizontal"
-                        showTriangle={true}
-                    >
+                    <FloatingPanel key="panel" hidden={!this.state.panelOpen} layout="horizontal" showTriangle={true}>
                         {this.props.items.map((item, index) => (
-                            <Button
-                                key={index}
-                                image={item.image}
-                                onClick={item.onClick}
-                            />
+                            <Button key={index} image={item.image} onClick={item.onClick} />
                         ))}
                     </FloatingPanel>
                 </div>
@@ -82,9 +72,9 @@ export default class ExpandingPanel extends UIComponent<ExpandingPanelProps, Exp
         if (this.state.panelOpen) {
             Mediator.fire(UIEvent.UNFOCUS);
         } else {
-            Mediator.fire(UIEvent.FOCUS, {id: this.props.focusId});
+            Mediator.fire(UIEvent.FOCUS, { id: this.props.focusId });
         }
 
-        this.setState({panelOpen: !this.state.panelOpen});
+        this.setState({ panelOpen: !this.state.panelOpen });
     }
 }

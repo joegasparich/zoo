@@ -1,4 +1,3 @@
-
 import { ObservablePoint, Point } from "pixi.js";
 
 import Vector from "vector";

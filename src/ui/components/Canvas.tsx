@@ -7,7 +7,6 @@ import { css, jsx } from "@emotion/core";
 import { Config } from "consts";
 
 export default class Canvas {
-
     private baseNode: HTMLElement;
     private children: JSX.Element[];
 

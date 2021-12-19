@@ -19,7 +19,7 @@ class SaveManager {
         const saveData: SaveData = {
             world: Game.world.save(),
             entities: entities?.length
-                ? entities.filter((entity) => entity.saveable && entity.exists).map((entity) => entity.save())
+                ? entities.filter(entity => entity.saveable && entity.exists).map(entity => entity.save())
                 : [],
         };
 
@@ -27,7 +27,7 @@ class SaveManager {
     }
 
     public loadGame(): void {
-        FileManager.loadFromFile(SAVE_GAME_LOCATION + "/save.json").then((data) => {
+        FileManager.loadFromFile(SAVE_GAME_LOCATION + "/save.json").then(data => {
             const saveData: SaveData = data as SaveData;
             console.log("Loading from Save:");
             console.log(saveData);
@@ -41,7 +41,7 @@ class SaveManager {
             // Use save data to set game state
             Game.world.load(saveData.world);
 
-            saveData.entities.forEach((entityData) => Entity.loadEntity(entityData));
+            saveData.entities.forEach(entityData => Entity.loadEntity(entityData));
 
             Game.world.postLoad(saveData.world);
         });

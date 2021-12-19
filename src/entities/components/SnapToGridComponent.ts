@@ -23,7 +23,11 @@ export default class SnapToGridComponent extends Component {
     public update(delta: number): void {
         super.update(delta);
 
-        this.entity.position = this.entity.position.divide(this.gridSize).floor().multiply(this.gridSize).add(new Vector(0.5, 0.5));
+        this.entity.position = this.entity.position
+            .divide(this.gridSize)
+            .floor()
+            .multiply(this.gridSize)
+            .add(new Vector(0.5, 0.5));
     }
 
     public save(): SnapToGridComponentSaveData {

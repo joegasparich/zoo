@@ -30,7 +30,6 @@ const defaultState: ToolbarState = {
 };
 
 export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
-
     public constructor(props: ToolbarProps) {
         super(props);
 
@@ -49,7 +48,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
 
             .bar {
                 pointer-events: all;
-                background-color: #AAAAAA;
+                background-color: #aaaaaa;
                 top: 0;
                 display: flex;
                 justify-content: center;
@@ -87,30 +86,21 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         key="animalButton"
                         image={Assets.UI.ANIMAL_ICON}
                         onClick={(): void => {
-                            this.setTool(
-                                ToolType.Animal,
-                                {assetPath: Assets.ANIMALS.PLAINS_ZEBRA},
-                            );
+                            this.setTool(ToolType.Animal, { assetPath: Assets.ANIMALS.PLAINS_ZEBRA });
                         }}
                     />
                     <Button
                         key="treeButton"
                         image={Assets.UI.FOLIAGE_ICON}
                         onClick={(): void => {
-                            this.setTool(
-                                ToolType.TileObject,
-                                {assetPath: Assets.FOLIAGE.TREE},
-                            );
+                            this.setTool(ToolType.TileObject, { assetPath: Assets.FOLIAGE.TREE });
                         }}
                     />
                     <Button
                         key="buildingButton"
                         image={Assets.UI.BUILDING_ICON}
                         onClick={(): void => {
-                            this.setTool(
-                                ToolType.TileObject,
-                                {assetPath: Assets.BUILDING.BUILDING},
-                            );
+                            this.setTool(ToolType.TileObject, { assetPath: Assets.BUILDING.BUILDING });
                         }}
                     />
                     <ExpandingPanel
@@ -120,7 +110,9 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                             const data = AssetManager.getJSON(asset) as TileObjectData;
                             return {
                                 image: data.sprite,
-                                onClick: (): void => { this.setTool(ToolType.TileObject, { assetPath: asset }); },
+                                onClick: (): void => {
+                                    this.setTool(ToolType.TileObject, { assetPath: asset });
+                                },
                             };
                         })}
                     />
@@ -128,10 +120,7 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         key="pathButton"
                         image={Assets.UI.PATH_ICON}
                         onClick={(): void => {
-                            this.setTool(
-                                ToolType.Path,
-                                {assetPath: Assets.PATHS.DIRT},
-                            );
+                            this.setTool(ToolType.Path, { assetPath: Assets.PATHS.DIRT });
                         }}
                     />
                     <Button
@@ -167,28 +156,30 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         focusId="BIOME_TOOLS"
                         items={EnumValues(Biome).map((biome: Biome) => ({
                             image: BiomeIconMap[biome],
-                            onClick: (): void => { this.setTool(ToolType.Biome, { biome }); },
+                            onClick: (): void => {
+                                this.setTool(ToolType.Biome, { biome });
+                            },
                         }))}
                     />
                     <Button
                         key="hillButton"
                         image={Assets.UI.ELEVATE_ICON}
                         onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: 1, colour: 0xFFFF00 });
+                            this.setTool(ToolType.Elevation, { elevation: 1, colour: 0xffff00 });
                         }}
                     />
                     <Button
                         key="flattenButton"
                         image={Assets.UI.FLATTEN_ICON}
                         onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: 0, colour: 0xFFFF00 });
+                            this.setTool(ToolType.Elevation, { elevation: 0, colour: 0xffff00 });
                         }}
                     />
                     <Button
                         key="waterButton"
                         image={Assets.UI.WATER_ICON}
                         onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: -1, colour: 0x0000FF });
+                            this.setTool(ToolType.Elevation, { elevation: -1, colour: 0x0000ff });
                         }}
                     />
                     <DebugControls />
@@ -225,27 +216,30 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                         key="decreaseButton"
                         onClick={(): void => {
                             const radius = Math.max(this.state.radius - 0.125, 0.5);
-                            this.setState({radius: radius});
+                            this.setState({ radius: radius });
                             this.props.toolManager.radius = radius;
                         }}
-                    >-</Button>
+                    >
+                        -
+                    </Button>
                     <span className="radius">{this.state.radius}</span>
                     <Button
                         key="increaseButton"
                         onClick={(): void => {
                             const radius = Math.min(this.state.radius + 0.125, 2.5);
-                            this.setState({radius: radius});
+                            this.setState({ radius: radius });
                             this.props.toolManager.radius = radius;
                         }}
-                    >+</Button>
+                    >
+                        +
+                    </Button>
                 </FloatingPanel>
             </React.Fragment>
         );
     }
 
-
     private setTool(tool: ToolType, data?: Record<string, any>): void {
-        this.setState({activeTool: tool});
+        this.setState({ activeTool: tool });
         this.props.toolManager.setTool(tool, data);
     }
 }

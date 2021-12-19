@@ -50,7 +50,7 @@ export default class Area {
         if (door) {
             removeItem(this.connectedAreas.get(area), door);
 
-            if (this.connectedAreas.get(area).length < 1){
+            if (this.connectedAreas.get(area).length < 1) {
                 this.connectedAreas.delete(area);
             }
         } else {

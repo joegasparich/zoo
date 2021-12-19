@@ -1,4 +1,3 @@
-
 import { Config } from "consts";
 import Game from "Game";
 import Graphics from "Graphics";
@@ -7,9 +6,12 @@ import Path from "./Path";
 import { NodeType } from "./PathfindingGrid";
 
 export interface PathGridSaveData {
-    paths: ({
-        assetPath: string;
-    } | undefined)[][];
+    paths: (
+        | {
+              assetPath: string;
+          }
+        | undefined
+    )[][];
 }
 
 export default class PathGrid {
@@ -67,7 +69,7 @@ export default class PathGrid {
             return;
         }
 
-        const {x, y} = tilePos;
+        const { x, y } = tilePos;
 
         const path = new Path(tilePos, assetPath);
         this.grid[x][y] = path;
@@ -98,11 +100,15 @@ export default class PathGrid {
 
     public save(): PathGridSaveData {
         return {
-            paths: this.grid.map(row => row.map(path => {
-                return path ? {
-                    assetPath: path.data.assetPath,
-                } : undefined;
-            })),
+            paths: this.grid.map(row =>
+                row.map(path => {
+                    return path
+                        ? {
+                            assetPath: path.data.assetPath,
+                        }
+                        : undefined;
+                }),
+            ),
         };
     }
 
@@ -121,10 +127,10 @@ export default class PathGrid {
         for (let i = 0; i < this.grid.length; i++) {
             for (let j = 0; j < this.grid[i].length; j++) {
                 if (this.grid[i][j] == undefined) {
-                    Graphics.setLineStyle(0.5, 0xFF0000);
+                    Graphics.setLineStyle(0.5, 0xff0000);
                     Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
                 } else {
-                    Graphics.setLineStyle(0.5, 0x00FF00);
+                    Graphics.setLineStyle(0.5, 0x00ff00);
                     Graphics.drawX(new Vector(i * Config.WORLD_SCALE + xOffset, j * Config.WORLD_SCALE + yOffset), 2);
                 }
             }

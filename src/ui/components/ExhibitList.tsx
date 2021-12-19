@@ -19,7 +19,6 @@ const defaultState: ExhibitListState = {
 };
 
 export default class ExhibitList extends UIComponent<UIComponentProps, ExhibitListState> {
-
     private exhibitUpdateListener: string;
 
     public constructor(props: UIComponentProps) {
@@ -78,17 +77,13 @@ export default class ExhibitList extends UIComponent<UIComponentProps, ExhibitLi
                     onMouseLeave={(): void => this.handleMouseLeave(exhibit)}
                     onClick={(): void => this.handleClick(exhibit)}
                 >
-                    <span className="square" style={{background: hexToString(exhibit.area.colour)}} />
+                    <span className="square" style={{ background: hexToString(exhibit.area.colour) }} />
                     {exhibit.area.name}
                 </div>
             );
         });
 
-        return (
-            <div className="exhibit-list">
-                {exhibitList}
-            </div>
-        );
+        return <div className="exhibit-list">{exhibitList}</div>;
     }
 
     private handleMouseEnter(exhibit: Exhibit): void {
@@ -98,6 +93,11 @@ export default class ExhibitList extends UIComponent<UIComponentProps, ExhibitLi
         exhibit.area.highlighted = false;
     }
     private handleClick(exhibit: Exhibit): void {
-        UIManager.openWindow(`exhibit-${exhibit.area.id}`, exhibit.area.name, new Vector(200, 200), <ExhibitInfo areaId={exhibit.area.id} />);
+        UIManager.openWindow(
+            `exhibit-${exhibit.area.id}`,
+            exhibit.area.name,
+            new Vector(200, 200),
+            <ExhibitInfo areaId={exhibit.area.id} />,
+        );
     }
 }

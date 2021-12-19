@@ -19,20 +19,26 @@ export default class DoorTool extends Tool {
         this.ghost = ghost;
         this.ghost.reset();
 
-        this.currentWall =  AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
+        this.currentWall = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
         ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.DoorHorizontal);
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
         ghost.canPlaceFunction = (pos: Vector): boolean => {
-            const wall = Game.world.wallGrid.getWallAtTile(pos.floor(), Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos())));
+            const wall = Game.world.wallGrid.getWallAtTile(
+                pos.floor(),
+                Game.map.getTileQuadrantAtPos(Game.camera.screenToWorldPosition(Game.input.getMousePos())),
+            );
             return wall?.exists && !wall.isDoor && !wall.isSloped();
         };
     }
 
     public update(): void {
         const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
-        const wallatMousePos = Game.world.wallGrid.getWallAtTile(mouseWorldPos.floor(), Game.map.getTileQuadrantAtPos(mouseWorldPos));
+        const wallatMousePos = Game.world.wallGrid.getWallAtTile(
+            mouseWorldPos.floor(),
+            Game.map.getTileQuadrantAtPos(mouseWorldPos),
+        );
 
         if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             if (wallatMousePos && wallatMousePos.exists && !wallatMousePos.isSloped()) {

@@ -10,13 +10,14 @@ export function removeItem<T>(array: T[], item: T): void {
 }
 
 export function registerPixiInspector(): void {
-    (window as any).__PIXI_INSPECTOR_GLOBAL_HOOK__ &&  (window as any).__PIXI_INSPECTOR_GLOBAL_HOOK__.register({ PIXI: PIXI });
+    (window as any).__PIXI_INSPECTOR_GLOBAL_HOOK__ &&
+        (window as any).__PIXI_INSPECTOR_GLOBAL_HOOK__.register({ PIXI: PIXI });
 }
 
 export function hexToString(hex: number): string {
     if (hex === undefined) return undefined;
 
-    const {r, g, b} = hexToRgb(hex);
+    const { r, g, b } = hexToRgb(hex);
     return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
@@ -27,11 +28,9 @@ export function defer(): Promise<void> {
 const StringIsNumber = (value: string) => isNaN(Number(value)) === false;
 
 export function EnumValues(enumme: any): any[] {
-    return Object.keys(enumme)
-        .filter(StringIsNumber);
+    return Object.keys(enumme).filter(StringIsNumber);
 }
 
 export function EnumKeys(enumme: any): any[] {
-    return EnumValues(enumme)
-        .map(key => enumme[key]);
+    return EnumValues(enumme).map(key => enumme[key]);
 }

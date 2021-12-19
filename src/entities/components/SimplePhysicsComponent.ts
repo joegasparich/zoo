@@ -7,13 +7,12 @@ interface SimplePhysicsComponentSaveData extends ComponentSaveData {
     force: number[];
 }
 
-
 export default class SimplePhysicsComponent extends Component {
     public id: COMPONENT = "SIMPLE_PHYSICS_COMPONENT";
     public type: COMPONENT = "SIMPLE_PHYSICS_COMPONENT";
 
-    private _velocity: Vector =  Vector.Zero();
-    private _force: Vector =  Vector.Zero();
+    private _velocity: Vector = Vector.Zero();
+    private _force: Vector = Vector.Zero();
 
     public constructor(public mass = 50, public friction = 0.5) {
         super();
@@ -34,7 +33,7 @@ export default class SimplePhysicsComponent extends Component {
         super.postUpdate(delta);
 
         // Add force
-        this._velocity = this._velocity.add(this._force.multiply(delta/this.mass));
+        this._velocity = this._velocity.add(this._force.multiply(delta / this.mass));
         // Apply dampening
         this._velocity = this._velocity.multiply(1 / (1 + delta * this.friction));
 

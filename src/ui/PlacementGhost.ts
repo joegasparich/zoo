@@ -41,9 +41,9 @@ export default class PlacementGhost {
     public postUpdate(): void {
         if (this.spriteVisible && this.changeColour) {
             if (this.canPlaceFunction(this.ghost.position)) {
-                this.ghostRenderer.colour = 0x0088DD;
+                this.ghostRenderer.colour = 0x0088dd;
             } else {
-                this.ghostRenderer.colour = 0xFF0000;
+                this.ghostRenderer.colour = 0xff0000;
             }
         }
 
@@ -135,7 +135,7 @@ export default class PlacementGhost {
     }
 
     public reset(): void {
-        this.ghostRenderer.colour = 0xFFFFFF;
+        this.ghostRenderer.colour = 0xffffff;
 
         this.setSprite(DEFAULT_SPRITE);
         this.setAlpha(0.6);

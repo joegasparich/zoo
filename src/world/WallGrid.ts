@@ -10,10 +10,13 @@ import Graphics from "Graphics";
 import { WorldEvent } from "consts/events";
 
 export interface WallGridSaveData {
-    walls: ({
-        assetPath: string;
-        isDoor: boolean;
-    } | undefined)[][];
+    walls: (
+        | {
+              assetPath: string;
+              isDoor: boolean;
+          }
+        | undefined
+    )[][];
 }
 
 export default class WallGrid {
@@ -34,14 +37,19 @@ export default class WallGrid {
     public setup(data?: WallGridSaveData): void {
         this.wallGrid = [];
 
-        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
             const orientation = col % 2;
             this.wallGrid[col] = [];
             for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const worldPos = Wall.wallToWorldPos(new Vector(col, row), orientation);
                 const wallSaveData = data?.walls[col][row];
                 if (wallSaveData) {
-                    this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row), data?.walls[col][row]?.assetPath);
+                    this.wallGrid[col][row] = new Wall(
+                        orientation,
+                        worldPos,
+                        new Vector(col, row),
+                        data?.walls[col][row]?.assetPath,
+                    );
                     this.wallGrid[col][row].setDoor(wallSaveData.isDoor);
                 } else {
                     this.wallGrid[col][row] = new Wall(orientation, worldPos, new Vector(col, row));
@@ -55,7 +63,7 @@ export default class WallGrid {
     }
 
     public reset(): void {
-        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < Game.map.rows + orientation; row++) {
                 this.wallGrid[col][row].remove();
@@ -70,12 +78,16 @@ export default class WallGrid {
      * Update the position and scale of the tile grid
      */
     private regenerateWallSprites(): void {
-        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
-                if (!wall?.exists) { continue; }
-                if (!wall?.data) { continue; }
+                if (!wall?.exists) {
+                    continue;
+                }
+                if (!wall?.data) {
+                    continue;
+                }
                 wall.updateSprite();
             }
         }
@@ -96,13 +108,18 @@ export default class WallGrid {
         const { orientation, x, y } = this.getGridPosition(side, tilePos);
 
         // Create wall and put in the grid
-        const wall = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y), assetPath);
+        const wall = new Wall(
+            orientation,
+            Wall.wallToWorldPos(new Vector(x, y), orientation),
+            new Vector(x, y),
+            assetPath,
+        );
         wall.indestructable = indestructable;
         this.wallGrid[x][y] = wall;
 
         this.updatePathfindingAtWall(tilePos, side);
 
-        Mediator.fire(WorldEvent.PLACE_SOLID, {position: Wall.wallToWorldPos(new Vector(x, y), orientation)});
+        Mediator.fire(WorldEvent.PLACE_SOLID, { position: Wall.wallToWorldPos(new Vector(x, y), orientation) });
 
         if (this.shouldCheckForLoop(wall) && this.checkForLoop(wall)) {
             Game.world.formAreas(wall);
@@ -113,20 +130,44 @@ export default class WallGrid {
 
     private updatePathfindingAtWall(tilePos: Vector, side: Side): void {
         if (side === Side.North && tilePos.y > 0) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y - 1),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)),
+            );
         }
         if (side === Side.South && tilePos.y < Game.map.rows - 1) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y + 1),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)),
+            );
         }
         if (side === Side.West && tilePos.x > 0) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x - 1, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)),
+            );
         }
         if (side === Side.East && tilePos.x < Game.map.cols - 1) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x + 1, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)),
+            );
         }
     }
 
@@ -141,7 +182,10 @@ export default class WallGrid {
 
     public deleteWall(wall: Wall): void {
         if (!this.isSetup) return;
-        this.deleteWallAtTile(wall.position.floor(), wall.orientation === Orientation.Horizontal ? Side.North : Side.West);
+        this.deleteWallAtTile(
+            wall.position.floor(),
+            wall.orientation === Orientation.Horizontal ? Side.North : Side.West,
+        );
     }
 
     public deleteWallAtTile(tilePos: Vector, side: Side): void {
@@ -154,7 +198,11 @@ export default class WallGrid {
 
         // Set to blank wall
         this.wallGrid[x][y].remove();
-        this.wallGrid[x][y] = new Wall(orientation, Wall.wallToWorldPos(new Vector(x, y), orientation), new Vector(x, y));
+        this.wallGrid[x][y] = new Wall(
+            orientation,
+            Wall.wallToWorldPos(new Vector(x, y), orientation),
+            new Vector(x, y),
+        );
 
         const [tile1, tile2] = this.getAdjacentTiles(this.wallGrid[x][y]);
         if (Game.world.getAreaAtPosition(tile1) !== Game.world.getAreaAtPosition(tile2)) {
@@ -163,20 +211,44 @@ export default class WallGrid {
 
         // Update pathfinding information
         if (side === Side.North && tilePos.y > 0) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y - 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y - 1),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y - 1)),
+            );
         }
         if (side === Side.South && tilePos.y < Game.map.rows - 1) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y + 1), this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y + 1),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y + 1)),
+            );
         }
         if (side === Side.West && tilePos.x > 0) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x - 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x - 1, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x - 1, tilePos.y)),
+            );
         }
         if (side === Side.East && tilePos.x < Game.map.cols - 1) {
-            Game.map.setTileAccess(new Vector(tilePos.x, tilePos.y), this.getWalledSides(new Vector(tilePos.x, tilePos.y)));
-            Game.map.setTileAccess(new Vector(tilePos.x + 1, tilePos.y), this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)));
+            Game.map.setTileAccess(
+                new Vector(tilePos.x, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x, tilePos.y)),
+            );
+            Game.map.setTileAccess(
+                new Vector(tilePos.x + 1, tilePos.y),
+                this.getWalledSides(new Vector(tilePos.x + 1, tilePos.y)),
+            );
         }
     }
 
@@ -189,12 +261,16 @@ export default class WallGrid {
         if (adjacent.length < 2) return false;
 
         if (wall.orientation === Orientation.Horizontal) {
-            if (adjacent.find(adj => adj.position.x > wall.position.x) &&
-                adjacent.find(adj => adj.position.x < wall.position.x) )
+            if (
+                adjacent.find(adj => adj.position.x > wall.position.x) &&
+                adjacent.find(adj => adj.position.x < wall.position.x)
+            )
                 return true;
         } else {
-            if (adjacent.find(adj => adj.position.y > wall.position.y) &&
-                adjacent.find(adj => adj.position.y < wall.position.y) )
+            if (
+                adjacent.find(adj => adj.position.y > wall.position.y) &&
+                adjacent.find(adj => adj.position.y < wall.position.y)
+            )
                 return true;
         }
         return false;
@@ -215,7 +291,7 @@ export default class WallGrid {
         checkedWalls.push(currentWall);
 
         let found = false;
-        for(const wall of this.getAdjacentWalls(currentWall)) {
+        for (const wall of this.getAdjacentWalls(currentWall)) {
             // console.log("  ".repeat(depth) + "" + currentWall.position + " -> " + wall.position + " === " + startWall.position);
             if (wall === startWall && depth > 1) {
                 // console.log("  ".repeat(depth) + "found");
@@ -239,17 +315,17 @@ export default class WallGrid {
         let x: number, y: number, orientation: Orientation;
         switch (side) {
             case Side.North:
-                x = (tilePos.x * 2) + 1;
+                x = tilePos.x * 2 + 1;
                 y = tilePos.y;
                 orientation = Orientation.Horizontal;
                 break;
             case Side.East:
-                x = (tilePos.x * 2) + 2;
+                x = tilePos.x * 2 + 2;
                 y = tilePos.y;
                 orientation = Orientation.Vertical;
                 break;
             case Side.South:
-                x = (tilePos.x * 2) + 1;
+                x = tilePos.x * 2 + 1;
                 y = tilePos.y + 1;
                 orientation = Orientation.Horizontal;
                 break;
@@ -270,11 +346,13 @@ export default class WallGrid {
     public isWallPosInMap(tilePos: Vector, side: Side): boolean {
         if (!this.isSetup) return false;
 
-        return Game.map.isPositionInMap(tilePos.floor()) ||
-               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) ||
-               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) ||
-               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.East) ||
-               (Game.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.West);
+        return (
+            Game.map.isPositionInMap(tilePos.floor()) ||
+            (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) ||
+            (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) ||
+            (Game.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.East) ||
+            (Game.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.West)
+        );
     }
 
     /**
@@ -285,10 +363,7 @@ export default class WallGrid {
     public isWallGridPosInMap(x: number, y: number): boolean {
         if (!this.isSetup) return false;
 
-        return x >= 0 &&
-               x < this.wallGrid.length &&
-               y >= 0 &&
-               y < this.wallGrid[x].length;
+        return x >= 0 && x < this.wallGrid.length && y >= 0 && y < this.wallGrid[x].length;
     }
 
     /**
@@ -316,16 +391,13 @@ export default class WallGrid {
             if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, 1))) && side === Side.South) {
                 tilePos = tilePos.floor().add(new Vector(0, 1));
                 side = Side.North;
-            }
-            else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) {
+            } else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(0, -1))) && side === Side.North) {
                 tilePos = tilePos.floor().add(new Vector(0, -1));
                 side = Side.South;
-            }
-            else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.East) {
+            } else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(-1, 0))) && side === Side.East) {
                 tilePos = tilePos.floor().add(new Vector(-1, 0));
                 side = Side.West;
-            }
-            else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.West) {
+            } else if (Game.map.isPositionInMap(tilePos.floor().add(new Vector(1, 0))) && side === Side.West) {
                 tilePos = tilePos.floor().add(new Vector(1, 0));
                 side = Side.East;
             } else {
@@ -334,11 +406,15 @@ export default class WallGrid {
             }
         }
 
-        switch(side) {
-            case Side.North: return this.wallGrid[(tilePos.x * 2) + 1][tilePos.y];
-            case Side.East: return this.wallGrid[(tilePos.x * 2) + 2][tilePos.y];
-            case Side.South: return this.wallGrid[(tilePos.x * 2) + 1][tilePos.y + 1];
-            case Side.West: return this.wallGrid[(tilePos.x * 2)][tilePos.y];
+        switch (side) {
+            case Side.North:
+                return this.wallGrid[tilePos.x * 2 + 1][tilePos.y];
+            case Side.East:
+                return this.wallGrid[tilePos.x * 2 + 2][tilePos.y];
+            case Side.South:
+                return this.wallGrid[tilePos.x * 2 + 1][tilePos.y + 1];
+            case Side.West:
+                return this.wallGrid[tilePos.x * 2][tilePos.y];
         }
     }
 
@@ -350,9 +426,9 @@ export default class WallGrid {
         if (!this.isSetup) return [];
 
         return [
-            this.wallGrid[(tilePos.x * 2) + 1][tilePos.y],
-            this.wallGrid[(tilePos.x * 2) + 2][tilePos.y],
-            this.wallGrid[(tilePos.x * 2) + 1][tilePos.y + 1],
+            this.wallGrid[tilePos.x * 2 + 1][tilePos.y],
+            this.wallGrid[tilePos.x * 2 + 2][tilePos.y],
+            this.wallGrid[tilePos.x * 2 + 1][tilePos.y + 1],
             this.wallGrid[tilePos.x * 2][tilePos.y],
         ];
     }
@@ -367,9 +443,9 @@ export default class WallGrid {
 
         const edges: Side[] = [];
 
-        if (this.getWallByGridPos((tilePos.x * 2) + 1, tilePos.y)?.data?.solid) edges.push(Side.North);
-        if (this.getWallByGridPos((tilePos.x * 2) + 2, tilePos.y)?.data?.solid) edges.push(Side.East);
-        if (this.getWallByGridPos((tilePos.x * 2) + 1, tilePos.y + 1)?.data?.solid) edges.push(Side.South);
+        if (this.getWallByGridPos(tilePos.x * 2 + 1, tilePos.y)?.data?.solid) edges.push(Side.North);
+        if (this.getWallByGridPos(tilePos.x * 2 + 2, tilePos.y)?.data?.solid) edges.push(Side.East);
+        if (this.getWallByGridPos(tilePos.x * 2 + 1, tilePos.y + 1)?.data?.solid) edges.push(Side.South);
         if (this.getWallByGridPos(tilePos.x * 2, tilePos.y)?.data?.solid) edges.push(Side.West);
 
         return edges;
@@ -383,7 +459,7 @@ export default class WallGrid {
         if (!this.isSetup) return [];
 
         const adjacentWalls: Wall[] = [];
-        const {x, y} = wall.gridPos;
+        const { x, y } = wall.gridPos;
 
         if (wall.orientation === Orientation.Horizontal) {
             if (this.getWallByGridPos(x - 2, y)?.exists) adjacentWalls.push(this.wallGrid[x - 2][y]);
@@ -412,7 +488,7 @@ export default class WallGrid {
         if (!this.isSetup) return [];
 
         const adjacentTiles: Vector[] = [];
-        const {x, y} = wall.position;
+        const { x, y } = wall.position;
 
         if (wall.orientation === Orientation.Horizontal) {
             if (Game.map.isPositionInMap(new Vector(x - 0.5, y - 1))) adjacentTiles.push(new Vector(x - 0.5, y - 1));
@@ -430,11 +506,13 @@ export default class WallGrid {
 
         const walls: Wall[] = [];
 
-        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < Game.map.rows + orientation; row++) {
                 const wall = this.wallGrid[col][row];
-                if (!wall?.exists) { continue; }
+                if (!wall?.exists) {
+                    continue;
+                }
 
                 if (Vector.Distance(pos, wall.position) < radius) {
                     walls.push(wall);
@@ -446,8 +524,8 @@ export default class WallGrid {
     }
 
     public areWallsInArea(pos: Vector, size: Vector): boolean {
-        for (let i=0; i < size.x; i++) {
-            for (let j=0; j < size.y; j++) {
+        for (let i = 0; i < size.x; i++) {
+            for (let j = 0; j < size.y; j++) {
                 if (i < size.x - 1 && this.getWallAtTile(pos.add(new Vector(i, j)), Side.East)?.exists) return true;
                 if (j < size.y - 1 && this.getWallAtTile(pos.add(new Vector(i, j)), Side.South)?.exists) return true;
             }
@@ -460,12 +538,16 @@ export default class WallGrid {
         if (!this.isSetup) return;
 
         return {
-            walls: this.wallGrid.map(row => row.map(wall => {
-                return wall.exists ? {
-                    assetPath: wall.data.assetPath,
-                    isDoor: !!wall.isDoor, // For some reason need to put a !! here for it to save
-                } : undefined;
-            })),
+            walls: this.wallGrid.map(row =>
+                row.map(wall => {
+                    return wall.exists
+                        ? {
+                            assetPath: wall.data.assetPath,
+                            isDoor: !!wall.isDoor, // For some reason need to put a !! here for it to save
+                        }
+                        : undefined;
+                }),
+            ),
         };
     }
 
@@ -480,15 +562,15 @@ export default class WallGrid {
     public drawDebug(): void {
         if (!this.isSetup) return;
 
-        const xOffset =  Game.map.position.x;
+        const xOffset = Game.map.position.x;
         const yOffset = Game.map.position.y;
 
-        for (let col = 0; col < (Game.map.cols * 2) + 1; col++) {
+        for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
             const orientation = col % 2;
             for (let row = 0; row < Game.map.rows + orientation; row++) {
-                Graphics.setLineStyle(1, 0x00FF00);
+                Graphics.setLineStyle(1, 0x00ff00);
                 if (!this.wallGrid[col][row].exists) {
-                    Graphics.setLineStyle(1, 0xFF0000);
+                    Graphics.setLineStyle(1, 0xff0000);
                 }
                 if (orientation === Orientation.Vertical) {
                     Graphics.drawLine(
@@ -500,9 +582,9 @@ export default class WallGrid {
                 } else {
                     Graphics.drawLine(
                         ((col - 1) / 2) * Config.WORLD_SCALE + xOffset,
-                        row  * Config.WORLD_SCALE + yOffset,
-                        (((col - 1) / 2)  + 1) * Config.WORLD_SCALE + xOffset,
-                        row  * Config.WORLD_SCALE + yOffset,
+                        row * Config.WORLD_SCALE + yOffset,
+                        ((col - 1) / 2 + 1) * Config.WORLD_SCALE + xOffset,
+                        row * Config.WORLD_SCALE + yOffset,
                     );
                 }
             }

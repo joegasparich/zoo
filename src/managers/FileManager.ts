@@ -22,7 +22,7 @@ class FileManager {
     public async saveToFile(path: string, fileName: string, data: any): Promise<void> {
         const json = JSON.stringify(data);
 
-        if (!await isFolder(path)) {
+        if (!(await isFolder(path))) {
             await fs.mkdir(path);
         }
         await fs.writeFile(path + fileName, json);

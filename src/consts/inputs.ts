@@ -10,31 +10,19 @@ const RightMouse: Input = {
 };
 const Up: Input = {
     name: "Move Up",
-    buttons: [
-        InputManager.KEY.UP,
-        InputManager.KEY.W,
-    ],
+    buttons: [InputManager.KEY.UP, InputManager.KEY.W],
 };
 const Down: Input = {
     name: "Move Down",
-    buttons: [
-        InputManager.KEY.DOWN,
-        InputManager.KEY.S,
-    ],
+    buttons: [InputManager.KEY.DOWN, InputManager.KEY.S],
 };
 const Left: Input = {
     name: "Move Left",
-    buttons: [
-        InputManager.KEY.LEFT,
-        InputManager.KEY.A,
-    ],
+    buttons: [InputManager.KEY.LEFT, InputManager.KEY.A],
 };
 const Right: Input = {
     name: "Move Right",
-    buttons: [
-        InputManager.KEY.RIGHT,
-        InputManager.KEY.D,
-    ],
+    buttons: [InputManager.KEY.RIGHT, InputManager.KEY.D],
 };
 const ZoomIn: Input = {
     name: "Zoom In",
@@ -54,10 +42,16 @@ const DecreaseBrushSize: Input = {
 };
 
 const Inputs = {
-    LeftMouse, RightMouse,
-    Up, Down, Left, Right,
-    ZoomIn, ZoomOut,
-    IncreaseBrushSize, DecreaseBrushSize,
+    LeftMouse,
+    RightMouse,
+    Up,
+    Down,
+    Left,
+    Right,
+    ZoomIn,
+    ZoomOut,
+    IncreaseBrushSize,
+    DecreaseBrushSize,
 };
 
 export default Inputs;

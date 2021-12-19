@@ -7,7 +7,20 @@ import { KEY } from "managers/InputManager";
 import Game from "Game";
 import { Inputs } from "consts";
 import { Toolbar } from "./components";
-import { NoTool, Tool, ToolType, Action, BiomeTool, DoorTool, TileObjectTool, WallTool, DeleteTool, ElevationTool, AnimalTool, DebugTool } from "./tools";
+import {
+    NoTool,
+    Tool,
+    ToolType,
+    Action,
+    BiomeTool,
+    DoorTool,
+    TileObjectTool,
+    WallTool,
+    DeleteTool,
+    ElevationTool,
+    AnimalTool,
+    DebugTool,
+} from "./tools";
 import PlacementGhost from "./PlacementGhost";
 import Vector from "vector";
 import PathTool from "./tools/PathTool";
@@ -25,11 +38,13 @@ export default class ToolManager {
 
     public constructor() {
         this.toolbarRef = React.createRef();
-        Game.canvas.addChild(React.createElement(Toolbar, {
-            key: "toolbar",
-            toolManager: this,
-            ref: this.toolbarRef,
-        }));
+        Game.canvas.addChild(
+            React.createElement(Toolbar, {
+                key: "toolbar",
+                toolManager: this,
+                ref: this.toolbarRef,
+            }),
+        );
     }
 
     public setup(): void {
@@ -60,7 +75,7 @@ export default class ToolManager {
     public postUpdate(): void {
         if (Game.input.isInputPressed(Inputs.RightMouse)) {
             this.setTool(ToolType.None);
-            this.toolbarRef.current?.setState({activeTool: ToolType.None});
+            this.toolbarRef.current?.setState({ activeTool: ToolType.None });
             Mediator.fire(UIEvent.UNFOCUS);
         }
 
@@ -82,16 +97,34 @@ export default class ToolManager {
         this.ghost.setPivot(new Vector(0.5, 0.5));
         this.ghost.setOffset(new Vector(0, 0));
 
-        switch(tool) {
-            case ToolType.Animal: this.activeTool = new AnimalTool(this); break;
-            case ToolType.TileObject: this.activeTool = new TileObjectTool(this); break;
-            case ToolType.Wall: this.activeTool = new WallTool(this); break;
-            case ToolType.Path: this.activeTool = new PathTool(this); break;
-            case ToolType.Door: this.activeTool = new DoorTool(this); break;
-            case ToolType.Delete: this.activeTool = new DeleteTool(this); break;
-            case ToolType.Biome: this.activeTool = new BiomeTool(this); break;
-            case ToolType.Elevation: this.activeTool = new ElevationTool(this); break;
-            case ToolType.Debug: this.activeTool = new DebugTool(this); break;
+        switch (tool) {
+            case ToolType.Animal:
+                this.activeTool = new AnimalTool(this);
+                break;
+            case ToolType.TileObject:
+                this.activeTool = new TileObjectTool(this);
+                break;
+            case ToolType.Wall:
+                this.activeTool = new WallTool(this);
+                break;
+            case ToolType.Path:
+                this.activeTool = new PathTool(this);
+                break;
+            case ToolType.Door:
+                this.activeTool = new DoorTool(this);
+                break;
+            case ToolType.Delete:
+                this.activeTool = new DeleteTool(this);
+                break;
+            case ToolType.Biome:
+                this.activeTool = new BiomeTool(this);
+                break;
+            case ToolType.Elevation:
+                this.activeTool = new ElevationTool(this);
+                break;
+            case ToolType.Debug:
+                this.activeTool = new DebugTool(this);
+                break;
 
             case ToolType.None:
             default:
@@ -121,11 +154,11 @@ export default class ToolManager {
 
     public setRadius(radius: number): void {
         this.radius = radius;
-        this.toolbarRef.current?.setState({radius});
+        this.toolbarRef.current?.setState({ radius });
     }
 
     public showRadius(): boolean {
-        switch(this.activeTool?.type) {
+        switch (this.activeTool?.type) {
             case ToolType.Biome:
             case ToolType.Elevation:
                 return true;

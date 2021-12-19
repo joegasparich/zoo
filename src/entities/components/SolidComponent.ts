@@ -19,16 +19,16 @@ export default class SolidComponent extends Component {
     public start(entity: Entity): void {
         super.start(entity);
 
-        for (let i=0; i < this.size.x; i++) {
-            for (let j=0; j < this.size.y; j++) {
+        for (let i = 0; i < this.size.x; i++) {
+            for (let j = 0; j < this.size.y; j++) {
                 Game.map.setTileSolid(this.entity.position.floor().add(new Vector(i, j)), true);
             }
         }
     }
 
     public end(): void {
-        for (let i=0; i < this.size.x; i++) {
-            for (let j=0; j < this.size.y; j++) {
+        for (let i = 0; i < this.size.x; i++) {
+            for (let j = 0; j < this.size.y; j++) {
                 Game.map.setTileSolid(this.entity.position.floor().add(new Vector(i, j)), false);
             }
         }

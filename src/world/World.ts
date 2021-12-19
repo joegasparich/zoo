@@ -21,10 +21,10 @@ import Exhibit, { ExhibitSaveData } from "./Exhibit";
 export const ZOO_AREA = "ZOO";
 
 export interface WorldSaveData {
-    biomes: BiomeSaveData,
-    paths: PathGridSaveData,
-    walls: WallGridSaveData,
-    elevation: ElevationSaveData,
+    biomes: BiomeSaveData;
+    paths: PathGridSaveData;
+    walls: WallGridSaveData;
+    elevation: ElevationSaveData;
     areas: {
         id: string;
         name: string;
@@ -130,8 +130,8 @@ export default class World {
         const component = tileObject.getComponent("TILE_OBJECT_COMPONENT");
 
         this.tileObjects.set(tileObject.id, tileObject);
-        for (let i=0; i < component.data.size.x; i++) {
-            for (let j=0; j < component.data.size.y; j++) {
+        for (let i = 0; i < component.data.size.x; i++) {
+            for (let j = 0; j < component.data.size.y; j++) {
                 this.tileObjectMap.set(tileObject.position.floor().add(new Vector(i, j)).toString(), tileObject);
             }
         }
@@ -186,7 +186,7 @@ export default class World {
         // Current solution is to ensure that the map is already surrounded by walls
         if (tiles.length < 2) return;
 
-        tiles.forEach(tilePos =>{
+        tiles.forEach(tilePos => {
             areasCells.push(this.floodFill(Game.map.getCell(tilePos)));
         });
 
@@ -414,7 +414,7 @@ export default class World {
     private getAccessibleAdjacentCells(cell: MapCell): MapCell[] {
         if (!Game.map.isPositionInMap(cell.position)) return;
 
-        const allSides: Side[] = [ Side.East, Side.North, Side.South, Side.West ];
+        const allSides: Side[] = [Side.East, Side.North, Side.South, Side.West];
 
         return allSides
             .filter(side => !this.wallGrid.getWallAtTile(cell.position, side).exists)
@@ -427,5 +427,4 @@ export default class World {
 
         return this.tileAreaMap.get(position.floor().toString());
     }
-
 }

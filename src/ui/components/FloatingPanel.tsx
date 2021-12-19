@@ -11,9 +11,7 @@ interface FloatingPanelProps extends UIComponentProps {
 
 export default class FloatingPanel extends UIComponent<FloatingPanelProps, {}> {
     protected getContent(): JSX.Element {
-        return (
-            <div className="container">{this.props.children}</div>
-        );
+        return <div className="container">{this.props.children}</div>;
     }
 
     protected getStyles(): SerializedStyles {
@@ -21,9 +19,9 @@ export default class FloatingPanel extends UIComponent<FloatingPanelProps, {}> {
 
         const triangle = css`
             &:after {
-                content: '';
+                content: "";
                 border: ${triangleSize}px solid transparent;
-                border-bottom-color: #AAAAAA;
+                border-bottom-color: #aaaaaa;
                 border-top: 0;
                 position: absolute;
                 top: -${triangleSize}px;

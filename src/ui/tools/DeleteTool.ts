@@ -25,8 +25,8 @@ export default class DeleteTool extends Tool {
             if (Game.input.isInputHeld(Inputs.LeftMouse)) return;
 
             const worldCellPos = pos.floor().multiply(Config.WORLD_SCALE);
-            Graphics.setLineStyle(1, 0xFF0000);
-            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, 0xFF0000, 0.5);
+            Graphics.setLineStyle(1, 0xff0000);
+            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, 0xff0000, 0.5);
         };
     }
 
@@ -42,8 +42,15 @@ export default class DeleteTool extends Tool {
                 const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
                 for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
                     for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {
-                        Graphics.setLineStyle(1, 0xFF0000);
-                        Graphics.drawRect(i * Config.WORLD_SCALE, j * Config.WORLD_SCALE, Config.WORLD_SCALE, Config.WORLD_SCALE, 0xFF0000, 0.5);
+                        Graphics.setLineStyle(1, 0xff0000);
+                        Graphics.drawRect(
+                            i * Config.WORLD_SCALE,
+                            j * Config.WORLD_SCALE,
+                            Config.WORLD_SCALE,
+                            Config.WORLD_SCALE,
+                            0xff0000,
+                            0.5,
+                        );
                     }
                 }
             }

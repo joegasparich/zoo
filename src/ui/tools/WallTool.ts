@@ -14,7 +14,7 @@ export default class WallTool extends Tool {
     private assetPath: string;
     private wallData: WallData;
 
-    private dragStart: {pos: Vector; quadrant: Side};
+    private dragStart: { pos: Vector; quadrant: Side };
     private ghost: PlacementGhost;
     private wallGhosts: PlacementGhost[];
     private isDragging: boolean;
@@ -23,7 +23,7 @@ export default class WallTool extends Tool {
         this.ghost = ghost;
         this.ghost.reset();
 
-        this.assetPath =  Assets.WALLS.IRON_BAR;
+        this.assetPath = Assets.WALLS.IRON_BAR;
         this.wallData = AssetManager.getJSON(this.assetPath) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.wallData.spriteSheet);
         this.ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.Horizontal);
@@ -37,8 +37,7 @@ export default class WallTool extends Tool {
 
         const xDif = mouseWorldPos.floor().x - this.dragStart?.pos.floor().x;
         const yDif = mouseWorldPos.floor().y - this.dragStart?.pos.floor().y;
-        const horizontal = this.dragStart?.quadrant === Side.North ||
-                           this.dragStart?.quadrant === Side.South;
+        const horizontal = this.dragStart?.quadrant === Side.North || this.dragStart?.quadrant === Side.South;
         const length = (horizontal ? Math.abs(xDif) : Math.abs(yDif)) + 1;
 
         let dragQuadrant = Side.North;
@@ -172,14 +171,17 @@ export default class WallTool extends Tool {
 
         // Check for tile object
         const [tileA, tileB] = Game.world.wallGrid.getAdjacentTiles(wall);
-        if (Game.world.getTileObjectAtPos(tileA) && Game.world.getTileObjectAtPos(tileA) === Game.world.getTileObjectAtPos(tileB)) {
+        if (
+            Game.world.getTileObjectAtPos(tileA) &&
+            Game.world.getTileObjectAtPos(tileA) === Game.world.getTileObjectAtPos(tileB)
+        ) {
             return false;
         }
 
         // Check for water
         let vertexA: Vector, vertexB: Vector;
         const flPos = pos.floor();
-        switch(quadrant) {
+        switch (quadrant) {
             case Side.North:
                 vertexA = new Vector(flPos.x, flPos.y);
                 vertexB = new Vector(flPos.x + 1, flPos.y);

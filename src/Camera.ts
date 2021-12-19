@@ -8,7 +8,7 @@ export default class Camera {
     public offset: Vector;
 
     public constructor(public worldPosition: Vector, public scale: number, public stage: Stage) {
-        this.offset = new Vector(Game.opts.windowWidth/2, Game.opts.windowHeight/2);
+        this.offset = new Vector(Game.opts.windowWidth / 2, Game.opts.windowHeight / 2);
     }
 
     public goToPosition(position: Vector): void {
@@ -38,7 +38,10 @@ export default class Camera {
             return;
         }
 
-        return worldPos.subtract(this.worldPosition).multiply(Game.opts.worldScale * this.scale).add(this.offset);
+        return worldPos
+            .subtract(this.worldPosition)
+            .multiply(Game.opts.worldScale * this.scale)
+            .add(this.offset);
     }
 
     public screenToWorldPosition(screenPos: Vector): Vector {
@@ -47,6 +50,9 @@ export default class Camera {
             return;
         }
 
-        return screenPos.subtract(this.offset).divide(Game.opts.worldScale * this.scale).add(this.worldPosition);
+        return screenPos
+            .subtract(this.offset)
+            .divide(Game.opts.worldScale * this.scale)
+            .add(this.worldPosition);
     }
 }

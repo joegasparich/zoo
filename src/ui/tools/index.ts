@@ -23,7 +23,7 @@ export interface Action {
 export abstract class Tool {
     public abstract type: ToolType;
 
-    public constructor(public toolManager: ToolManager) {};
+    public constructor(public toolManager: ToolManager) {}
     public abstract set(ghost: PlacementGhost, data?: Record<string, any>): void;
     public abstract update(): void;
     public abstract postUpdate(): void;

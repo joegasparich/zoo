@@ -14,15 +14,17 @@ export default class TileObjectTool extends Tool {
     private currentObject: TileObjectData;
 
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
-        this.assetPath =  data.assetPath;
+        this.assetPath = data.assetPath;
         this.currentObject = AssetManager.getJSON(this.assetPath) as TileObjectData;
 
         ghost.reset();
         ghost.setSprite(this.currentObject.sprite);
-        ghost.setPivot(new Vector(
-            1/this.currentObject.size.x * this.currentObject.pivot.x,
-            1/this.currentObject.size.y * this.currentObject.pivot.y,
-        ));
+        ghost.setPivot(
+            new Vector(
+                (1 / this.currentObject.size.x) * this.currentObject.pivot.x,
+                (1 / this.currentObject.size.y) * this.currentObject.pivot.y,
+            ),
+        );
         ghost.setScale(this.currentObject.scale || 1);
         ghost.setSnap(true);
         ghost.applyElevation();
@@ -53,12 +55,13 @@ export default class TileObjectTool extends Tool {
 
     private canPlace(pos: Vector): boolean {
         const position = pos.floor();
-        for (let i=0; i< this.currentObject.size.x; i++) {
-            for (let j=0; j< this.currentObject.size.y; j++) {
+        for (let i = 0; i < this.currentObject.size.x; i++) {
+            for (let j = 0; j < this.currentObject.size.y; j++) {
                 const pos = new Vector(position.x + i, position.y + j);
                 if (!Game.map.isTileFree(pos)) return false;
                 if (!Game.map.isPositionInMap(pos)) return false;
-                if (!this.currentObject.canPlaceOnSlopes && Game.world.elevationGrid.isPositionSloped(pos)) return false;
+                if (!this.currentObject.canPlaceOnSlopes && Game.world.elevationGrid.isPositionSloped(pos))
+                    return false;
                 if (!this.currentObject.canPlaceInWater && Game.world.waterGrid.isPositionWater(pos)) return false;
             }
         }
