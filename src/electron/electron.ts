@@ -3,6 +3,7 @@ import installExtension from "electron-devtools-installer";
 
 app.on("ready", async () => {
     await installExtension("aamddddknhcagpehecnhphigffljadon");
+    await installExtension("fmkadmapgofadopljbjfkapdkoienihi");
 
     // once electron has started up, create a window.
     const window = new BrowserWindow({

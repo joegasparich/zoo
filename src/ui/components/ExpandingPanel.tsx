@@ -15,6 +15,7 @@ interface ExpandingPanelProps extends UIComponentProps {
     focusId: string;
     buttonIcon: string;
     items: PanelItem[];
+    active?: boolean;
 }
 interface ExpandingPanelState {
     panelOpen: boolean;
@@ -56,6 +57,7 @@ export default class ExpandingPanel extends UIComponent<ExpandingPanelProps, Exp
                     <Button
                         key={this.props.focusId}
                         image={this.props.buttonIcon}
+                        active={this.props.active}
                         onClick={this.handlePanelButtonClick.bind(this)}
                     />
                     <FloatingPanel key="panel" hidden={!this.state.panelOpen} layout="horizontal" showTriangle={true}>

@@ -1,17 +1,19 @@
 /** @jsx jsx */
 import * as React from "react";
+import classNames from "classnames";
 import { css, jsx, SerializedStyles } from "@emotion/core";
 import { UIComponent, UIComponentProps } from ".";
 
 interface ButtonProps extends UIComponentProps {
     image?: string;
+    active?: boolean;
     onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
 export default class Button extends UIComponent<ButtonProps, {}> {
     protected getContent(): JSX.Element {
         return (
-            <div className="button" onClick={this.props.onClick}>
+            <div className={classNames("button", this.props.active && "active")} onClick={this.props.onClick}>
                 {this.props.image && <img src={this.props.image} />}
                 {this.props.children}
             </div>
@@ -31,6 +33,10 @@ export default class Button extends UIComponent<ButtonProps, {}> {
                 height: 30px;
                 cursor: pointer;
                 margin: 2.5px;
+
+                &.active {
+                    background-color: #87bedc;
+                }
 
                 &:hover {
                     background-color: #ffffff;

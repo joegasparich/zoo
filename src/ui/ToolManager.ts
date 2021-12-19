@@ -75,7 +75,7 @@ export default class ToolManager {
     public postUpdate(): void {
         if (Game.input.isInputPressed(Inputs.RightMouse)) {
             this.setTool(ToolType.None);
-            this.toolbarRef.current?.setState({ activeTool: ToolType.None });
+            this.toolbarRef.current?.setState({ activeButton: "" });
             Mediator.fire(UIEvent.UNFOCUS);
         }
 

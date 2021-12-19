@@ -21,11 +21,11 @@ interface ToolbarProps extends UIComponentProps {
 }
 
 interface ToolbarState {
-    activeTool: ToolType;
+    activeButton: string;
     radius: number;
 }
 const defaultState: ToolbarState = {
-    activeTool: 0,
+    activeButton: "",
     radius: 1,
 };
 
@@ -85,33 +85,41 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     <Button
                         key="animalButton"
                         image={Assets.UI.ANIMAL_ICON}
+                        active={this.state.activeButton === "animalButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.Animal, { assetPath: Assets.ANIMALS.PLAINS_ZEBRA });
+                            this.setTool(ToolType.Animal, { assetPath: Assets.ANIMALS.PLAINS_ZEBRA }, "animalButton");
                         }}
                     />
                     <Button
                         key="treeButton"
                         image={Assets.UI.FOLIAGE_ICON}
+                        active={this.state.activeButton === "treeButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.TileObject, { assetPath: Assets.FOLIAGE.TREE });
+                            this.setTool(ToolType.TileObject, { assetPath: Assets.FOLIAGE.TREE }, "treeButton");
                         }}
                     />
                     <Button
                         key="buildingButton"
                         image={Assets.UI.BUILDING_ICON}
+                        active={this.state.activeButton === "buildingButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.TileObject, { assetPath: Assets.BUILDING.BUILDING });
+                            this.setTool(
+                                ToolType.TileObject,
+                                { assetPath: Assets.BUILDING.BUILDING },
+                                "buildingButton",
+                            );
                         }}
                     />
                     <ExpandingPanel
                         buttonIcon={Assets.UI.CONSUMABLE_ICON}
                         focusId="CONSUMABLES"
+                        active={this.state.activeButton === "consumableButton"}
                         items={Object.values(Assets.CONSUMABLE).map((asset: string) => {
                             const data = AssetManager.getJSON(asset) as TileObjectData;
                             return {
                                 image: data.sprite,
                                 onClick: (): void => {
-                                    this.setTool(ToolType.TileObject, { assetPath: asset });
+                                    this.setTool(ToolType.TileObject, { assetPath: asset }, "consumableButton");
                                 },
                             };
                         })}
@@ -119,29 +127,68 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                     <Button
                         key="pathButton"
                         image={Assets.UI.PATH_ICON}
+                        active={this.state.activeButton === "pathButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.Path, { assetPath: Assets.PATHS.DIRT });
+                            this.setTool(ToolType.Path, { assetPath: Assets.PATHS.DIRT }, "pathButton");
                         }}
                     />
                     <Button
                         key="wallButton"
                         image={Assets.UI.IRON_BAR_FENCE}
+                        active={this.state.activeButton === "wallButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.Wall);
+                            this.setTool(ToolType.Wall, {}, "wallButton");
                         }}
                     />
                     <Button
                         key="gateButton"
                         image={Assets.UI.IRON_BAR_GATE}
+                        active={this.state.activeButton === "gateButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.Door);
+                            this.setTool(ToolType.Door, {}, "gateButton");
                         }}
                     />
                     <Button
                         key="deleteButton"
                         image={Assets.UI.BIN_ICON}
+                        active={this.state.activeButton === "deleteButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.Delete);
+                            this.setTool(ToolType.Delete, {}, "deleteButton");
+                        }}
+                    />
+                    <ExpandingPanel
+                        buttonIcon={Assets.UI.BIOME_ICON}
+                        focusId="BIOME_TOOLS"
+                        active={this.state.activeButton === "biomeButton"}
+                        items={EnumValues(Biome).map((biome: Biome) => ({
+                            image: BiomeIconMap[biome],
+                            onClick: (): void => {
+                                this.setTool(ToolType.Biome, { biome }, "biomeButton");
+                            },
+                        }))}
+                    />
+                    <Button
+                        key="hillButton"
+                        image={Assets.UI.ELEVATE_ICON}
+                        active={this.state.activeButton === "hillButton"}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Elevation, { elevation: 1, colour: 0xffff00 }, "hillButton");
+                        }}
+                    />
+                    <Button
+                        key="flattenButton"
+                        image={Assets.UI.FLATTEN_ICON}
+                        active={this.state.activeButton === "flattenButton"}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Elevation, { elevation: 0, colour: 0xffff00 }, "flattenButton");
+                        }}
+                    />
+                    <Button
+                        key="waterButton"
+                        image={Assets.UI.WATER_ICON}
+                        active={this.state.activeButton === "waterButton"}
+                        onClick={(): void => {
+                            this.setTool(ToolType.Elevation, { elevation: -1, colour: 0x0000ff }, "waterButton");
                         }}
                     />
                     <Button
@@ -151,43 +198,13 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
                             UIManager.openWindow("exhibitList", "Exhibits", new Vector(0, 400), <ExhibitList />);
                         }}
                     />
-                    <ExpandingPanel
-                        buttonIcon={Assets.UI.BIOME_ICON}
-                        focusId="BIOME_TOOLS"
-                        items={EnumValues(Biome).map((biome: Biome) => ({
-                            image: BiomeIconMap[biome],
-                            onClick: (): void => {
-                                this.setTool(ToolType.Biome, { biome });
-                            },
-                        }))}
-                    />
-                    <Button
-                        key="hillButton"
-                        image={Assets.UI.ELEVATE_ICON}
-                        onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: 1, colour: 0xffff00 });
-                        }}
-                    />
-                    <Button
-                        key="flattenButton"
-                        image={Assets.UI.FLATTEN_ICON}
-                        onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: 0, colour: 0xffff00 });
-                        }}
-                    />
-                    <Button
-                        key="waterButton"
-                        image={Assets.UI.WATER_ICON}
-                        onClick={(): void => {
-                            this.setTool(ToolType.Elevation, { elevation: -1, colour: 0x0000ff });
-                        }}
-                    />
                     <DebugControls />
                     <Button
                         key="debugEntityButton"
                         image={Assets.UI.DEBUG_ENTITY_ICON}
+                        active={this.state.activeButton === "debugEntityButton"}
                         onClick={(): void => {
-                            this.setTool(ToolType.Debug);
+                            this.setTool(ToolType.Debug, {}, "debugEntityButton");
                         }}
                     />
                     <Button
@@ -238,8 +255,8 @@ export default class Toolbar extends UIComponent<ToolbarProps, ToolbarState> {
         );
     }
 
-    private setTool(tool: ToolType, data?: Record<string, any>): void {
-        this.setState({ activeTool: tool });
+    private setTool(tool: ToolType, data?: Record<string, any>, id?: string): void {
+        this.setState({ activeButton: id });
         this.props.toolManager.setTool(tool, data);
     }
 }
