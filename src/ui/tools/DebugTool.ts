@@ -10,5 +10,6 @@ export default class DebugTool extends Tool {
     }
 
     public update(): void {}
+
     public postUpdate(): void {}
 }

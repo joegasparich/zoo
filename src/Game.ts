@@ -17,6 +17,7 @@ import { createDude } from "helpers/entityGenerators";
 import World from "world/World";
 
 type DebugSettings = {
+    showEntities: boolean;
     showMapGrid: boolean;
     showPathfinding: boolean;
     showWallGrid: boolean;
@@ -26,6 +27,7 @@ type DebugSettings = {
 };
 
 const defaultSettings: DebugSettings = {
+    showEntities: false,
     showMapGrid: false,
     showPathfinding: false,
     showWallGrid: false,
@@ -129,12 +131,9 @@ class Game {
         this.map = new MapGrid();
 
         this.sceneManager = new SceneManager(this.map);
-        this.sceneManager.loadScene(
-            new ZooScene(),
-            (progress: number) => {
-                console.log(`Map Load Progress: ${progress}%`);
-            },
-        );
+        this.sceneManager.loadScene(new ZooScene(), (progress: number) => {
+            console.log(`Map Load Progress: ${progress}%`);
+        });
 
         Graphics.init();
 
@@ -160,9 +159,9 @@ class Game {
 
         this.layers = [];
         this.groups = [];
-        for(const l in Object.values(RenderLayers)) {
+        for (const l in Object.values(RenderLayers)) {
             const group = new Group(+l, true);
-            group.on("sort", (sprite) => {
+            group.on("sort", sprite => {
                 sprite.zOrder = sprite.y;
             });
 
@@ -182,13 +181,13 @@ class Game {
         delta *= this.opts.gameSpeed;
 
         this.preUpdate(delta);
-        Mediator.fire(GameEvent.PRE_UPDATE, {delta, game: this});
+        Mediator.fire(GameEvent.PRE_UPDATE, { delta, game: this });
 
         this.update(delta);
-        Mediator.fire(GameEvent.UPDATE, {delta, game: this});
+        Mediator.fire(GameEvent.UPDATE, { delta, game: this });
 
         this.postUpdate(delta);
-        Mediator.fire(GameEvent.POST_UPDATE, {delta, game: this});
+        Mediator.fire(GameEvent.POST_UPDATE, { delta, game: this });
 
         // Reset tings
         this.input.clearKeys();
@@ -289,6 +288,7 @@ class Game {
     }
 
     private drawDebug(): void {
+        if (this.debugSettings.showEntities) this.entities.forEach(entity => entity.drawDebug());
         if (this.debugSettings.showMapGrid) this.map.drawDebug();
         if (this.debugSettings.showPathfinding) this.map.pathfindingGrid.drawDebug();
         if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();

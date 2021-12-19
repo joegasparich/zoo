@@ -49,7 +49,12 @@ export default class PathFollowComponent extends Component {
     public async pathTo(location: Vector): Promise<boolean> {
         this.resetPath();
 
-        const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {optimise: true, allowedNodes: [NodeType.OPEN, NodeType.PATH]});
+        if (!location) return;
+
+        const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {
+            optimise: true,
+            allowedNodes: [NodeType.OPEN, NodeType.PATH],
+        });
         if (!path) return false;
 
         this.setPath(path);
@@ -95,23 +100,19 @@ export default class PathFollowComponent extends Component {
     private drawDebugPath(): void {
         const cellSize = Game.map.cellSize;
 
-        Graphics.setLineStyle(3, 0x0000FF);
+        Graphics.setLineStyle(3, 0x0000ff);
 
         Graphics.drawLine(
             this.entity.position.x * cellSize,
             this.entity.position.y * cellSize,
             this.currentTarget.x * cellSize,
-            this.currentTarget.y * cellSize);
+            this.currentTarget.y * cellSize,
+        );
 
         let lastNode = this.currentTarget;
         Graphics.drawCircle(lastNode.multiply(cellSize), 2);
         this.path.forEach(node => {
-            Graphics.drawLine(
-                lastNode.x * cellSize,
-                lastNode.y * cellSize,
-                node.x * cellSize,
-                node.y * cellSize,
-            );
+            Graphics.drawLine(lastNode.x * cellSize, lastNode.y * cellSize, node.x * cellSize, node.y * cellSize);
             Graphics.drawCircle(node.multiply(cellSize), 2);
             lastNode = node;
         });

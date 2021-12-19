@@ -1,4 +1,6 @@
+import { Config } from "consts";
 import Game from "Game";
+import Graphics from "Graphics";
 import { v1 as uuid } from "uuid";
 import Vector from "vector";
 
@@ -115,5 +117,10 @@ export default class Entity {
         });
 
         return entity;
+    }
+
+    public drawDebug(): void {
+        Graphics.setLineStyle(0.5, 0xffffff);
+        Graphics.drawCircle(this.position.multiply(Config.WORLD_SCALE), 2, 0xffffff);
     }
 }

@@ -140,6 +140,7 @@ export default class WaterGrid {
 
     /**
      * Draws blue & black Xs to show water
+     * TODO: Make it looks nicer
      */
     public drawDebug(): void {
         const xOffset = Config.WORLD_SCALE / 2;

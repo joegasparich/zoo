@@ -1,4 +1,5 @@
 import { Sprite } from "pixi.js";
+import { OutlineFilter } from "pixi-filters";
 
 import { Component, COMPONENT } from ".";
 import { AssetManager } from "managers";
@@ -49,7 +50,8 @@ export default class RenderComponent extends Component {
 
     protected camera: Camera;
 
-    public colour = 0xFFFFFF;
+    public colour = 0xffffff;
+    public outline: number;
     public alpha = 1;
     public visible = true;
 
@@ -136,6 +138,14 @@ export default class RenderComponent extends Component {
         this.sprite.visible = this.visible;
     }
 
+    public setOutline(colour?: number): void {
+        if (colour) {
+            this.sprite.filters = [new OutlineFilter(2, colour)];
+        } else {
+            this.sprite.filters = [];
+        }
+    }
+
     protected syncPosition(): void {
         if (!this.sprite) return;
 
@@ -206,7 +216,9 @@ export default class RenderComponent extends Component {
     public printDebug(): void {
         super.printDebug();
 
-        console.log(`Current sprite URL: ${this.spriteUrl} | spritesheet: ${this.spriteSheet?.data}, index: ${this.spriteIndex}`);
+        console.log(
+            `Current sprite URL: ${this.spriteUrl} | spritesheet: ${this.spriteSheet?.data}, index: ${this.spriteIndex}`,
+        );
         console.log(`Layer: ${this.layer} | Flip: ${this.flipX} ${this.flipY} | Scale ${this.scale}`);
         console.log(`Pivot: ${this.pivot} | Offset: ${this.offset}`);
     }

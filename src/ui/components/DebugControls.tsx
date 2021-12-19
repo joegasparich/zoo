@@ -16,7 +16,6 @@ const defaultState: DebugState = {
 };
 
 export default class DebugControls extends UIComponent<UIComponentProps, DebugState> {
-
     public focusID = "DEBUG_CONTROLS";
 
     private focusListener: string;
@@ -27,12 +26,12 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
 
         this.state = defaultState;
 
-        this.focusListener = Mediator.on(UIEvent.FOCUS, ({id}: {id: string}) => {
+        this.focusListener = Mediator.on(UIEvent.FOCUS, ({ id }: { id: string }) => {
             if (id !== this.focusID) {
-                this.setState({panelOpen: false});
+                this.setState({ panelOpen: false });
             }
         });
-        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.setState({panelOpen: false}));
+        this.unfocusListener = Mediator.on(UIEvent.UNFOCUS, () => this.setState({ panelOpen: false }));
     }
 
     public componentWillUnmount(): void {
@@ -41,8 +40,7 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
     }
 
     protected getStyles(): SerializedStyles {
-        return css`
-        `;
+        return css``;
     }
 
     protected getContent(): JSX.Element {
@@ -63,34 +61,53 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
                         showTriangle={true}
                     >
                         <Button
+                            key="entityButton"
+                            image={Assets.UI.ANIMAL_ICON}
+                            onClick={(): void => {
+                                Game.debugSettings.showEntities = !Game.debugSettings.showEntities;
+                            }}
+                        />
+                        <Button
                             key="mapGridButton"
                             image={Assets.UI.GRID_ICON}
-                            onClick={(): void => { Game.debugSettings.showMapGrid = !Game.debugSettings.showMapGrid; }}
+                            onClick={(): void => {
+                                Game.debugSettings.showMapGrid = !Game.debugSettings.showMapGrid;
+                            }}
                         />
                         <Button
                             key="pathfindingButton"
                             image={Assets.UI.PATHFINDING_ICON}
-                            onClick={(): void => { Game.debugSettings.showPathfinding = !Game.debugSettings.showPathfinding; }}
+                            onClick={(): void => {
+                                Game.debugSettings.showPathfinding = !Game.debugSettings.showPathfinding;
+                            }}
                         />
                         <Button
                             key="wallButton"
                             image={Assets.UI.IRON_BAR_FENCE}
-                            onClick={(): void => { Game.debugSettings.showWallGrid = !Game.debugSettings.showWallGrid; }}
+                            onClick={(): void => {
+                                Game.debugSettings.showWallGrid = !Game.debugSettings.showWallGrid;
+                            }}
                         />
                         <Button
                             key="elevationButton"
                             image={Assets.UI.ELEVATION_ICON}
-                            onClick={(): void => { Game.debugSettings.showElevation = !Game.debugSettings.showElevation; }}
+                            onClick={(): void => {
+                                Game.debugSettings.showElevation = !Game.debugSettings.showElevation;
+                            }}
                         />
                         <Button
                             key="waterButton"
                             image={Assets.UI.WATER_ICON}
-                            onClick={(): void => { Game.debugSettings.showWater = !Game.debugSettings.showWater; }}
+                            onClick={(): void => {
+                                Game.debugSettings.showWater = !Game.debugSettings.showWater;
+                            }}
                         />
                         <Button
                             key="pathButton"
                             image={Assets.UI.PATH_ICON}
-                            onClick={(): void => { Game.debugSettings.showPath = !Game.debugSettings.showPath; }}
+                            onClick={(): void => {
+                                Game.debugSettings.showPath = !Game.debugSettings.showPath;
+                            }}
                         />
                     </FloatingPanel>
                 </div>
@@ -102,9 +119,9 @@ export default class DebugControls extends UIComponent<UIComponentProps, DebugSt
         if (this.state.panelOpen) {
             Mediator.fire(UIEvent.UNFOCUS);
         } else {
-            Mediator.fire(UIEvent.FOCUS, {id: this.focusID});
+            Mediator.fire(UIEvent.FOCUS, { id: this.focusID });
         }
 
-        this.setState({panelOpen: !this.state.panelOpen});
+        this.setState({ panelOpen: !this.state.panelOpen });
     }
 }

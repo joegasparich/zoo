@@ -125,6 +125,6 @@ export default class AnimalBehaviourComponent extends InputComponent {
 
         console.log(this.data);
         console.log(`Current state: ${this.stateMachine.getState().id}`);
-        console.log(`Exhibit: ${this.exhibit.area.name}`);
+        console.log(`Exhibit: ${this.exhibit?.area?.name ?? "None"}`);
     }
 }

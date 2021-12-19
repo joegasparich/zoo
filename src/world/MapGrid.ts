@@ -34,7 +34,7 @@ export default class MapGrid {
      * @param cells The map cells to populate the grid with
      * @param useTexture Whether a textured tile grid will be used
      */
-    public setupGrid(cells: MapCell[][]): void{
+    public setupGrid(cells: MapCell[][]): void {
         this.grid = cells;
         this.cols = cells.length;
         this.rows = cells[0].length;
@@ -89,11 +89,7 @@ export default class MapGrid {
      * @param position The position to check
      */
     public isPositionInMap(position: Vector): boolean {
-        return position &&
-               position.x >= 0 &&
-               position.x < this.cols &&
-               position.y >= 0 &&
-               position.y < this.rows;
+        return position && position.x >= 0 && position.x < this.cols && position.y >= 0 && position.y < this.rows;
     }
 
     /**
@@ -109,11 +105,23 @@ export default class MapGrid {
     public getCellInDirection(position: Vector, direction: Side): MapCell {
         if (!this.isPositionInMap(position)) return undefined;
 
-        switch(direction) {
-            case Side.West: return this.isPositionInMap(new Vector(position.x - 1, position.y)) ? this.grid[position.x - 1][position.y] : undefined;
-            case Side.East: return this.isPositionInMap(new Vector(position.x + 1, position.y)) ? this.grid[position.x + 1][position.y] : undefined;
-            case Side.North: return this.isPositionInMap(new Vector(position.x, position.y - 1)) ? this.grid[position.x][position.y - 1] : undefined;
-            case Side.South: return this.isPositionInMap(new Vector(position.x, position.y + 1)) ? this.grid[position.x][position.y + 1] : undefined;
+        switch (direction) {
+            case Side.West:
+                return this.isPositionInMap(new Vector(position.x - 1, position.y))
+                    ? this.grid[position.x - 1][position.y]
+                    : undefined;
+            case Side.East:
+                return this.isPositionInMap(new Vector(position.x + 1, position.y))
+                    ? this.grid[position.x + 1][position.y]
+                    : undefined;
+            case Side.North:
+                return this.isPositionInMap(new Vector(position.x, position.y - 1))
+                    ? this.grid[position.x][position.y - 1]
+                    : undefined;
+            case Side.South:
+                return this.isPositionInMap(new Vector(position.x, position.y + 1))
+                    ? this.grid[position.x][position.y + 1]
+                    : undefined;
         }
     }
 
@@ -126,10 +134,14 @@ export default class MapGrid {
 
         const adjacentCells: MapCell[] = [];
 
-        if (this.isPositionInMap(new Vector(position.x - 1, position.y))) adjacentCells.push(this.grid[position.x - 1][position.y]);
-        if (this.isPositionInMap(new Vector(position.x + 1, position.y))) adjacentCells.push(this.grid[position.x + 1][position.y]);
-        if (this.isPositionInMap(new Vector(position.x, position.y - 1))) adjacentCells.push(this.grid[position.x][position.y - 1]);
-        if (this.isPositionInMap(new Vector(position.x, position.y + 1))) adjacentCells.push(this.grid[position.x][position.y + 1]);
+        if (this.isPositionInMap(new Vector(position.x - 1, position.y)))
+            adjacentCells.push(this.grid[position.x - 1][position.y]);
+        if (this.isPositionInMap(new Vector(position.x + 1, position.y)))
+            adjacentCells.push(this.grid[position.x + 1][position.y]);
+        if (this.isPositionInMap(new Vector(position.x, position.y - 1)))
+            adjacentCells.push(this.grid[position.x][position.y - 1]);
+        if (this.isPositionInMap(new Vector(position.x, position.y + 1)))
+            adjacentCells.push(this.grid[position.x][position.y + 1]);
 
         return adjacentCells;
     }
@@ -166,8 +178,12 @@ export default class MapGrid {
      * @param end The target position
      * @param opts Optional arguments
      */
-    public async getPath(start: Vector, end: Vector, opts?: {optimise?: boolean, allowedNodes?: NodeType[]}): Promise<Vector[]> {
-        if (this.isLineWalkable(start, end)) return [start, end];
+    public async getPath(
+        start: Vector,
+        end: Vector,
+        opts?: { optimise?: boolean; allowedNodes?: NodeType[] },
+    ): Promise<Vector[]> {
+        if (this.isLineWalkable(start, end)) return [start.add(new Vector(0.5, 0.5)), end.add(new Vector(0.5, 0.5))];
 
         let path = await this.pathfindingGrid?.getPath(start, end, opts?.allowedNodes);
         if (!path) return;
@@ -199,7 +215,7 @@ export default class MapGrid {
      */
     public checkPath(path: Vector[]): boolean {
         let lastNode: Vector = undefined;
-        for(const node of path) {
+        for (const node of path) {
             if (lastNode && !this.isLineWalkable(node, lastNode)) {
                 console.log("Path blocked");
                 return false;
@@ -233,7 +249,10 @@ export default class MapGrid {
                 if (prev.y < cell.y) prevDir = Side.North;
 
                 if (prevDir === undefined) {
-                    console.warn("getCellsIntersectedByLine returned duplicate cells", cells.map(cell => cell.toString()));
+                    console.warn(
+                        "getCellsIntersectedByLine returned duplicate cells",
+                        cells.map(cell => cell.toString()),
+                    );
                 }
                 if (Game.world.wallGrid.getWallAtTile(cell, prevDir)?.exists) return false;
             }
@@ -250,11 +269,11 @@ export default class MapGrid {
      * Draws a grid showing the map cells
      */
     public drawDebug(): void {
-        Graphics.setLineStyle(1, 0xFFFFFF);
-        const xOffset =  this.position.x;
+        Graphics.setLineStyle(1, 0xffffff);
+        const xOffset = this.position.x;
         const yOffset = this.position.y;
         // Horizontal
-        for(let i = 0; i < this.rows + 1; i++) {
+        for (let i = 0; i < this.rows + 1; i++) {
             Graphics.drawLine(
                 xOffset,
                 i * this.cellSize + yOffset,
@@ -263,7 +282,7 @@ export default class MapGrid {
             );
         }
         // Vertical
-        for(let i = 0; i < this.cols + 1; i++) {
+        for (let i = 0; i < this.cols + 1; i++) {
             Graphics.drawLine(
                 i * this.cellSize + xOffset,
                 yOffset,

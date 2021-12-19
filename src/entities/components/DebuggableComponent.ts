@@ -3,6 +3,8 @@ import { ToolType } from "ui/tools";
 import UIManager from "ui/UIManager";
 import { COMPONENT, Component, RenderComponent } from ".";
 
+const HOVER_OUTLINE_COLOUR = 0xff0000;
+
 export default class DebuggableComponent extends Component {
     public id: COMPONENT = "DEBUGGABLE_COMPONENT";
     public type: COMPONENT = "DEBUGGABLE_COMPONENT";
@@ -11,6 +13,10 @@ export default class DebuggableComponent extends Component {
 
     public renderer: RenderComponent;
 
+    private boundMouseDownListener = this.printDebugInfo.bind(this);
+    private boundMouseOverListener = this.onMouseOver.bind(this);
+    private boundMouseOutListener = this.onMouseOut.bind(this);
+
     public start(entity: Entity): void {
         super.start(entity);
 
@@ -18,7 +24,30 @@ export default class DebuggableComponent extends Component {
 
         const sprite = this.renderer.getSprite();
         sprite.interactive = true;
-        sprite.on("mousedown", this.printDebugInfo.bind(this));
+        sprite.on("mousedown", this.boundMouseDownListener);
+        sprite.on("mouseover", this.boundMouseOverListener);
+        sprite.on("mouseout", this.boundMouseOutListener);
+    }
+
+    public end(): void {
+        const sprite = this.renderer.getSprite();
+
+        sprite.interactive = false;
+        sprite.off("mousedown", this.boundMouseDownListener);
+        sprite.off("mouseover", this.boundMouseOverListener);
+        sprite.off("mouseout", this.boundMouseOutListener);
+    }
+
+    private onMouseOver(): void {
+        if (UIManager.getCurrentTool() !== ToolType.Debug) return;
+
+        this.renderer.setOutline(HOVER_OUTLINE_COLOUR);
+    }
+
+    private onMouseOut(): void {
+        if (UIManager.getCurrentTool() !== ToolType.Debug) return;
+
+        this.renderer.setOutline();
     }
 
     private printDebugInfo(): void {
