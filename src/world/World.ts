@@ -78,11 +78,11 @@ export default class World {
 
     public postSetup(): void {
         const zooArea = new Area(ZOO_AREA);
-        Game.world.areas.set(zooArea.id, zooArea);
+        this.areas.set(zooArea.id, zooArea);
         Mediator.fire(WorldEvent.AREAS_UPDATED);
-        const zooCells = Game.world.floodFill(Game.map.getCell(new Vector(1)));
+        const zooCells = this.floodFill(Game.map.getCell(new Vector(1)));
         zooArea.setCells(zooCells);
-        zooCells.forEach(cell => Game.world.tileAreaMap.set(cell.position.toString(), zooArea));
+        zooCells.forEach(cell => this.tileAreaMap.set(cell.position.toString(), zooArea));
     }
 
     public reset(): void {
@@ -98,6 +98,9 @@ export default class World {
     }
 
     private resetAreas(): void {
+        this.getAreas().forEach(area => area.delete());
+        this.getExhibits().forEach(exhibit => exhibit.delete());
+
         this.areas = new Map();
         this.tileAreaMap = new Map();
         this.exhibits = new Map();
@@ -340,10 +343,10 @@ export default class World {
 
     public save(): WorldSaveData {
         return {
-            biomes: Game.world.biomeGrid.save(),
-            paths: Game.world.pathGrid.save(),
-            walls: Game.world.wallGrid.save(),
-            elevation: Game.world.elevationGrid.save(),
+            biomes: this.biomeGrid.save(),
+            paths: this.pathGrid.save(),
+            walls: this.wallGrid.save(),
+            elevation: this.elevationGrid.save(),
             areas: Array.from(this.areas.values()).map(area => ({
                 id: area.id,
                 colour: area.colour,
@@ -358,10 +361,10 @@ export default class World {
     }
 
     public load(data: WorldSaveData): void {
-        Game.world.elevationGrid.load(data.elevation);
-        Game.world.biomeGrid.load(data.biomes);
-        Game.world.pathGrid.load(data.paths);
-        Game.world.wallGrid.load(data.walls);
+        this.elevationGrid.load(data.elevation);
+        this.biomeGrid.load(data.biomes);
+        this.pathGrid.load(data.paths);
+        this.wallGrid.load(data.walls);
 
         // Create areas
         data.areas.forEach(area => {

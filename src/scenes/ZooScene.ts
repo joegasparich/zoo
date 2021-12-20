@@ -4,7 +4,7 @@ import UIManager from "ui/UIManager";
 import { Scene } from "./Scene";
 import { MapCell } from "world/MapGrid";
 import Vector from "vector";
-import { createDude } from "helpers/entityGenerators";
+import { createDude, createGuest } from "helpers/entityGenerators";
 import { Assets, Side } from "consts";
 
 const MAP_SIZE = 20;
@@ -20,6 +20,7 @@ export default class ZooScene extends Scene {
         this.generateMap();
 
         createDude();
+        createGuest(new Vector(5, 5));
     }
 
     public stop(): void {

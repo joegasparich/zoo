@@ -18,6 +18,7 @@ import ElevationComponent from "./ElevationComponent";
 import TileObjectComponent from "./TileObjectComponent";
 import NeedsComponent from "./NeedsComponent";
 import AnimalBehaviourComponent from "./AnimalBehaviourComponent";
+import GuestComponent from "./GuestComponent";
 import ConsumableComponent from "./ConsumableComponent";
 
 export type COMPONENT =
@@ -39,6 +40,7 @@ export type COMPONENT =
     | "TILE_OBJECT_COMPONENT"
     | "NEEDS_COMPONENT"
     | "ANIMAL_BEHAVIOUR_COMPONENT"
+    | "GUEST_COMPONENT"
     | "CONSUMABLE_COMPONENT";
 
 // prettier-ignore
@@ -61,6 +63,7 @@ export function createComponent(componentData: ComponentSaveData): Component {
         case "TILE_OBJECT_COMPONENT": return new TileObjectComponent();
         case "NEEDS_COMPONENT": return new NeedsComponent();
         case "ANIMAL_BEHAVIOUR_COMPONENT": return new AnimalBehaviourComponent();
+        case "GUEST_COMPONENT": return new GuestComponent();
         case "CONSUMABLE_COMPONENT": return new ConsumableComponent();
         default: return undefined;
     }
@@ -86,6 +89,7 @@ export type ComponentType<T> =
     T extends "TILE_OBJECT_COMPONENT" ? TileObjectComponent :
     T extends "NEEDS_COMPONENT" ? NeedsComponent :
     T extends "ANIMAL_BEHAVIOUR_COMPONENT" ? AnimalBehaviourComponent :
+    T extends "GUEST_COMPONENT" ? GuestComponent :
     T extends "CONSUMABLE_COMPONENT" ? ConsumableComponent :
     Component;
 
@@ -109,5 +113,6 @@ export {
     TileObjectComponent,
     NeedsComponent,
     AnimalBehaviourComponent,
+    GuestComponent,
     ConsumableComponent,
 };

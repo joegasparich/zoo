@@ -73,4 +73,9 @@ export default class Area {
             Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, this.colour, 0.5);
         });
     }
+
+    public delete(): void {
+        this.cells = [];
+        this.connectedAreas = new Map();
+    }
 }

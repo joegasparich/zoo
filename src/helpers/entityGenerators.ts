@@ -10,6 +10,7 @@ import {
     DebuggableComponent,
     ConsumableComponent,
     InteractableComponent,
+    GuestComponent,
 } from "entities/components";
 import { AssetManager } from "managers";
 import {
@@ -24,6 +25,18 @@ import SpriteSheet from "SpriteSheet";
 import Vector from "vector";
 import { Need } from "entities/components/NeedsComponent";
 import AnimalBehaviourComponent from "entities/components/AnimalBehaviourComponent";
+
+export function createActor(position: Vector): Entity {
+    const actor = new Entity(position);
+
+    actor.addComponent(new RenderComponent());
+    actor.addComponent(new SimplePhysicsComponent());
+    actor.addComponent(new ElevationComponent());
+    actor.addComponent(new InteractableComponent());
+    actor.addComponent(new DebuggableComponent());
+
+    return actor;
+}
 
 export function createDude(): Entity {
     const spritesheet = new SpriteSheet({
@@ -68,16 +81,19 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
     return animal;
 }
 
-export function createActor(position: Vector): Entity {
-    const actor = new Entity(position);
+export function createGuest(position: Vector): Entity {
+    const guest = createActor(position);
 
-    actor.addComponent(new RenderComponent());
-    actor.addComponent(new SimplePhysicsComponent());
-    actor.addComponent(new ElevationComponent());
-    actor.addComponent(new InteractableComponent());
-    actor.addComponent(new DebuggableComponent());
+    guest.addComponent(new PathFollowComponent());
+    guest.addComponent(new NeedsComponent([new Need(NeedType.Energy, 0.0025, 0.5, true)]));
+    guest.addComponent(new GuestComponent());
+    guest.addComponent(new InputToPhysicsComponent());
 
-    return actor;
+    const renderer = guest.getComponent("RENDER_COMPONENT");
+    renderer.setSprite(Assets.SPRITES.GUEST);
+    renderer.scale = 0.5;
+
+    return guest;
 }
 
 export function createTileObject(assetPath: string, position: Vector, size = new Vector(1, 1)): Entity {

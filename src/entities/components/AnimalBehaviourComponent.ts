@@ -1,7 +1,7 @@
 import { WorldEvent } from "consts";
 import { Entity } from "entities";
-import { Behaviour, BehaviourData, createBehaviour, IdleBehaviour } from "entities/behaviours";
-import ConsumeBehaviour from "entities/behaviours/ConsumeBehaviour";
+import { BehaviourData, createBehaviour, IdleBehaviour } from "entities/behaviours/animal";
+import ConsumeBehaviour from "entities/behaviours/animal/ConsumeBehaviour";
 import Game from "Game";
 import { randomInt } from "helpers/math";
 import { AssetManager } from "managers";
@@ -18,8 +18,9 @@ import { COMPONENT, InputComponent, InteractableComponent, NeedsComponent, PathF
 import { ComponentSaveData } from "./Component";
 import { InteractableEvents } from "./InteractableComponent";
 import { randomItem } from "helpers/util";
+import { Behaviour } from "entities/behaviours";
 
-import { names } from "../../consts/names.json";
+import { firstNames } from "../../consts/names.json";
 
 const NEED_THRESHOLD = 50; // TODO: flesh this out
 const STATE_UPDATE_INTERVAL_RANGE: [number, number] = [1000, 5000];
@@ -44,11 +45,11 @@ export default class AnimalBehaviourComponent extends InputComponent {
 
     public assetPath: string;
     public data: AnimalData;
-    public stateMachine = new StateMachine<Behaviour>(new IdleBehaviour());
     public exhibit?: Exhibit;
 
-    private areaListener: string;
+    public stateMachine = new StateMachine<Behaviour>(new IdleBehaviour());
     private nextStateChange = 0;
+    private areaListener: string;
 
     private mouseDownHandle: string;
 
@@ -74,7 +75,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
         this.findExhibit();
 
         if (!this.name) {
-            this.name = randomItem(names);
+            this.name = randomItem(firstNames);
         }
     }
 
@@ -162,6 +163,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
         super.printDebug();
 
         console.log(this.data);
+        console.log(`Name: ${this.name}`);
         console.log(`Current state: ${this.stateMachine.getState().id}`);
         console.log(`Exhibit: ${this.exhibit?.name ?? "None"}`);
     }

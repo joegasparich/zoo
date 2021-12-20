@@ -27,6 +27,7 @@ export default class Exhibit {
     public viewingAreaHighlighted = false;
     public foliage: Entity[];
     public consumables: Entity[];
+    public centre: Vector;
 
     private biomeListener: string;
     private placeTileObjectListener: string;
@@ -64,6 +65,18 @@ export default class Exhibit {
         [this.foliage, this.consumables] = this.updateTileObjects();
         [this.hilliness, this.waterness] = this.updateElevation();
         this.viewingArea = this.updateViewingArea();
+        this.centre = this.findCentre();
+    }
+
+    public findCentre(): Vector {
+        let totalX = 0,
+            totalY = 0;
+        this.area.getCells().forEach(cell => {
+            totalX += cell.position.x;
+            totalY += cell.position.y;
+        });
+
+        return new Vector(totalX / this.area.getCells().length, totalY / this.area.getCells().length);
     }
 
     public updateBiomes(): Partial<Record<Biome, number>> {

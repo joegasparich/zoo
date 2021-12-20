@@ -25,9 +25,9 @@ export default class DebuggableComponent extends Component {
         this.renderer = entity.getComponent("RENDER_COMPONENT");
         this.interactable = entity.getComponent("INTERACTABLE_COMPONENT");
 
-        this.mouseDownHandle = this.interactable.on(InteractableEvents.MouseDown, this.onMouseOver.bind(this));
-        this.mouseEnterHandle = this.interactable.on(InteractableEvents.MouseEnter, this.onMouseOut.bind(this));
-        this.mouseExitHandle = this.interactable.on(InteractableEvents.MouseExit, this.printDebugInfo.bind(this));
+        this.mouseDownHandle = this.interactable.on(InteractableEvents.MouseDown, this.printDebugInfo.bind(this));
+        this.mouseEnterHandle = this.interactable.on(InteractableEvents.MouseEnter, this.onMouseEnter.bind(this));
+        this.mouseExitHandle = this.interactable.on(InteractableEvents.MouseExit, this.onMouseExit.bind(this));
     }
 
     public end(): void {
@@ -36,13 +36,13 @@ export default class DebuggableComponent extends Component {
         this.interactable.unsubscribe(InteractableEvents.MouseExit, this.mouseExitHandle);
     }
 
-    private onMouseOver(): void {
+    private onMouseEnter(): void {
         if (UIManager.getCurrentTool() !== ToolType.Debug) return;
 
         this.renderer.setOutline(HOVER_OUTLINE_COLOUR);
     }
 
-    private onMouseOut(): void {
+    private onMouseExit(): void {
         if (UIManager.getCurrentTool() !== ToolType.Debug) return;
 
         this.renderer.setOutline();
@@ -52,6 +52,7 @@ export default class DebuggableComponent extends Component {
         if (UIManager.getCurrentTool() !== ToolType.Debug) return;
 
         console.group(`%cEntity ID: ${this.entity.id}`, "background-color: #ebdb9d; color: black");
+        console.log(`Position: ${this.entity.position.toString()}`);
         console.log("Components:");
         this.entity.getAllComponents().forEach(component => {
             console.group(`Component ID: ${component.id}`);

@@ -1,27 +1,7 @@
 import { State } from "state";
-
-import IdleBehaviour from "./IdleBehaviour";
-import ConsumeBehaviour from "./ConsumeBehaviour";
-
-export type BEHAVIOUR_STATE = "IDLE" | "CONSUME";
-
-export interface BehaviourData {
-    id: BEHAVIOUR_STATE;
-}
+import { ANIMAL_BEHAVIOUR_STATE } from "./animal";
+import { GUEST_BEHAVIOUR_STATE } from "./guest";
 
 export interface Behaviour extends State {
-    id: BEHAVIOUR_STATE;
+    id: ANIMAL_BEHAVIOUR_STATE | GUEST_BEHAVIOUR_STATE;
 }
-
-export function createBehaviour(behaviour: BehaviourData): Behaviour {
-    switch (behaviour.id) {
-        case "IDLE":
-            return new IdleBehaviour();
-        case "CONSUME":
-            return new ConsumeBehaviour();
-        default:
-            return undefined;
-    }
-}
-
-export { IdleBehaviour, ConsumeBehaviour };

@@ -1,7 +1,8 @@
 import { AnimalBehaviourComponent } from "entities/components";
 import { randomBool } from "helpers/math";
 import Vector from "vector";
-import { Behaviour, BehaviourData, BEHAVIOUR_STATE } from ".";
+import { ANIMAL_BEHAVIOUR_STATE, BehaviourData } from ".";
+import { Behaviour } from "..";
 
 const RANDOM_MOVE_INTERVAL = 5000;
 
@@ -10,7 +11,7 @@ interface IdleData extends BehaviourData {
 }
 
 export default class IdleBehaviour implements Behaviour {
-    public id: BEHAVIOUR_STATE = "IDLE";
+    public id: ANIMAL_BEHAVIOUR_STATE = "IDLE";
     private timer = 0;
 
     public update(delta: number, animal: AnimalBehaviourComponent): void {

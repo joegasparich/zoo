@@ -29,6 +29,7 @@ export default class PathFollowComponent extends Component {
         super.start(entity);
 
         this.placeSolidListener = Mediator.on(WorldEvent.PLACE_SOLID, () => {
+            // TODO: Can we chunk the map so that we can only need to check paths that go through a chunk
             if (!this.path) return;
 
             window.clearTimeout(this.checkPathDebounce);

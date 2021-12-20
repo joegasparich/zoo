@@ -4,7 +4,8 @@ import { Need } from "entities/components/NeedsComponent";
 import Game from "Game";
 import { NeedType } from "types/AssetTypes";
 import Vector from "vector";
-import { Behaviour, BehaviourData, BEHAVIOUR_STATE, IdleBehaviour } from ".";
+import { BehaviourData, ANIMAL_BEHAVIOUR_STATE, IdleBehaviour } from ".";
+import { Behaviour } from "..";
 
 const CONSUME_SPEED = 0.1; // TODO: Make variable?
 
@@ -15,7 +16,7 @@ interface ConsumeData extends BehaviourData {
 }
 
 export default class ConsumeBehaviour implements Behaviour {
-    public id: BEHAVIOUR_STATE = "CONSUME";
+    public id: ANIMAL_BEHAVIOUR_STATE = "CONSUME";
     private target: Entity;
     private isConsuming: boolean;
 
