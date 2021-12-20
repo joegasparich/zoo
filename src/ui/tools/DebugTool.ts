@@ -5,7 +5,6 @@ export default class DebugTool extends Tool {
     public type = ToolType.Debug;
 
     public set(ghost: PlacementGhost): void {
-        ghost.reset();
         ghost.setSpriteVisible(false);
     }
 

@@ -86,6 +86,7 @@ export default class ToolManager {
     public reset(): void {
         this.actionStack = [];
         this.ghost.destroy();
+        this.ghost = undefined;
     }
 
     public getActiveTool(): ToolType {
@@ -93,6 +94,7 @@ export default class ToolManager {
     }
 
     public setTool(tool: ToolType, data?: Record<string, any>): void {
+        this.ghost.reset();
         this.ghost.setSpriteVisible(true);
         this.ghost.setPivot(new Vector(0.5, 0.5));
         this.ghost.setOffset(new Vector(0, 0));

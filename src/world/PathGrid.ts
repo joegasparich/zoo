@@ -30,7 +30,9 @@ export default class PathGrid {
             for (let j = 0; j < this.height; j++) {
                 const { assetPath } = data?.paths?.[i]?.[j] ?? {};
                 if (assetPath) {
-                    this.grid[i][j] = new Path(new Vector(i, j), assetPath);
+                    const pos = new Vector(i, j);
+                    this.grid[i][j] = new Path(pos, assetPath);
+                    Game.map.setTilePathable(pos, NodeType.PATH);
                 } else {
                     this.grid[i][j] = undefined;
                 }
@@ -104,8 +106,8 @@ export default class PathGrid {
                 row.map(path => {
                     return path
                         ? {
-                            assetPath: path.data.assetPath,
-                        }
+                              assetPath: path.data.assetPath,
+                          }
                         : undefined;
                 }),
             ),

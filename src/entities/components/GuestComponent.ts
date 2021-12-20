@@ -36,8 +36,9 @@ export default class GuestComponent extends InputComponent {
 
     public stateMachine = new StateMachine<Behaviour>(new IdleBehaviour());
     private nextStateChange = 0;
-    private visitedExhibits: string[] = [];
-    private inaccessibleExhibits: string[] = [];
+    public visitedExhibits: string[] = [];
+    // TODO: Should these reset periodically?
+    public inaccessibleExhibits: string[] = [];
 
     public start(entity: Entity): void {
         super.start(entity);
@@ -64,42 +65,11 @@ export default class GuestComponent extends InputComponent {
     }
 
     private checkForStateChange(): void {
-        const nearestExhibit = this.findExhibit();
-        if (nearestExhibit) {
-            const randomViewingTile = randomItem(nearestExhibit.viewingArea);
-            const path = this.pathfinder.pathTo(randomViewingTile);
-            if (path) {
-                this.stateMachine.setState(new ViewBehaviour(randomViewingTile, nearestExhibit.area.id));
-            } else {
-                // TODO: Can we assume that if the random tile is inaccessible then they all are?
-                this.inaccessibleExhibits.push(nearestExhibit.area.id);
+        if (this.stateMachine.getState().id !== "VIEW") {
+            if (Game.world.getExhibits().length > this.inaccessibleExhibits.length + this.visitedExhibits.length) {
+                this.stateMachine.setState(new ViewBehaviour());
             }
         }
-    }
-
-    public findExhibit(): Exhibit {
-        // TODO: Pick random of known ones rather than closest
-        // Maybe favour closer ones out of known ones?
-        return Game.world
-            .getExhibits()
-            .filter(
-                exhibit =>
-                    this.inaccessibleExhibits.includes(exhibit.area.id) ||
-                    !this.visitedExhibits.includes(exhibit.area.id),
-            )
-            .reduce(
-                (prev, current) =>
-                    !prev ||
-                    Vector.Distance(current.centre, this.entity.position) <
-                        Vector.Distance(prev.centre, this.entity.position)
-                        ? current
-                        : prev,
-                undefined,
-            );
-    }
-
-    public setExhibitVisited(exhibitId: string) {
-        this.visitedExhibits.push(exhibitId);
     }
 
     public save(): GuestComponentSaveData {

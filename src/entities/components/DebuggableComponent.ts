@@ -31,9 +31,9 @@ export default class DebuggableComponent extends Component {
     }
 
     public end(): void {
-        this.interactable.unsubscribe(InteractableEvents.MouseDown, this.mouseDownHandle);
-        this.interactable.unsubscribe(InteractableEvents.MouseEnter, this.mouseEnterHandle);
-        this.interactable.unsubscribe(InteractableEvents.MouseExit, this.mouseExitHandle);
+        this.interactable?.unsubscribe(InteractableEvents.MouseDown, this.mouseDownHandle);
+        this.interactable?.unsubscribe(InteractableEvents.MouseEnter, this.mouseEnterHandle);
+        this.interactable?.unsubscribe(InteractableEvents.MouseExit, this.mouseExitHandle);
     }
 
     private onMouseEnter(): void {

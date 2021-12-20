@@ -14,8 +14,6 @@ export default class DeleteTool extends Tool {
     private startPos: Vector;
 
     public set(ghost: PlacementGhost): void {
-        ghost.reset();
-
         ghost.setSprite(Assets.UI.BIN_ICON);
         ghost.setPivot(new Vector(0.5, 0.5));
         ghost.changeColour = false;

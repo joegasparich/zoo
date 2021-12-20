@@ -263,6 +263,9 @@ class Game {
         this.entities.forEach(entity => {
             entity.remove();
         });
+        this.entitiesToAdd.forEach(entity => {
+            entity.remove();
+        });
         this.entities = new Map();
         this.entitiesToAdd = [];
         this.entitiesToDelete = [];

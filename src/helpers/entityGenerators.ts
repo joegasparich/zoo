@@ -63,7 +63,7 @@ export function createAnimal(assetPath: string, position: Vector): Entity {
 
     const animal = createActor(position);
 
-    animal.addComponent(new PathFollowComponent());
+    animal.addComponent(new PathFollowComponent(true));
     animal.addComponent(
         new NeedsComponent([
             new Need(NeedType.Hunger, 0.004, 1, true), // TODO: per animal & genes

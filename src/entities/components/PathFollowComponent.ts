@@ -13,6 +13,7 @@ const DISTANCE_TO_NODE = 0.3;
 export interface PathFollowComponentSaveData extends ComponentSaveData {
     path: number[][];
     currentNode: number[];
+    optimise: boolean;
 }
 
 export default class PathFollowComponent extends Component {
@@ -24,6 +25,10 @@ export default class PathFollowComponent extends Component {
 
     private placeSolidListener: string;
     private checkPathDebounce: number;
+
+    public constructor(private optimise = false) {
+        super();
+    }
 
     public start(entity: Entity): void {
         super.start(entity);
@@ -53,8 +58,7 @@ export default class PathFollowComponent extends Component {
         if (!location) return;
 
         const path = await Game.map.getPath(this.entity.position.floor(), location.floor(), {
-            optimise: true,
-            allowedNodes: [NodeType.OPEN, NodeType.PATH],
+            optimise: this.optimise,
         });
         if (!path) return false;
 
@@ -124,6 +128,7 @@ export default class PathFollowComponent extends Component {
             ...super.save(),
             path: this.path?.map(node => Vector.Serialize(node)),
             currentNode: this.currentTarget && Vector.Serialize(this.currentTarget),
+            optimise: this.optimise,
         };
     }
 
@@ -132,6 +137,7 @@ export default class PathFollowComponent extends Component {
 
         this.path = data.path?.map(node => Vector.Deserialize(node));
         this.currentTarget = data.currentNode && Vector.Deserialize(data.currentNode);
+        this.optimise = data.optimise;
     }
 
     public printDebug(): void {

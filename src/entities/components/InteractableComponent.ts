@@ -38,12 +38,16 @@ export default class InteractableComponent extends Component {
     }
 
     public end(): void {
-        const sprite = this.renderer.getSprite();
-        sprite.interactive = false;
+        const sprite = this.renderer?.getSprite();
+        if (sprite) {
+            sprite.interactive = false;
 
-        sprite.off("mousedown", this.boundMouseDownListener);
-        sprite.off("mouseover", this.boundMouseOverListener);
-        sprite.off("mouseout", this.boundMouseOutListener);
+            sprite.off("mousedown", this.boundMouseDownListener);
+            sprite.off("mouseover", this.boundMouseOverListener);
+            sprite.off("mouseout", this.boundMouseOutListener);
+        }
+
+        this.listeners = new Map();
     }
 
     private onMouseOver(): void {
@@ -72,7 +76,7 @@ export default class InteractableComponent extends Component {
     public unsubscribe(event: InteractableEvents, handle: string): void {
         this.listeners.set(
             event,
-            this.listeners.get(event).filter(listener => listener.handle !== handle),
+            this.listeners.get(event)?.filter(listener => listener.handle !== handle),
         );
     }
 }

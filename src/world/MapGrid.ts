@@ -5,8 +5,12 @@ import Graphics from "Graphics";
 import { getCellsIntersectedByLine } from "helpers/math";
 import Mediator from "Mediator";
 import Vector from "vector";
-import PathfindingGrid, { NodeType } from "./PathfindingGrid";
+import PathfindingGrid, { AllowedNodes, NodeType } from "./PathfindingGrid";
 
+const defaultNodes: AllowedNodes = [
+    { type: NodeType.OPEN, cost: 10 },
+    { type: NodeType.PATH, cost: 1 },
+];
 export class MapCell {
     public position: Vector;
 
@@ -181,11 +185,11 @@ export default class MapGrid {
     public async getPath(
         start: Vector,
         end: Vector,
-        opts?: { optimise?: boolean; allowedNodes?: NodeType[] },
+        opts: { optimise?: boolean; allowedNodes?: AllowedNodes },
     ): Promise<Vector[]> {
-        if (this.isLineWalkable(start, end)) return [start.add(new Vector(0.5, 0.5)), end.add(new Vector(0.5, 0.5))];
+        // if (this.isLineWalkable(start, end)) return [start.add(new Vector(0.5, 0.5)), end.add(new Vector(0.5, 0.5))];
 
-        let path = await this.pathfindingGrid?.getPath(start, end, opts?.allowedNodes);
+        let path = await this.pathfindingGrid?.getPath(start, end, opts.allowedNodes ?? defaultNodes);
         if (!path) return;
 
         if (opts?.optimise) path = this.pathfindingGrid?.optimisePath(path, this.isLineWalkable.bind(this));

@@ -22,7 +22,6 @@ export default class BiomeTool extends Tool {
         this.chunksUpdated = new Map();
 
         this.currentBiome = data.biome;
-        ghost.reset();
         ghost.drawFunction = (pos: Vector): void => {
             Graphics.setLineStyle(1, 0xffffff);
             Graphics.drawCircle(

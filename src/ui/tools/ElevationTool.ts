@@ -20,7 +20,6 @@ export default class ElevationTool extends Tool {
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
         this.targetElevation = data.elevation;
 
-        ghost.reset();
         ghost.drawFunction = (pos: Vector): void => {
             Graphics.setLineStyle(1, data.colour);
             Graphics.drawCircle(

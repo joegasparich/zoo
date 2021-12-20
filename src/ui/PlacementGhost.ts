@@ -30,12 +30,16 @@ export default class PlacementGhost {
     public constructor() {
         this.world = Game.world;
 
+        this.createGhost();
+
+        this.reset();
+    }
+
+    private createGhost() {
         this.ghost = new Entity(Game.input.getMousePos(), false);
         this.ghost.addComponent(new FollowMouseComponent());
         this.ghost.addComponent(new SnapToGridComponent());
         this.ghostRenderer = this.ghost.addComponent(new RenderComponent(DEFAULT_SPRITE, RenderLayers.GHOSTS));
-
-        this.reset();
     }
 
     public postUpdate(): void {
@@ -135,6 +139,9 @@ export default class PlacementGhost {
     }
 
     public reset(): void {
+        if (!this.ghost?.exists) {
+            this.createGhost();
+        }
         this.ghostRenderer.colour = 0xffffff;
 
         this.setSprite(DEFAULT_SPRITE);

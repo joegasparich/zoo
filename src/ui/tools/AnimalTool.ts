@@ -17,7 +17,6 @@ export default class AnimalTool extends Tool {
         this.assetPath = data.assetPath;
         this.currentAnimal = AssetManager.getJSON(this.assetPath) as AnimalData;
 
-        ghost.reset();
         ghost.setSprite(this.currentAnimal.sprite);
         ghost.setScale(0.5);
         ghost.setSnap(false);

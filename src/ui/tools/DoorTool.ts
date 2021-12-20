@@ -17,7 +17,6 @@ export default class DoorTool extends Tool {
 
     public set(ghost: PlacementGhost): void {
         this.ghost = ghost;
-        this.ghost.reset();
 
         this.currentWall = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
         const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);

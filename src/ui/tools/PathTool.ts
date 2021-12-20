@@ -24,7 +24,6 @@ export default class PathTool extends Tool {
         this.pathData = AssetManager.getJSON(this.assetPath) as PathData;
         const spriteSheet = Path.pathSprites.get(this.pathData.spriteSheet);
 
-        this.ghost.reset();
         this.ghost.setSpriteSheet(spriteSheet, 0);
         this.ghost.setPivot(new Vector(0.5, 0.75));
         this.ghost.setSnap(true);

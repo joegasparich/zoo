@@ -20,7 +20,11 @@ export enum NodeType {
     OPEN = 1,
     PATH = 2,
 }
-const defaultNodes = [NodeType.OPEN, NodeType.PATH];
+
+export type AllowedNodes = {
+    type: NodeType;
+    cost: number;
+}[];
 
 export default class PathfindingGrid {
     private pathFinder: Pathfinder;
@@ -90,13 +94,16 @@ export default class PathfindingGrid {
      * @param start The start co ordinate
      * @param end The end co ordinate
      */
-    public getPath(start: Vector, end: Vector, allowedNodes = defaultNodes): Promise<Vector[] | void> {
+    public getPath(start: Vector, end: Vector, allowedNodes: AllowedNodes): Promise<Vector[] | void> {
         if (!this.isPositionInGrid(start.x, start.y) || !this.isPositionInGrid(end.x, end.y)) return Promise.resolve();
-        if (!allowedNodes.includes(this.grid[start.x][start.y])) return Promise.resolve(); // TODO: start from next nearest tile?
-        if (!allowedNodes.includes(this.grid[end.x][end.y])) return Promise.resolve(); // TODO: potentially pick adjacent tile?
+        if (!allowedNodes.find(node => node.type === this.grid[start.x][start.y])) return Promise.resolve(); // TODO: start from next nearest tile?
+        if (!allowedNodes.find(node => node.type === this.grid[end.x][end.y])) return Promise.resolve(); // TODO: potentially pick adjacent tile?
         if (start.equals(end)) return Promise.resolve();
 
-        if (allowedNodes) this.pathFinder.setAcceptableTiles([...allowedNodes]);
+        this.pathFinder.setAcceptableTiles([...allowedNodes.map(node => node.type)]);
+        allowedNodes.forEach(node => {
+            this.pathFinder.setTileCost(node.type, node.cost);
+        });
 
         console.log("Getting path from " + start + " to " + end);
         return new Promise(resolve => {

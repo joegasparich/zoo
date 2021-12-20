@@ -17,7 +17,6 @@ export default class TileObjectTool extends Tool {
         this.assetPath = data.assetPath;
         this.currentObject = AssetManager.getJSON(this.assetPath) as TileObjectData;
 
-        ghost.reset();
         ghost.setSprite(this.currentObject.sprite);
         ghost.setPivot(
             new Vector(

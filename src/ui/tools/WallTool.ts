@@ -21,7 +21,6 @@ export default class WallTool extends Tool {
 
     public set(ghost: PlacementGhost): void {
         this.ghost = ghost;
-        this.ghost.reset();
 
         this.assetPath = Assets.WALLS.IRON_BAR;
         this.wallData = AssetManager.getJSON(this.assetPath) as WallData;
