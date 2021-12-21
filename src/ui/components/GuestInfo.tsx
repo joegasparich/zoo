@@ -4,31 +4,32 @@ import { css, jsx, SerializedStyles } from "@emotion/core";
 import { UIComponent, UIComponentProps } from ".";
 import Game from "Game";
 import { Entity } from "entities";
+import { Assets } from "consts";
 import Needs from "./Needs";
 
-const ANIMAL_UPDATE_INTERVAL = 1000;
+const GUEST_UPDATE_INTERVAL = 1000;
 
-interface AnimalInfoProps extends UIComponentProps {
-    animalId: string;
+interface GuestInfoProps extends UIComponentProps {
+    guestId: string;
     closeWindow?: () => void;
 }
 
-interface AnimalInfoState {
-    animal: Entity;
+interface GuestInfoState {
+    guest: Entity;
 }
-const defaultState: AnimalInfoState = {
-    animal: undefined,
+const defaultState: GuestInfoState = {
+    guest: undefined,
 };
 
-export default class AnimalInfo extends UIComponent<AnimalInfoProps, AnimalInfoState> {
+export default class GuestInfo extends UIComponent<GuestInfoProps, GuestInfoState> {
     private updateIntervalHandle: number;
 
-    public constructor(props: AnimalInfoProps) {
+    public constructor(props: GuestInfoProps) {
         super(props);
 
         this.state = defaultState;
 
-        this.updateIntervalHandle = window.setInterval(this.updateAnimal.bind(this), ANIMAL_UPDATE_INTERVAL);
+        this.updateIntervalHandle = window.setInterval(this.updateAnimal.bind(this), GUEST_UPDATE_INTERVAL);
     }
 
     public componentDidMount(): void {
@@ -39,16 +40,16 @@ export default class AnimalInfo extends UIComponent<AnimalInfoProps, AnimalInfoS
     }
 
     private updateAnimal(): void {
-        const animal = Game.getEntityById(this.props.animalId);
+        const guest = Game.getEntityById(this.props.guestId);
 
-        if (!animal?.exists) {
+        if (!guest?.exists) {
             this.props.closeWindow?.();
             return;
         }
 
         // Setting the state to the same animal will force a rerender
         this.setState({
-            animal,
+            guest,
         });
     }
 
@@ -76,21 +77,18 @@ export default class AnimalInfo extends UIComponent<AnimalInfoProps, AnimalInfoS
     }
 
     protected getContent(): JSX.Element {
-        if (!this.state.animal) {
+        if (!this.state.guest) {
             return <div />;
         }
 
-        const { animal } = this.state;
-        const animalComponent = animal.getComponent("ANIMAL_BEHAVIOUR_COMPONENT");
+        const { guest } = this.state;
+        const guestComponent = guest.getComponent("GUEST_COMPONENT");
 
         return (
             <div className="animal">
-                <img className="image" src={animalComponent.data.sprite} />
-                <p>Species: {animalComponent.data.name}</p>
-                <p>Scientific Name: {animalComponent.data.species}</p>
-                <p>Class: {animalComponent.data.class}</p>
+                <img className="image" src={Assets.SPRITES.GUEST} />
                 <p>Needs: </p>
-                <Needs needs={animalComponent.needs.needs} />
+                <Needs needs={guestComponent.needs.needs} />
             </div>
         );
     }

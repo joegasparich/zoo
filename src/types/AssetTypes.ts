@@ -57,6 +57,10 @@ export interface TileObjectData {
     scale?: number;
     size: Vector;
     sprite: string;
+    spriteSheet: string;
+    cellHeight: number;
+    cellWidth: number;
+    rotations: number;
     canPlaceOnSlopes: boolean;
     canPlaceInWater: boolean;
     type: TileObjectType;

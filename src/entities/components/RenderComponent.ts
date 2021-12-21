@@ -116,6 +116,12 @@ export default class RenderComponent extends Component {
         }
     }
 
+    public setSpriteSheetIndex(index: number): void {
+        if (!this.spriteSheet) return;
+
+        this.updateSprite(new Sprite(this.spriteSheet.getTextureByIndex(index)));
+    }
+
     protected updateSprite(sprite: Sprite): void {
         if (!sprite) {
             console.error("Failed to update sprite");

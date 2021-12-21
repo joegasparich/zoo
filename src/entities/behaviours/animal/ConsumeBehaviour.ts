@@ -17,15 +17,20 @@ interface ConsumeData extends BehaviourData {
 
 export default class ConsumeBehaviour implements Behaviour {
     public id: ANIMAL_BEHAVIOUR_STATE = "CONSUME";
+
     private target: Entity;
     private isConsuming: boolean;
 
-    public constructor(public needType?: NeedType) {}
+    public constructor(private animal: AnimalBehaviourComponent, public needType?: NeedType) {}
 
-    public update(delta: number, animal: AnimalBehaviourComponent): void {
+    public exit(): void {
+        this.animal.pathfinder?.clearPath();
+    }
+
+    public update(delta: number): void {
         // Eat snack
         if (this.isConsuming) {
-            const need = animal.needs.getNeedByType(this.needType);
+            const need = this.animal.needs.getNeedByType(this.needType);
             const consumable = this.target.getComponent("CONSUMABLE_COMPONENT");
 
             need.value += consumable.consume(CONSUME_SPEED);
@@ -33,11 +38,11 @@ export default class ConsumeBehaviour implements Behaviour {
             if (need.value >= Need.MAX_NEED) {
                 // Full
                 need.value = Need.MAX_NEED;
-                animal.stateMachine.setState(new IdleBehaviour());
+                this.animal.stateMachine.setState(new IdleBehaviour(this.animal));
             }
             if (!this.target.exists) {
                 // Snack finished
-                animal.stateMachine.setState(new IdleBehaviour());
+                this.animal.stateMachine.setState(new IdleBehaviour(this.animal));
             }
 
             return;
@@ -47,28 +52,29 @@ export default class ConsumeBehaviour implements Behaviour {
         if (!this.target && this.needType) {
             const consumables =
                 this.needType === NeedType.Hunger
-                    ? animal.exhibit.findFoodOfType(animal.data.diet)
-                    : animal.exhibit.findConsumables(this.needType);
+                    ? this.animal.exhibit.findFoodOfType(this.animal.data.diet)
+                    : this.animal.exhibit.findConsumables(this.needType);
 
             this.target = consumables.reduce((prev, current) =>
-                Vector.Distance(current.position, animal.entity.position) <
-                Vector.Distance(prev.position, animal.entity.position)
+                Vector.Distance(current.position, this.animal.entity.position) <
+                Vector.Distance(prev.position, this.animal.entity.position)
                     ? current
                     : prev,
             );
             if (this.target) {
-                animal.pathfinder.pathTo(this.target.position);
+                this.animal.pathfinder.pathTo(this.target.position);
             }
         }
 
         // Move to snack
         if (this.target) {
-            if (animal.pathfinder.followPath()) {
-                animal.inputVector = Vector.Zero();
+            if (this.animal.pathfinder.followPath()) {
+                this.animal.inputVector = Vector.Zero();
                 this.isConsuming = true;
             } else {
-                animal.inputVector =
-                    animal.pathfinder.currentTarget?.subtract(animal.entity.position).normalize() ?? Vector.Zero();
+                this.animal.inputVector =
+                    this.animal.pathfinder.currentTarget?.subtract(this.animal.entity.position).normalize() ??
+                    Vector.Zero();
             }
         }
     }

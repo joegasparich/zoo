@@ -58,10 +58,10 @@ export default class ToolManager {
         this.activeTool.update();
 
         if (this.showRadius()) {
-            if (Game.input.isInputPressed(Inputs.IncreaseBrushSize)) {
+            if (Game.input.isInputPressed(Inputs.ToolModRight)) {
                 this.setRadius(Math.min(this.radius + 0.125, 2.5));
             }
-            if (Game.input.isInputPressed(Inputs.DecreaseBrushSize)) {
+            if (Game.input.isInputPressed(Inputs.ToolModLeft)) {
                 this.setRadius(Math.max(this.radius - 0.125, 0.25));
             }
         }

@@ -66,6 +66,10 @@ export default class PlacementGhost {
         this.ghostRenderer.setSpriteSheet(spriteSheet, index);
         this.ghostRenderer.visible = this.spriteVisible;
     }
+    public setSpriteSheetIndex(index: number): void {
+        this.ghostRenderer.setSpriteSheetIndex(index);
+        this.ghostRenderer.visible = this.spriteVisible;
+    }
 
     public setAlpha(alpha: number): void {
         this.ghostRenderer.alpha = alpha;

@@ -2,7 +2,7 @@ export const SPRITES = {
     HERO: "/assets/img/hero.png",
     GUEST: "/assets/img/guest.png",
     TREE: "/assets/img/tree.png",
-    BUILDING: "/assets/img/building.png",
+    ENTRANCE: "/assets/img/entrance.png",
 };
 
 export const UI = {
@@ -35,6 +35,7 @@ export const UI = {
 
 export const SPRITESHEETS = {
     DUDE_RUN: "/assets/img/dude_run.png",
+    BUILDING: "/assets/img/building.png",
 };
 
 export const ANIMALS = {

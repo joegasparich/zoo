@@ -6,14 +6,15 @@ import Mediator from "./Mediator";
 import { registerPixiInspector } from "./helpers/util";
 import { Canvas } from "ui/components";
 import Camera from "Camera";
-import MapGrid from "world/MapGrid";
 import { Entity } from "entities";
 import Vector from "vector";
 import Graphics from "Graphics";
 import { Config, GameEvent, Inputs, RenderLayers } from "consts";
 import ZooScene from "scenes/ZooScene";
 import UIManager from "ui/UIManager";
+import MapGrid from "world/MapGrid";
 import World from "world/World";
+import Zoo from "Zoo";
 
 type DebugSettings = {
     showEntities: boolean;
@@ -62,8 +63,13 @@ class Game {
 
     public canvas: Canvas;
     public camera: Camera;
+
+    // Declared here for easy global access but controlled from the scene
+    // Because fuck (Game.sceneManager.getCurrentScene() as ZooScene).map
+    // And also fuck passing these refs through every god damn class
     public map: MapGrid;
     public world: World;
+    public zoo: Zoo;
 
     private entities: Map<string, Entity>;
     private entitiesToAdd: Entity[];
@@ -127,9 +133,7 @@ class Game {
         this.camera = new Camera(new Vector(4, 4), 1, this.stage);
         this.camera.scale = Config.CAMERA_SCALE;
 
-        this.map = new MapGrid();
-
-        this.sceneManager = new SceneManager(this.map);
+        this.sceneManager = new SceneManager();
         this.sceneManager.loadScene(new ZooScene(), (progress: number) => {
             console.log(`Map Load Progress: ${progress}%`);
         });
@@ -194,7 +198,7 @@ class Game {
     protected preUpdate(delta: number): void {
         // Setup actions
         const scene = this.sceneManager.getCurrentScene();
-        scene && scene.preUpdate();
+        scene && scene.preUpdate(delta);
         Graphics.preUpdate();
 
         this.entities.forEach(entity => {
@@ -205,7 +209,7 @@ class Game {
     protected update(delta: number): void {
         // Game actions
         const scene = this.sceneManager.getCurrentScene();
-        scene && scene.update();
+        scene && scene.update(delta);
         UIManager.update(delta);
 
         this.entities.forEach(entity => {
@@ -216,12 +220,8 @@ class Game {
     protected postUpdate(delta: number): void {
         // Rendering actions
         const scene = this.sceneManager.getCurrentScene();
-        scene && scene.postUpdate();
+        scene && scene.postUpdate(delta);
 
-        this.drawDebug();
-
-        this.map.postUpdate();
-        this.world.postUpdate(delta);
         UIManager.postUpdate(delta);
 
         this.entities.forEach(entity => {
@@ -284,16 +284,6 @@ class Game {
             this.entities.delete(entityId);
         });
         this.entitiesToDelete = [];
-    }
-
-    private drawDebug(): void {
-        if (this.debugSettings.showEntities) this.entities.forEach(entity => entity.drawDebug());
-        if (this.debugSettings.showMapGrid) this.map.drawDebug();
-        if (this.debugSettings.showPathfinding) this.map.pathfindingGrid.drawDebug();
-        if (this.debugSettings.showWallGrid) this.world.wallGrid.drawDebug();
-        if (this.debugSettings.showElevation) this.world.elevationGrid.drawDebug();
-        if (this.debugSettings.showWater) this.world.waterGrid.drawDebug();
-        if (this.debugSettings.showPath) this.world.pathGrid.drawDebug();
     }
 }
 

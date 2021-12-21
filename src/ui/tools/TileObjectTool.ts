@@ -10,27 +10,46 @@ import Vector from "vector";
 export default class TileObjectTool extends Tool {
     public type = ToolType.TileObject;
 
+    private ghost: PlacementGhost;
+
     private assetPath: string;
     private currentObject: TileObjectData;
+    private rotation = 0;
 
     public set(ghost: PlacementGhost, data?: Record<string, any>): void {
+        this.ghost = ghost;
         this.assetPath = data.assetPath;
         this.currentObject = AssetManager.getJSON(this.assetPath) as TileObjectData;
 
-        ghost.setSprite(this.currentObject.sprite);
-        ghost.setPivot(
+        if (this.currentObject.spriteSheet) {
+            this.ghost.setSpriteSheet(AssetManager.getSpriteSheet(this.currentObject.spriteSheet), 0);
+        } else {
+            this.ghost.setSprite(this.currentObject.sprite);
+        }
+        this.ghost.setPivot(
             new Vector(
                 (1 / this.currentObject.size.x) * this.currentObject.pivot.x,
                 (1 / this.currentObject.size.y) * this.currentObject.pivot.y,
             ),
         );
-        ghost.setScale(this.currentObject.scale || 1);
-        ghost.setSnap(true);
-        ghost.applyElevation();
-        ghost.canPlaceFunction = this.canPlace.bind(this);
+        this.ghost.setScale(this.currentObject.scale || 1);
+        this.ghost.setSnap(true);
+        this.ghost.applyElevation();
+        this.ghost.canPlaceFunction = this.canPlace.bind(this);
     }
 
     public update(): void {
+        if (this.currentObject.rotations) {
+            if (Game.input.isInputPressed(Inputs.ToolModRight)) {
+                this.rotation = (this.rotation + 1) % this.currentObject.rotations;
+                this.ghost.setSpriteSheetIndex(this.rotation);
+            }
+            if (Game.input.isInputPressed(Inputs.ToolModLeft)) {
+                this.rotation = (this.rotation - 1 + this.currentObject.rotations) % this.currentObject.rotations;
+                this.ghost.setSpriteSheetIndex(this.rotation);
+            }
+        }
+
         const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
 
         if (Game.input.isInputPressed(Inputs.LeftMouse)) {
@@ -38,6 +57,7 @@ export default class TileObjectTool extends Tool {
                 const placePos: Vector = mouseWorldPos.floor();
 
                 const tileObject = createTileObject(this.assetPath, placePos, this.currentObject.size);
+                tileObject.getComponent("TILE_OBJECT_COMPONENT").rotation = this.rotation;
 
                 this.toolManager.pushAction({
                     name: `Place ${this.currentObject.name}`,

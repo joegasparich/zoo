@@ -27,8 +27,6 @@ export enum Orientation {
 }
 
 export default class Wall {
-    public static wallSprites = new Map<string, SpriteSheet>();
-
     public static wallToWorldPos(wallPos: Vector, orientation: Orientation): Vector {
         if (orientation === Orientation.Horizontal) {
             return new Vector(wallPos.x / 2, wallPos.y);
@@ -59,7 +57,7 @@ export default class Wall {
             const data = AssetManager.getJSON(assetPath) as WallData;
 
             this.data = data;
-            this.spriteSheet = Wall.wallSprites.get(this.data.spriteSheet);
+            this.spriteSheet = AssetManager.getSpriteSheet(this.data.spriteSheet);
             this.exists = true;
 
             this.updateSprite();

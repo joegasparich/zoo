@@ -19,7 +19,7 @@ export default class DoorTool extends Tool {
         this.ghost = ghost;
 
         this.currentWall = AssetManager.getJSON(Assets.WALLS.IRON_BAR) as WallData;
-        const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+        const spriteSheet = AssetManager.getSpriteSheet(this.currentWall.spriteSheet);
         ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.DoorHorizontal);
         ghost.setPivot(new Vector(0.5, 1));
         ghost.setSnap(true);
@@ -62,7 +62,7 @@ export default class DoorTool extends Tool {
     }
 
     private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
-        const spriteSheet = Wall.wallSprites.get(this.currentWall.spriteSheet);
+        const spriteSheet = AssetManager.getSpriteSheet(this.currentWall.spriteSheet);
         const wall = Game.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex(true) || [0, 0];
         ghost.setSpriteSheet(spriteSheet, spriteIndex);

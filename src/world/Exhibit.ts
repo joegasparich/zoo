@@ -181,7 +181,7 @@ export default class Exhibit {
 
     public delete(): void {
         this.animals.forEach(animal => {
-            animal.getComponent("ANIMAL_BEHAVIOUR_COMPONENT").findExhibit();
+            animal.getComponent("ANIMAL_BEHAVIOUR_COMPONENT")?.findExhibit();
         });
 
         Mediator.unsubscribe(WorldEvent.BIOMES_UPDATED, this.biomeListener);

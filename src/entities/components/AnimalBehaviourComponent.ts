@@ -47,7 +47,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
     public data: AnimalData;
     public exhibit?: Exhibit;
 
-    public stateMachine = new StateMachine<Behaviour>(new IdleBehaviour());
+    public stateMachine = new StateMachine<Behaviour>(new IdleBehaviour(this));
     private nextStateChange = 0;
     private areaListener: string;
 
@@ -80,7 +80,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
     }
 
     public update(delta: number): void {
-        this.stateMachine.update(delta, this);
+        this.stateMachine.update(delta);
 
         if (Date.now() > this.nextStateChange) {
             this.checkForStateChange();
@@ -101,7 +101,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
                             ? this.exhibit.findFoodOfType(this.data.diet).length
                             : this.exhibit.findConsumables(need.type).length
                     ) {
-                        this.stateMachine.setState(new ConsumeBehaviour(need.type));
+                        this.stateMachine.setState(new ConsumeBehaviour(this, need.type));
                         break;
                     }
                 }
@@ -153,7 +153,7 @@ export default class AnimalBehaviourComponent extends InputComponent {
 
         this.setAsset(data.assetPath);
 
-        const state = createBehaviour(data.behaviourData);
+        const state = createBehaviour(data.behaviourData, this);
         state.load(data.behaviourData);
 
         this.stateMachine.setState(state);

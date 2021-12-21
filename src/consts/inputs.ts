@@ -32,11 +32,11 @@ const ZoomOut: Input = {
     name: "Zoom Out",
     buttons: [InputManager.KEY.DOT],
 };
-const IncreaseBrushSize: Input = {
+const ToolModRight: Input = {
     name: "Increase Brush Size",
     buttons: [InputManager.KEY.RIGHT_SQUARE_BRACKET],
 };
-const DecreaseBrushSize: Input = {
+const ToolModLeft: Input = {
     name: "Decrease Brush Size",
     buttons: [InputManager.KEY.LEFT_SQUARE_BRACKET],
 };
@@ -50,8 +50,8 @@ const Inputs = {
     Right,
     ZoomIn,
     ZoomOut,
-    IncreaseBrushSize,
-    DecreaseBrushSize,
+    ToolModRight,
+    ToolModLeft,
 };
 
 export default Inputs;

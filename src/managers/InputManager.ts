@@ -1,4 +1,3 @@
-import Game from "Game";
 import * as util from "helpers/util";
 import Vector from "vector";
 
@@ -53,6 +52,12 @@ export default class InputManager {
     private inputsUp: string[];
     private inputsDown: string[];
 
+    private keyDownListener: (event: KeyboardEvent) => void;
+    private keyUpListener: (event: KeyboardEvent) => void;
+    private mouseMoveListener: (event: MouseEvent) => void;
+    private mouseDownListener: (event: MouseEvent) => void;
+    private mouseUpListener: (event: MouseEvent) => void;
+
     public constructor() {
         const canvas = document.getElementsByTagName("canvas")[0];
         this.canvasPos = new Vector(canvas.getBoundingClientRect().x, canvas.getBoundingClientRect().y);
@@ -67,7 +72,13 @@ export default class InputManager {
         this.keysDown = [];
         this.keysUp = [];
 
-        document.addEventListener("keydown", (event: KeyboardEvent) => {
+        //-- Mouse --//
+        this.mouseButtons = [];
+        this.mouseButtonsDown = [];
+        this.mouseButtonsUp = [];
+        this.mousePos = Vector.Zero();
+
+        this.keyDownListener = (event: KeyboardEvent) => {
             if (Object.values(KEY).includes(event.key as KEY)) {
                 event.preventDefault();
             }
@@ -80,28 +91,21 @@ export default class InputManager {
             if (this.inputsHeld.includes(input)) return;
             this.inputsHeld.push(input);
             this.inputsDown.push(input);
-        });
-
-        document.addEventListener("keyup", (event: KeyboardEvent) => {
+        };
+        this.keyUpListener = (event: KeyboardEvent) => {
             util.removeItem(this.keys, event.key);
             this.keysUp.push(event.key);
 
             const input = this.registeredInputs.get(event.key as KEY);
             util.removeItem(this.inputsHeld, input);
             this.inputsUp.push(input);
-        });
+        };
 
-        //-- Mouse --//
-        this.mouseButtons = [];
-        this.mouseButtonsDown = [];
-        this.mouseButtonsUp = [];
-
-        this.mousePos = Vector.Zero();
-        document.addEventListener("mousemove", (event: MouseEvent) => {
+        this.mouseMoveListener = (event: MouseEvent) => {
             this.mousePos = new Vector(event.clientX, event.clientY).subtract(this.canvasPos);
-        });
+        };
 
-        document.addEventListener("mousedown", (event: MouseEvent) => {
+        this.mouseDownListener = (event: MouseEvent) => {
             if (!(event.target instanceof HTMLCanvasElement)) {
                 // Target was UI
                 return;
@@ -118,9 +122,9 @@ export default class InputManager {
             if (this.inputsHeld.includes(input)) return;
             this.inputsHeld.push(input);
             this.inputsDown.push(input);
-        });
+        };
 
-        document.addEventListener("mouseup", (event: MouseEvent) => {
+        this.mouseUpListener = (event: MouseEvent) => {
             if (!(event.target instanceof HTMLCanvasElement)) {
                 // Target was UI
                 return;
@@ -133,7 +137,21 @@ export default class InputManager {
             const input = this.registeredInputs.get(event.button as MOUSE_BUTTON);
             util.removeItem(this.inputsHeld, input);
             this.inputsUp.push(input);
-        });
+        };
+
+        document.addEventListener("keydown", this.keyDownListener);
+        document.addEventListener("keyup", this.keyUpListener);
+        document.addEventListener("mousemove", this.mouseMoveListener);
+        document.addEventListener("mousedown", this.mouseDownListener);
+        document.addEventListener("mouseup", this.mouseUpListener);
+    }
+
+    public delete() {
+        document.removeEventListener("keydown", this.keyDownListener);
+        document.removeEventListener("keyup", this.keyUpListener);
+        document.removeEventListener("mousemove", this.mouseMoveListener);
+        document.removeEventListener("mousedown", this.mouseDownListener);
+        document.removeEventListener("mouseup", this.mouseUpListener);
     }
 
     public clearKeys(): void {

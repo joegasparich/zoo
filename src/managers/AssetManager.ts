@@ -1,15 +1,16 @@
 import { LoaderResource, Loader, Texture } from "pixi.js";
+import SpriteSheet, { SpriteSheetData } from "SpriteSheet";
 
 import TileSet, { TileSetData } from "TileSet";
 
 class AssetManager {
     private loader: Loader;
     private preloadedAssets: string[];
-    private tilesets: Map<string, TileSet>;
+    private spriteSheets: Map<string, SpriteSheet>;
 
     public constructor() {
         this.loader = new Loader();
-        this.tilesets = new Map();
+        this.spriteSheets = new Map();
     }
 
     public preLoadAssets(assets: string[]): void {
@@ -39,16 +40,22 @@ class AssetManager {
             return null;
         }
         const existingAssets = assets.filter(asset => this.loader.resources[asset]);
-        assets = assets.filter(asset => !this.loader.resources[asset]);
+        const newAssets = assets.filter(asset => !this.loader.resources[asset]);
 
-        this.loader.add(assets);
+        if (!newAssets.length) {
+            return Promise.resolve(existingAssets.map(asset => this.loader.resources[asset]));
+        }
+
+        this.loader.add(newAssets);
         const progressListener: (loader: Loader) => void = loader => onProgress && onProgress(loader.progress);
         const progressListenerRef = this.loader.onProgress.add(progressListener);
 
         return new Promise(resolve => {
             this.loader.load((loader, resources) => {
                 this.loader.onProgress.detach(progressListenerRef);
-                const res = assets.map(asset => resources[asset]).concat(existingAssets.map(asset => resources[asset]));
+                const res = newAssets
+                    .map(asset => resources[asset])
+                    .concat(existingAssets.map(asset => resources[asset]));
                 resolve(res);
             });
         });
@@ -78,21 +85,21 @@ class AssetManager {
         return Object.values(type).map(asset => this.loader.resources[asset].texture);
     }
 
-    public createTileset(data: TileSetData): TileSet {
-        if (this.tilesets.has(data.path)) return this.tilesets.get(data.path);
+    public createSpriteSheet(data: SpriteSheetData): SpriteSheet {
+        if (this.spriteSheets.has(data.imageUrl)) return this.spriteSheets.get(data.imageUrl);
 
-        const tileset = new TileSet(data);
-        this.tilesets.set(data.path, tileset);
-        return tileset;
+        const spriteSheet = new SpriteSheet(data);
+        this.spriteSheets.set(data.imageUrl, spriteSheet);
+        return spriteSheet;
     }
 
-    public getTileset(key: string): TileSet {
-        if (!this.tilesets.has(key)) {
-            console.error(`Tried to get unregistered tileset: ${key}`);
+    public getSpriteSheet(key: string): SpriteSheet {
+        if (!this.spriteSheets.has(key)) {
+            console.error(`Tried to get unregistered spritesheet: ${key}`);
             return undefined;
         }
 
-        return this.tilesets.get(key);
+        return this.spriteSheets.get(key);
     }
 }
 

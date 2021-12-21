@@ -96,7 +96,7 @@ export default class AreaPathFollowComponent extends PathFollowComponent {
     }
 
     private resetAreaPath(): void {
-        super.resetPath();
+        super.clearPath();
 
         this.areaPath = undefined;
         this.currentArea = undefined;

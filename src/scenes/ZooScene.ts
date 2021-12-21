@@ -2,10 +2,13 @@ import Game from "Game";
 import World from "world/World";
 import UIManager from "ui/UIManager";
 import { Scene } from "./Scene";
-import { MapCell } from "world/MapGrid";
+import MapGrid, { MapCell } from "world/MapGrid";
 import Vector from "vector";
-import { createDude, createGuest } from "helpers/entityGenerators";
+import { createDude } from "helpers/entityGenerators";
 import { Assets, Side } from "consts";
+import { Entity } from "entities";
+import { RenderComponent } from "entities/components";
+import Zoo from "Zoo";
 
 const MAP_SIZE = 20;
 
@@ -17,10 +20,25 @@ export default class ZooScene extends Scene {
     }
 
     public start(): void {
+        Game.map = new MapGrid();
+
+        Game.zoo = new Zoo();
         this.generateMap();
 
+        Game.zoo.start();
+
         createDude();
-        createGuest(new Vector(5, 5));
+    }
+
+    public update(delta: number): void {
+        Game.zoo.update();
+    }
+
+    public postUpdate(delta: number): void {
+        Game.map.postUpdate();
+        Game.world.postUpdate(delta);
+
+        this.drawDebug();
     }
 
     public stop(): void {
@@ -28,9 +46,15 @@ export default class ZooScene extends Scene {
         Game.world.reset();
         Game.map.clearMap();
         UIManager.reset();
+
+        Game.world = undefined;
+        Game.map = undefined;
+        Game.zoo = undefined;
     }
 
     private async generateMap(): Promise<void> {
+        console.log("Generating Map");
+
         const cells: MapCell[][] = [];
 
         // Place Grass
@@ -74,5 +98,18 @@ export default class ZooScene extends Scene {
                 true,
             );
         }
+
+        Game.zoo.entrance = new Entity(new Vector(MAP_SIZE / 2, 0));
+        Game.zoo.entrance.addComponent(new RenderComponent(Assets.SPRITES.ENTRANCE, undefined, new Vector(0.5, 0.5)));
+    }
+
+    private drawDebug(): void {
+        if (Game.debugSettings.showEntities) Game.getEntities().forEach(entity => entity.drawDebug());
+        if (Game.debugSettings.showMapGrid) Game.map.drawDebug();
+        if (Game.debugSettings.showPathfinding) Game.map.pathfindingGrid.drawDebug();
+        if (Game.debugSettings.showWallGrid) Game.world.wallGrid.drawDebug();
+        if (Game.debugSettings.showElevation) Game.world.elevationGrid.drawDebug();
+        if (Game.debugSettings.showWater) Game.world.waterGrid.drawDebug();
+        if (Game.debugSettings.showPath) Game.world.pathGrid.drawDebug();
     }
 }

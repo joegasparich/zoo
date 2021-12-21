@@ -24,7 +24,7 @@ export default class WallTool extends Tool {
 
         this.assetPath = Assets.WALLS.IRON_BAR;
         this.wallData = AssetManager.getJSON(this.assetPath) as WallData;
-        const spriteSheet = Wall.wallSprites.get(this.wallData.spriteSheet);
+        const spriteSheet = AssetManager.getSpriteSheet(this.wallData.spriteSheet);
         this.ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.Horizontal);
         this.ghost.setPivot(new Vector(0.5, 1));
         this.ghost.setSnap(true);
@@ -64,7 +64,7 @@ export default class WallTool extends Tool {
             for (let w = 0; w < this.wallGhosts.length; w++) {
                 const ghost = this.wallGhosts[w];
                 ghost.setPosition(new Vector(i, j));
-                this.setSprite(ghost, new Vector(-0.5, 0.5), dragQuadrant);
+                this.updateSprite(ghost, new Vector(-0.5, 0.5), dragQuadrant);
 
                 if (horizontal) {
                     i += Math.sign(mouseWorldPos.floor().x - i);
@@ -123,14 +123,13 @@ export default class WallTool extends Tool {
         this.wallGhosts?.forEach(ghost => ghost.postUpdate());
 
         const quadrant = Game.map.getTileQuadrantAtPos(mouseWorldPos);
-        this.setSprite(this.ghost, Vector.Zero(), quadrant);
+        this.updateSprite(this.ghost, Vector.Zero(), quadrant);
     }
 
-    private setSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
-        const spriteSheet = Wall.wallSprites.get(this.wallData.spriteSheet);
+    private updateSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
         const wall = Game.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex() || [0, 0];
-        ghost.setSpriteSheet(spriteSheet, spriteIndex);
+        ghost.setSpriteSheetIndex(spriteIndex);
 
         switch (side) {
             case Side.North:

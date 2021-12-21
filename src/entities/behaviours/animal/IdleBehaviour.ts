@@ -12,25 +12,34 @@ interface IdleData extends BehaviourData {
 
 export default class IdleBehaviour implements Behaviour {
     public id: ANIMAL_BEHAVIOUR_STATE = "IDLE";
+
     private timer = 0;
 
-    public update(delta: number, animal: AnimalBehaviourComponent): void {
+    public constructor(private animal: AnimalBehaviourComponent) {}
+
+    public exit(): void {
+        this.animal.pathfinder?.clearPath();
+        this.animal.inputVector = Vector.Zero();
+    }
+
+    public update(delta: number): void {
         // Move randomly
         const currentTime = new Date().getTime();
         if (currentTime > this.timer) {
             if (randomBool()) {
-                animal.pathfinder.pathTo(animal.exhibit?.area.getRandomPos());
+                this.animal.pathfinder.pathTo(this.animal.exhibit?.area.getRandomPos());
             } else {
-                animal.pathfinder.resetPath();
-                animal.inputVector = Vector.Zero();
+                this.animal.pathfinder.clearPath();
+                this.animal.inputVector = Vector.Zero();
             }
             this.timer = currentTime + RANDOM_MOVE_INTERVAL;
         }
 
-        if (animal.pathfinder.hasPath()) {
-            animal.pathfinder.followPath();
-            animal.inputVector =
-                animal.pathfinder.currentTarget?.subtract(animal.entity.position).normalize() ?? Vector.Zero();
+        if (this.animal.pathfinder.hasPath()) {
+            this.animal.pathfinder.followPath();
+            this.animal.inputVector =
+                this.animal.pathfinder.currentTarget?.subtract(this.animal.entity.position).normalize() ??
+                Vector.Zero();
         }
     }
 

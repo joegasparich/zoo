@@ -17,8 +17,6 @@ export enum PathSpriteIndex {
 }
 
 export default class Path {
-    public static pathSprites = new Map<string, SpriteSheet>();
-
     public static getSpriteIndex(pos: Vector): [index: PathSpriteIndex, elevation: number] {
         pos = pos.floor();
         switch (Game.world.elevationGrid.getSlopeVariant(pos)) {
@@ -48,7 +46,7 @@ export default class Path {
             const data = AssetManager.getJSON(assetPath) as PathData;
 
             this.data = data;
-            this.spriteSheet = Path.pathSprites.get(this.data.spriteSheet);
+            this.spriteSheet = AssetManager.getSpriteSheet(this.data.spriteSheet);
 
             this.updateSprite();
         }

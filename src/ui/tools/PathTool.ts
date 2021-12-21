@@ -22,7 +22,7 @@ export default class PathTool extends Tool {
         this.ghost = ghost;
         this.assetPath = data.assetPath;
         this.pathData = AssetManager.getJSON(this.assetPath) as PathData;
-        const spriteSheet = Path.pathSprites.get(this.pathData.spriteSheet);
+        const spriteSheet = AssetManager.getSpriteSheet(this.pathData.spriteSheet);
 
         this.ghost.setSpriteSheet(spriteSheet, 0);
         this.ghost.setPivot(new Vector(0.5, 0.75));
@@ -113,7 +113,7 @@ export default class PathTool extends Tool {
     }
 
     private setSprite(ghost: PlacementGhost, offset: Vector): void {
-        const spriteSheet = Path.pathSprites.get(this.pathData.spriteSheet);
+        const spriteSheet = AssetManager.getSpriteSheet(this.pathData.spriteSheet);
         const [spriteIndex, elevation] = Path.getSpriteIndex(ghost.getPosition()) ?? [];
 
         ghost.setSpriteSheet(spriteSheet, spriteIndex);

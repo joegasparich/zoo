@@ -23,6 +23,7 @@ export default class Entity {
     private hasStarted: boolean;
 
     public constructor(public position: Vector, public saveable = true) {
+        this.position = this.position.clone(); // Ensure new vector
         this.id = uuid();
         this.componentIdMap = new Map();
         this.componentTypeMap = new Map();

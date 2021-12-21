@@ -1,9 +1,9 @@
 import { State } from ".";
 
-export default class StateMachine<T extends State> {
-    private currentState: T;
+export default class StateMachine<S extends State> {
+    private currentState: S;
 
-    public constructor(initialState: T) {
+    public constructor(initialState: S) {
         this.currentState = initialState;
     }
 
@@ -11,13 +11,13 @@ export default class StateMachine<T extends State> {
         this.currentState.update && this.currentState.update(delta, ...opts);
     }
 
-    public setState(newState: T): void {
+    public setState(newState: S): void {
         this.currentState.exit?.();
         this.currentState = newState;
         this.currentState.enter?.();
     }
 
-    public getState(): T {
+    public getState(): S {
         return this.currentState;
     }
 }

@@ -53,7 +53,7 @@ export default class PathFollowComponent extends Component {
     }
 
     public async pathTo(location: Vector): Promise<boolean> {
-        this.resetPath();
+        this.clearPath();
 
         if (!location) return;
 
@@ -84,7 +84,7 @@ export default class PathFollowComponent extends Component {
         if (Vector.Distance(this.entity.position, this.currentTarget) < DISTANCE_TO_NODE) {
             if (this.path.length < 1) {
                 // Path complete
-                this.resetPath();
+                this.clearPath();
                 return true;
             }
             this.currentTarget = this.path.shift();
@@ -97,7 +97,7 @@ export default class PathFollowComponent extends Component {
         return false;
     }
 
-    public resetPath(): void {
+    public clearPath(): void {
         this.path = undefined;
         this.currentTarget = undefined;
     }

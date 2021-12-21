@@ -85,7 +85,7 @@ export function createGuest(position: Vector): Entity {
     const guest = createActor(position);
 
     guest.addComponent(new PathFollowComponent());
-    guest.addComponent(new NeedsComponent([new Need(NeedType.Energy, 0.0025, 0.5, true)]));
+    guest.addComponent(new NeedsComponent([new Need(NeedType.Energy, 0.005, 0.5, true)]));
     guest.addComponent(new GuestComponent());
     guest.addComponent(new InputToPhysicsComponent());
 
@@ -102,26 +102,35 @@ export function createTileObject(assetPath: string, position: Vector, size = new
     const data = AssetManager.getJSON(assetPath) as TileObjectData;
 
     const tileObject = new Entity(position.floor().add(new Vector(0.5)));
-    const renderer = tileObject.addComponent(
-        new RenderComponent(
-            data.sprite,
-            undefined,
-            new Vector((1 / size.x) * data.pivot.x, (1 / size.y) * data.pivot.y),
-        ),
-    );
+    const renderer = tileObject.addComponent(new RenderComponent());
+
+    if (data.spriteSheet) {
+        const spritesheet = new SpriteSheet({
+            imageUrl: data.spriteSheet,
+            cellHeight: data.cellHeight,
+            cellWidth: data.cellWidth,
+        });
+        renderer.setSpriteSheet(spritesheet, 0);
+    } else {
+        renderer.setSprite(data.sprite);
+    }
+    renderer.pivot = new Vector((1 / size.x) * data.pivot.x, (1 / size.y) * data.pivot.y);
     renderer.scale = data.scale || 1;
     tileObject.addComponent(new ElevationComponent());
     if (data.solid) {
         tileObject.addComponent(new SolidComponent(size));
     }
+
+    let tileObjComponent: TileObjectComponent;
     switch (data.type) {
         case TileObjectType.Consumable:
-            tileObject.addComponent(new ConsumableComponent()).setAsset(assetPath);
+            tileObjComponent = tileObject.addComponent(new ConsumableComponent());
             break;
         default:
-            tileObject.addComponent(new TileObjectComponent()).setAsset(assetPath);
+            tileObjComponent = tileObject.addComponent(new TileObjectComponent());
             break;
     }
+    tileObjComponent.setAsset(assetPath);
     tileObject.addComponent(new InteractableComponent());
     tileObject.addComponent(new DebuggableComponent());
 

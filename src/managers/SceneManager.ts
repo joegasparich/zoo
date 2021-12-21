@@ -3,11 +3,6 @@ import MapGrid from "world/MapGrid";
 
 export default class SceneManager {
     private currentScene: Scene;
-    private mapGrid: MapGrid;
-
-    public constructor(mapGrid: MapGrid) {
-        this.mapGrid = mapGrid;
-    }
 
     public loadScene(scene: Scene, onProgress?: Function): void {
         if (this.currentScene) {
@@ -18,7 +13,7 @@ export default class SceneManager {
         this.currentScene = scene;
 
         console.log("Starting scene:", scene.name);
-        scene.start(this.mapGrid);
+        scene.start();
     }
 
     public getCurrentScene(): Scene {
