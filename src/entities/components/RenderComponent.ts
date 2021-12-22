@@ -76,13 +76,22 @@ export default class RenderComponent extends Component {
         }
     }
 
+    public update(delta: number): void {
+        super.postUpdate(delta);
+
+        if (!this.sprite) return;
+
+        this.sprite.tint = this.colour;
+    }
+
     public postUpdate(delta: number): void {
         super.postUpdate(delta);
 
         if (!this.sprite) return;
 
         this.syncPosition();
-        this.setColour();
+        this.sprite.alpha = this.alpha;
+        this.sprite.visible = this.visible;
 
         this.sprite.zIndex = this.entity.position.y;
     }
@@ -138,10 +147,13 @@ export default class RenderComponent extends Component {
         this.syncPosition();
     }
 
-    protected setColour(): void {
-        this.sprite.tint = this.colour;
-        this.sprite.alpha = this.alpha;
-        this.sprite.visible = this.visible;
+    /**
+     * Must be called in post update
+     */
+    public overrideColourForFrame(colour: number) {
+        if (!this.sprite) return;
+
+        this.sprite.tint = colour;
     }
 
     public setOutline(colour?: number): void {

@@ -52,6 +52,17 @@ export default class Path {
         }
     }
 
+    public update(): void {
+        this.sprite.tint = 0xffffff;
+    }
+
+    /**
+     * Must be called in post update
+     */
+    public overrideColourForFrame(colour: number) {
+        this.sprite.tint = colour;
+    }
+
     public remove(): void {
         Game.removeFromStage(this.sprite, RenderLayers.GROUND);
         this.data = undefined;

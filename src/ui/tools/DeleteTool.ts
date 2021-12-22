@@ -8,6 +8,8 @@ import { WallGridSaveData } from "world/WallGrid";
 import Entity, { EntitySaveData } from "entities/Entity";
 import { PathGridSaveData } from "world/PathGrid";
 
+const UI_COLOUR = 0xff0000;
+
 export default class DeleteTool extends Tool {
     public type = ToolType.Delete;
 
@@ -23,8 +25,8 @@ export default class DeleteTool extends Tool {
             if (Game.input.isInputHeld(Inputs.LeftMouse)) return;
 
             const worldCellPos = pos.floor().multiply(Config.WORLD_SCALE);
-            Graphics.setLineStyle(1, 0xff0000);
-            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE, 0xff0000, 0.5);
+            Graphics.setLineStyle(1, UI_COLOUR);
+            Graphics.drawRect(worldCellPos.x, worldCellPos.y, Config.WORLD_SCALE, Config.WORLD_SCALE);
         };
     }
 
@@ -34,29 +36,29 @@ export default class DeleteTool extends Tool {
         if (Game.input.isInputPressed(Inputs.LeftMouse)) {
             this.startPos = mouseWorldPos;
         }
+
+        // Dragging
         if (Game.input.isInputHeld(Inputs.LeftMouse)) {
             if (this.startPos) {
                 const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
                 const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
-                for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
-                    for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {
-                        Graphics.setLineStyle(1, 0xff0000);
-                        Graphics.drawRect(
-                            i * Config.WORLD_SCALE,
-                            j * Config.WORLD_SCALE,
-                            Config.WORLD_SCALE,
-                            Config.WORLD_SCALE,
-                            0xff0000,
-                            0.5,
-                        );
-                    }
-                }
+                const width = mouseWorldPos.floor().x - this.startPos.floor().x + xSign;
+                const height = mouseWorldPos.floor().y - this.startPos.floor().y + ySign;
+
+                if (height === 0 || width === 0) return;
+                Graphics.setLineStyle(1, UI_COLOUR);
+                Graphics.drawRect(
+                    (this.startPos.floor().x + Math.max(-xSign, 0)) * Config.WORLD_SCALE,
+                    (this.startPos.floor().y + Math.max(-ySign, 0)) * Config.WORLD_SCALE,
+                    width * Config.WORLD_SCALE,
+                    height * Config.WORLD_SCALE,
+                );
             }
         }
+
+        // Do deletion
         if (Game.input.isInputReleased(Inputs.LeftMouse)) {
             if (this.startPos) {
-                const xSign = Math.sign(mouseWorldPos.x - this.startPos.x) || 1; // Ensure never 0 so that we get at least one square
-                const ySign = Math.sign(mouseWorldPos.y - this.startPos.y) || 1;
                 let pos;
 
                 this.toolManager.pushAction({
@@ -77,24 +79,76 @@ export default class DeleteTool extends Tool {
                     },
                 });
 
-                for (let i = this.startPos.floor().x; i !== mouseWorldPos.floor().x + xSign; i += xSign) {
-                    for (let j = this.startPos.floor().y; j !== mouseWorldPos.floor().y + ySign; j += ySign) {
+                for (
+                    let i = Math.min(this.startPos.floor().x, mouseWorldPos.floor().x);
+                    i <= Math.max(this.startPos.floor().x, mouseWorldPos.floor().x);
+                    i++
+                ) {
+                    for (
+                        let j = Math.min(this.startPos.floor().y, mouseWorldPos.floor().y);
+                        j <= Math.max(this.startPos.floor().y, mouseWorldPos.floor().y);
+                        j++
+                    ) {
                         pos = new Vector(i, j);
                         // Delete paths
                         Game.world.pathGrid.deletePathAtPosition(pos);
-                        // Delete walls
-                        for (let side = 0; side < 4; side++) {
-                            Game.world.wallGrid.deleteWallAtTile(pos, side);
-                        }
                         // Delete tile objects
                         Game.world.getTileObjectAtPos(pos)?.remove();
                     }
                 }
+                Game.world.wallGrid
+                    .getWallsInArea(
+                        new Vector(
+                            Math.min(this.startPos.floor().x, mouseWorldPos.floor().x),
+                            Math.min(this.startPos.floor().y, mouseWorldPos.floor().y),
+                        ),
+                        new Vector(
+                            Math.max(this.startPos.floor().x, mouseWorldPos.floor().x) -
+                                Math.min(this.startPos.floor().x, mouseWorldPos.floor().x) +
+                                1,
+                            Math.max(this.startPos.floor().y, mouseWorldPos.floor().y) -
+                                Math.min(this.startPos.floor().y, mouseWorldPos.floor().y) +
+                                1,
+                        ),
+                    )
+                    .forEach(wall => {
+                        Game.world.wallGrid.deleteWall(wall);
+                    });
 
                 this.startPos = undefined;
             }
         }
     }
 
-    public postUpdate(): void {}
+    public postUpdate(): void {
+        const mouseWorldPos = Game.camera.screenToWorldPosition(Game.input.getMousePos());
+
+        if (Game.input.isInputHeld(Inputs.LeftMouse)) {
+            this.highlightObjectsToDelete(this.startPos.floor(), mouseWorldPos.floor());
+        } else {
+            this.highlightObjectsToDelete(mouseWorldPos.floor(), mouseWorldPos.floor());
+        }
+    }
+
+    private highlightObjectsToDelete(start: Vector, end: Vector) {
+        for (let i = Math.min(start.floor().x, end.floor().x); i <= Math.max(start.floor().x, end.floor().x); i++) {
+            for (let j = Math.min(start.floor().y, end.floor().y); j <= Math.max(start.floor().y, end.floor().y); j++) {
+                const pos = new Vector(i, j);
+
+                Game.world.pathGrid.getPathAtTile(pos)?.overrideColourForFrame(UI_COLOUR);
+                Game.world.getTileObjectAtPos(pos)?.getComponent("RENDER_COMPONENT")?.overrideColourForFrame(UI_COLOUR);
+            }
+        }
+        Game.world.wallGrid
+            .getWallsInArea(
+                new Vector(Math.min(start.floor().x, end.floor().x), Math.min(start.floor().y, end.floor().y)),
+                new Vector(
+                    Math.max(start.floor().x, end.floor().x) - Math.min(start.floor().x, end.floor().x) + 1,
+                    Math.max(start.floor().y, end.floor().y) - Math.min(start.floor().y, end.floor().y) + 1,
+                ),
+            )
+            .forEach(wall => {
+                wall.overrideColourForFrame(UI_COLOUR);
+            });
+    }
 }

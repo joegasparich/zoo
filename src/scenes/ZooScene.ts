@@ -31,6 +31,7 @@ export default class ZooScene extends Scene {
     }
 
     public update(delta: number): void {
+        Game.world.update();
         Game.zoo.update();
     }
 

@@ -7,11 +7,13 @@ import { Tool, ToolType } from ".";
 import PlacementGhost from "ui/PlacementGhost";
 import Game from "Game";
 import Vector from "vector";
+import SpriteSheet from "SpriteSheet";
 
 export default class WallTool extends Tool {
     public type = ToolType.Wall;
 
     private assetPath: string;
+    private spriteSheet: SpriteSheet;
     private wallData: WallData;
 
     private dragStart: { pos: Vector; quadrant: Side };
@@ -24,8 +26,8 @@ export default class WallTool extends Tool {
 
         this.assetPath = Assets.WALLS.IRON_BAR;
         this.wallData = AssetManager.getJSON(this.assetPath) as WallData;
-        const spriteSheet = AssetManager.getSpriteSheet(this.wallData.spriteSheet);
-        this.ghost.setSpriteSheet(spriteSheet, WallSpriteIndex.Horizontal);
+        this.spriteSheet = AssetManager.getSpriteSheet(this.wallData.spriteSheet);
+        this.ghost.setSpriteSheet(this.spriteSheet, WallSpriteIndex.Horizontal);
         this.ghost.setPivot(new Vector(0.5, 1));
         this.ghost.setSnap(true);
         this.ghost.canPlaceFunction = this.canPlace.bind(this);
@@ -129,7 +131,7 @@ export default class WallTool extends Tool {
     private updateSprite(ghost: PlacementGhost, offset: Vector, side: Side): void {
         const wall = Game.world.wallGrid.getWallAtTile(ghost.getPosition().floor(), side);
         const [spriteIndex, elevation] = wall?.getSpriteIndex() || [0, 0];
-        ghost.setSpriteSheetIndex(spriteIndex);
+        ghost.setSpriteSheet(this.spriteSheet, spriteIndex);
 
         switch (side) {
             case Side.North:

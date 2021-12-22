@@ -44,6 +44,16 @@ export default class PathGrid {
         this.regeneratePathSprites();
     }
 
+    public update(): void {
+        for (let i = 0; i < this.width; i++) {
+            for (let j = 0; j < this.height; j++) {
+                const path = this.grid?.[i]?.[j];
+                if (!path) continue;
+                path.update();
+            }
+        }
+    }
+
     public regeneratePathSprites(): void {
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {

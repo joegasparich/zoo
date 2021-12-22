@@ -67,6 +67,19 @@ export default class Wall {
         }
     }
 
+    public update(): void {
+        if (!this.exists) return;
+        this.sprite.tint = 0xffffff;
+    }
+
+    /**
+     * Must be called in post update
+     */
+    public overrideColourForFrame(colour: number) {
+        if (!this.exists) return;
+        this.sprite.tint = colour;
+    }
+
     public remove(): void {
         if (this.exists) {
             Game.removeFromStage(this.sprite, RenderLayers.ENTITIES);

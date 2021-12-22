@@ -62,6 +62,15 @@ export default class WallGrid {
         this.regeneratePathfinding();
     }
 
+    public update(): void {
+        for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
+            const orientation = col % 2;
+            for (let row = 0; row < Game.map.rows + orientation; row++) {
+                this.wallGrid[col][row].update();
+            }
+        }
+    }
+
     public reset(): void {
         for (let col = 0; col < Game.map.cols * 2 + 1; col++) {
             const orientation = col % 2;
@@ -424,6 +433,7 @@ export default class WallGrid {
      */
     public getWallsAtTile(tilePos: Vector): Wall[] {
         if (!this.isSetup) return [];
+        if (!Game.map.isPositionInMap(tilePos)) return [];
 
         return [
             this.wallGrid[tilePos.x * 2 + 1][tilePos.y],
@@ -523,6 +533,19 @@ export default class WallGrid {
         return walls;
     }
 
+    public getWallsInArea(pos: Vector, size: Vector): Wall[] {
+        const walls = [];
+
+        for (let i = 0; i < size.x; i++) {
+            for (let j = 0; j < size.y; j++) {
+                if (i < size.x - 1) walls.push(this.getWallAtTile(pos.add(new Vector(i, j)), Side.East));
+                if (j < size.y - 1) walls.push(this.getWallAtTile(pos.add(new Vector(i, j)), Side.South));
+            }
+        }
+
+        return walls.filter(wall => wall.exists);
+    }
+
     public areWallsInArea(pos: Vector, size: Vector): boolean {
         for (let i = 0; i < size.x; i++) {
             for (let j = 0; j < size.y; j++) {
@@ -542,9 +565,9 @@ export default class WallGrid {
                 row.map(wall => {
                     return wall.exists
                         ? {
-                            assetPath: wall.data.assetPath,
-                            isDoor: !!wall.isDoor, // For some reason need to put a !! here for it to save
-                        }
+                              assetPath: wall.data.assetPath,
+                              isDoor: !!wall.isDoor, // For some reason need to put a !! here for it to save
+                          }
                         : undefined;
                 }),
             ),

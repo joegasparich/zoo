@@ -24,7 +24,7 @@ export default class PlacementGhost {
     private follow: boolean;
     private elevation: boolean;
 
-    public changeColour: boolean;
+    public changeColour = true;
     public canPlaceFunction = this.canPlace;
 
     public constructor() {
@@ -45,9 +45,9 @@ export default class PlacementGhost {
     public postUpdate(): void {
         if (this.spriteVisible && this.changeColour) {
             if (this.canPlaceFunction(this.ghost.position)) {
-                this.ghostRenderer.colour = 0x0088dd;
+                this.ghostRenderer.overrideColourForFrame(0x0088dd);
             } else {
-                this.ghostRenderer.colour = 0xff0000;
+                this.ghostRenderer.overrideColourForFrame(0xff0000);
             }
         }
 

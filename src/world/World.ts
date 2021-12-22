@@ -106,9 +106,13 @@ export default class World {
         this.exhibits = new Map();
     }
 
+    public update(): void {
+        this.pathGrid.update();
+        this.wallGrid.update();
+    }
+
     public postUpdate(delta: number): void {
         this.biomeGrid.postUpdate();
-        // this.pathGrid.postUpdate();
 
         this.exhibits.forEach(exhibit => {
             exhibit.postUpdate();
