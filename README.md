@@ -1,6 +1,7 @@
-# Game Framework
+# Zoo Game
 
-Intended to be a base framework to start building a game from.
+Was intended to be somewhat of a clone of Zoo Tycoon
+Ended up scratching it and starting again in C++
 
 ## Set Up
 
